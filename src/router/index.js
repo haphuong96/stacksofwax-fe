@@ -1,27 +1,49 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import LoginForm from '../pages/LoginForm.vue'
-import SignupForm from '../pages/SignupForm.vue'
-import Home from '../pages/Home.vue'
-
+import { createRouter, createWebHistory } from "vue-router";
+import LoginPage from "../pages/LoginPage.vue";
+import SignupPage from "../pages/SignupPage.vue";
+import HomePage from "../pages/HomePage.vue";
+import { routeNames } from "./route-names";
+import { screenLayout } from "./screen-layouts";
+import { checkAuthGuard, requireLoginGuard } from "./guards/check-auth.guard";
+//note: need to add meta:layout and guard (optional)
 const router = createRouter({
-    history: createWebHistory(import.meta.env.BASE_URL),
-    routes: [
-        {
-            path: '/',
-            name: 'homepage',
-            component: Home
-        },
-        {
-            path: '/login',
-            name: 'login',
-            component: LoginForm
-        },
-        {
-            path: '/signup',
-            name: 'signup',
-            component: SignupForm
-        }
-    ]
-})
+  history: createWebHistory(import.meta.env.BASE_URL),
+  routes: [
+    {
+      path: "/",
+      name: routeNames.DEFAULT,
+      redirect: {
+        name: routeNames.LOGIN
+      }
+    },
+    {
+      path: "/login",
+      name: routeNames.LOGIN,
+      component: LoginPage,
+      meta: {
+        layout: screenLayout.AUTH_LAYOUT
+      },
+      beforeEnter: checkAuthGuard
+    },
+    {
+      path: "/signup",
+      name: routeNames.SIGNUP,
+      component: SignupPage,
+      meta: {
+        layout: screenLayout.AUTH_LAYOUT
+      },
+      beforeEnter: checkAuthGuard
+    },
+    {
+      path: "/home",
+      name: routeNames.HOME,
+      component: HomePage,
+      meta: {
+        layout: screenLayout.DEFAULT_LAYOUT
+      },
+      beforeEnter: requireLoginGuard
+    }
+  ]
+});
 
-export default router
+export default router;
