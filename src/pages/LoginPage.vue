@@ -1,16 +1,23 @@
 <script setup>
-import { ref } from "vue";
 import axios from "axios";
+import { computed, ref } from "vue";
+import { localStorageKeys } from "../common/local-storage-keys";
 import router from "../router";
 import { routeNames } from "../router/route-names";
-import { localStorageKeys } from "../common/local-storage-keys";
+import { message } from "ant-design-vue";
 
 // reactive state
 const username = ref();
 const password = ref();
+const isLoading = ref(false);
+
+const isValid = computed(() => {
+  return !!username.value && !!password.value;
+});
 
 async function submitLogin() {
   try {
+    isLoading.value = true;
     const res = await axios.post("http://localhost:4000/api/login", {
       username: username.value,
       password: password.value
@@ -19,26 +26,54 @@ async function submitLogin() {
     if (accessToken) {
       localStorage.setItem(localStorageKeys.ACCESS_TOKEN, "accessToken");
       router.push({ name: routeNames.HOME });
-      //router.push({name: ...}) to nagivate to a page
+      message.error("Login successfully!");
     } else {
-      alert("fail");
+      message.error("Something went wrong! please check and try again later!");
     }
   } catch (error) {
-    alert("fail");
+    message.error("Something went wrong! please check and try again later!");
+  } finally {
+    isLoading.value = false;
   }
+}
+
+function goToSignUp() {
+  router.push({ name: routeNames.SIGNUP });
 }
 </script>
 
 <template>
-  <div>Login</div>
-  <div>
-    Username: <input placeholder="username or email" v-model="username" />
-    <br />
-    Password: <input placeholder="password" v-model="password" />
-  </div>
-  <div>
-    <button @click="submitLogin">Login</button>
-  </div>
+  <div class="page-title mt-80 mb-32">Login</div>
+  <a-form
+    name="basic"
+    :label-col="{ span: 8 }"
+    :wrapper-col="{ span: 8 }"
+    autocomplete="off"
+  >
+    <a-form-item label="Username or email *" name="username">
+      <a-input v-model:value="username" />
+    </a-form-item>
+
+    <a-form-item label="Password *" name="password">
+      <a-input-password v-model:value="password" />
+    </a-form-item>
+
+    <a-form-item :wrapper-col="{ offset: 8, span: 8 }">
+      <a-button
+        type="primary"
+        shape="round"
+        size="large"
+        block
+        @click="submitLogin"
+        :loading="isLoading"
+        :disabled="!isValid"
+        >Login</a-button
+      >
+      <a-button type="link" block @click="goToSignUp"
+        >You don't have account? Go to singup.</a-button
+      >
+    </a-form-item>
+  </a-form>
 </template>
 
 <style scoped></style>

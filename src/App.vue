@@ -1,6 +1,6 @@
 <script setup>
-import { RouterView, useRoute } from "vue-router";
 import { computed } from "vue";
+import { RouterView, useRoute } from "vue-router";
 const $route = useRoute();
 
 const layout = computed(() => $route.meta.layout || undefined);
@@ -22,5 +22,13 @@ const layout = computed(() => $route.meta.layout || undefined);
   height: 100%;
   margin: 0;
   padding: 0;
+}
+
+.alert-modal {
+  width: 400px;
+  position: absolute;
+  bottom: 32px;
+  left: 50%;
+  transform: translate(-50%, 0);
 }
 </style>

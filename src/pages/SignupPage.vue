@@ -1,46 +1,104 @@
 <script setup>
-import { ref } from 'vue'
-import axios from 'axios';
+import { computed, ref } from "vue";
+import axios from "axios";
+import { message } from "ant-design-vue";
+import router from "../router";
+import { routeNames } from "../router/route-names";
+import { colProps } from "ant-design-vue/lib/grid/Col";
 
 // reactive state
-const username = ref()
-const email = ref()
-const password = ref()
-const confirmPassword = ref()
-let errMismatchPw = ref();
+const username = ref();
+const email = ref();
+const password = ref();
+const confirmPassword = ref();
+const isLoading = ref(false);
+
+const isInvalidConfirmPassword = computed(() => {
+  return (
+    password.value &&
+    confirmPassword.value &&
+    password.value !== confirmPassword.value
+  );
+});
+
+const isValid = computed(() => {
+  return (
+    !isInvalidConfirmPassword.value &&
+    password.value &&
+    confirmPassword.value &&
+    email.value &&
+    username.value
+  );
+});
 
 async function submitSignup() {
-    if (password !== confirmPassword) {
-        errMismatchPw = "Mismatch password and confirmation password. Please try again."
-    }
-    const res = await axios.post('http://localhost:4000/api/signup', {
-        username: username.value,
-        email_address: email.value,
-        password: password.value
+  try {
+    const res = await axios.post("http://localhost:4000/api/signup", {
+      username: username.value,
+      email_address: email.value,
+      password: password.value
     });
+    if (res) {
+      message.success("Signup successfully! You can login now.");
+      router.push({ name: routeNames.LOGIN });
+    } else {
+      message.error("Something went wrong! please check and try again later!");
+    }
+  } catch (error) {
+    message.error("Something went wrong! please check and try again later!");
+  } finally {
+    isLoading.value = false;
+  }
+}
 
-    console.log(res);
-
-    // const newUser
+function goToLogin() {
+  router.push({ name: routeNames.LOGIN });
 }
 </script>
 
 <template>
-    <h2>Sign Up</h2>
-    <div>
-        *Username: <input placeholder="username" v-model="username">
-        <br>
-        *Email: <input placeholder="email address" v-model="email">
-        <br>
-        *Password: <input placeholder="password" v-model="password">
-        <br>
-        *Re-type password: <input placeholder="confirm password" v-model="confirmPassword">
-        <br>
-        {{ errMismatchPw }}
-    </div>
-    <div>
-        <button @click="submitSignup">Sign up</button>
-    </div>
+  <div class="page-title mt-80 mb-32">Sign Up</div>
+  <a-form
+    name="basic"
+    :label-col="{ span: 8 }"
+    :wrapper-col="{ span: 8 }"
+    autocomplete="off"
+  >
+    <a-form-item label="Username *" name="username">
+      <a-input v-model:value="username" />
+    </a-form-item>
+
+    <a-form-item label="Email *" name="email">
+      <a-input v-model:value="email" />
+    </a-form-item>
+
+    <a-form-item label="Password *" name="password">
+      <a-input-password v-model:value="password" />
+    </a-form-item>
+
+    <a-form-item label="Confirm Password *" name="password">
+      <a-input-password v-model:value="confirmPassword" />
+      <div v-if="isInvalidConfirmPassword" class="error-label mt-8">
+        Mismatch password and confirmation password. Please try again.
+      </div>
+    </a-form-item>
+
+    <a-form-item :wrapper-col="{ offset: 8, span: 8 }">
+      <a-button
+        type="primary"
+        shape="round"
+        size="large"
+        block
+        @click="submitSignup"
+        :loading="isLoading"
+        :disabled="!isValid"
+        >Signup</a-button
+      >
+      <a-button type="link" block @click="goToLogin"
+        >Already have an account? Go to login.</a-button
+      >
+    </a-form-item>
+  </a-form>
 </template>
 
 <style scoped></style>
