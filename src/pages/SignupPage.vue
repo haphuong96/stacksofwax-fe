@@ -1,10 +1,9 @@
 <script setup>
-import { computed, ref } from "vue";
-import axios from "axios";
 import { message } from "ant-design-vue";
+import axios from "axios";
+import { computed, ref } from "vue";
 import router from "../router";
 import { routeNames } from "../router/route-names";
-import { colProps } from "ant-design-vue/lib/grid/Col";
 
 // reactive state
 const username = ref();

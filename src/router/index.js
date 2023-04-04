@@ -1,10 +1,13 @@
 import { createRouter, createWebHistory } from "vue-router";
+import ArtistsPage from "../pages/ArtistsPage.vue";
+import CollectionsPage from "../pages/CollectionsPage.vue";
+import HomePage from "../pages/HomePage.vue";
 import LoginPage from "../pages/LoginPage.vue";
 import SignupPage from "../pages/SignupPage.vue";
-import HomePage from "../pages/HomePage.vue";
+import VinylsPage from "../pages/VinylsPage.vue";
+import { checkAuthGuard } from "./guards/check-auth.guard";
 import { routeNames } from "./route-names";
 import { screenLayout } from "./screen-layouts";
-import { checkAuthGuard, requireLoginGuard } from "./guards/check-auth.guard";
 //note: need to add meta:layout and guard (optional)
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -40,8 +43,35 @@ const router = createRouter({
       component: HomePage,
       meta: {
         layout: screenLayout.DEFAULT_LAYOUT
-      },
-      beforeEnter: requireLoginGuard
+      }
+      // beforeEnter: requireLoginGuard
+    },
+    {
+      path: "/vinyls",
+      name: routeNames.VINYL,
+      component: VinylsPage,
+      meta: {
+        layout: screenLayout.DEFAULT_LAYOUT
+      }
+      // beforeEnter: requireLoginGuard
+    },
+    {
+      path: "/artists",
+      name: routeNames.ARTIST,
+      component: ArtistsPage,
+      meta: {
+        layout: screenLayout.DEFAULT_LAYOUT
+      }
+      // beforeEnter: requireLoginGuard
+    },
+    {
+      path: "/collections",
+      name: routeNames.COLLECTION,
+      component: CollectionsPage,
+      meta: {
+        layout: screenLayout.DEFAULT_LAYOUT
+      }
+      // beforeEnter: requireLoginGuard
     }
   ]
 });

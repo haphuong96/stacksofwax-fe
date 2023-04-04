@@ -3,7 +3,7 @@
 </script>
 
 <template>
-  <div>This is Home Page</div>
+  <div>This is Vinyls Page</div>
 </template>
 
 <style scoped></style>

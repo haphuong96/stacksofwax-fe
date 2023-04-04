@@ -2,6 +2,8 @@
 //#region import
 //#endregion
 
+import NavHeader from '../components/NavHeader.vue';
+
 //#region props
 //#endregion
 
@@ -14,6 +16,7 @@
 </script>
 <template>
   <div class="default-layout">
+    <nav-header></nav-header>
     <router-view />
   </div>
 </template>
@@ -22,6 +25,6 @@
 .default-layout {
   width: 100%;
   height: 100%;
-  background-color: green;
+  background-color: white;
 }
 </style>
