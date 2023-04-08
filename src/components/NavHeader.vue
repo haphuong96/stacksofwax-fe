@@ -37,16 +37,27 @@
   </div>
 </template>
 <script setup>
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import router from "../router";
 import { routeNames } from "../router/route-names";
 const activeKey = ref(routeNames.HOME);
+
+computed(() => {
+  activeKey.value = router.currentRoute.value.name;
+});
 
 function onTabChanged() {
   router.push({ name: activeKey.value });
 }
 function goTo(routeName) {
   router.push({ name: routeName });
+}
+
+watch: {
+  router.currentRoute.value.name,
+    () => {
+      activeKey.value = router.currentRoute.value.name;
+    };
 }
 </script>
 <style scoped>

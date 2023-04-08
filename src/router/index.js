@@ -16,7 +16,7 @@ const router = createRouter({
       path: "/",
       name: routeNames.DEFAULT,
       redirect: {
-        name: routeNames.LOGIN
+        name: routeNames.HOME
       }
     },
     {
