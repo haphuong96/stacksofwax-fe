@@ -4,7 +4,7 @@ import CollectionsPage from "../pages/CollectionsPage.vue";
 import HomePage from "../pages/HomePage.vue";
 import LoginPage from "../pages/LoginPage.vue";
 import SignupPage from "../pages/SignupPage.vue";
-import VinylsPage from "../pages/VinylsPage.vue";
+import AlbumsPage from "../pages/AlbumsPage.vue";
 import { checkAuthGuard } from "./guards/check-auth.guard";
 import { routeNames } from "./route-names";
 import { screenLayout } from "./screen-layouts";
@@ -47,9 +47,9 @@ const router = createRouter({
       // beforeEnter: requireLoginGuard
     },
     {
-      path: "/vinyls",
-      name: routeNames.VINYL,
-      component: VinylsPage,
+      path: "/albums",
+      name: routeNames.ALBUM,
+      component: AlbumsPage,
       meta: {
         layout: screenLayout.DEFAULT_LAYOUT
       }

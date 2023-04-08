@@ -3,7 +3,7 @@ export const routeNames = {
   LOGIN: "LOGIN",
   SIGNUP: "SIGNUP",
   HOME: "HOME",
-  VINYL: "VINYL",
+  ALBUM: "ALBUM",
   ARTIST: "ARTIST",
   COLLECTION: "COLLECTION"
 };

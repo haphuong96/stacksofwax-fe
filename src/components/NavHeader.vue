@@ -12,7 +12,7 @@
       @change="onTabChanged"
     >
       <a-tab-pane :key="routeNames.HOME" tab="Home"></a-tab-pane>
-      <a-tab-pane :key="routeNames.VINYL" tab="Vynils"></a-tab-pane>
+      <a-tab-pane :key="routeNames.ALBUM" tab="Albums"></a-tab-pane>
       <a-tab-pane :key="routeNames.ARTIST" tab="Artists"></a-tab-pane>
       <a-tab-pane :key="routeNames.COLLECTION" tab="Collections"></a-tab-pane>
     </a-tabs>

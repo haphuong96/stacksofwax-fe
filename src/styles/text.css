@@ -4,6 +4,12 @@
     color: var(--primary-color);
 }
 
+.default-page-title {
+    font-size: var(--page-title-text-size);
+    color: black;
+    text-align: left;
+}
+
 .error-label {
     color: red;
     font-size: 14px;
