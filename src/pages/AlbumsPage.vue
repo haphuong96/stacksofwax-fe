@@ -3,28 +3,39 @@ import axios from "axios";
 import { message } from "ant-design-vue";
 import { computed, ref } from "vue";
 
-// const handleChange = value => {
-//       console.log(`selected ${value}`);
-//     };
-//     return {
-//       handleChange,
-//       value: ref(['a1', 'b2']),
-//     };
 
 // album list
 const data = ref();
+//total number of returned data
 const total = ref(0);
+// current page
+const current = ref(1);
+// list of genre filter
+const genres = await getGenreList();
+// list of decades filter
+const decades = ref();
+// selected value of decade filter
+const decadeValue = ref();
+// selected values of genre filter
+const genreValue = ref();
 
-async function fetchAlbums() {
+async function fetchAlbums(page, pageSize) {
   try {
+    const limit = pageSize;
+    const offset = (page - 1) * pageSize;
+
     const res = await axios.get('http://localhost:4000/api/albums', {
+
       params: {
-        limit: 10,
-        offset: 0
+        limit,
+        offset
       }
     });
-    data.value = res.data;
-    // console.log(data.value)
+    data.value = res.data.albums;
+    total.value = res.data.total;
+    decades.value = res.data.decades.map((item) => ({ value: item.decade, label: item.decade}));
+
+    console.log(decades.value)
   } catch (Error) {
     message.error("Error retrieving list of albums")
   }
@@ -34,24 +45,24 @@ async function fetchAlbums() {
 async function getGenreList() {
   try {
     const res = await axios.get('http://localhost:4000/api/genres')
-    const genres = res.data.map((genre) => ({ value: genre.genre_name }));
-    // const genreList = genres;
-    // console.log(genres);
+    const genres = res.data.map((genre) => ({ value: genre.genre_name, id: genre.id }));
     return genres;
-    // return genres.value.map((genre) => ({ value: genre.genre_name}))
   } catch (Error) {
     message.error("Error retrieving list of genres.")
   }
 }
 
+async function filterByGenre(value, selectedVals) {
+
+  const res = await axios.post('http://localhost:4000/api/albums', {
+    params: selectedVals
+  })
+}
+
 // fetch data
-fetchAlbums();
-const genres = await getGenreList();
+fetchAlbums(1, 10);
 
-// console.log(genres);
-// const genreFilterList = genres.map((genre) => ({ value: genre.genre_name}));
 
-[...Array(25)].map((_, i) => ({ value: (i + 10).toString(36) + (i + 1) }))
 
 </script>
 
@@ -61,11 +72,21 @@ const genres = await getGenreList();
       <div>
         <h2>Genre</h2>
         <a-select v-model:value="value" mode="multiple" style="width: 100%" placeholder="Please select" :options="genres"
-          @change="handleChange"></a-select>
+          @change="filterByGenre"></a-select>
       </div>
       <div>
         <h2>Decade</h2>
-        <div>List of decades to select</div>
+        <a-select
+          v-model:value="decadeValue"
+          show-search
+          placeholder="Select a decade"
+          style="width: 100%"
+          :options="decades"
+          :filter-option="filterOption"
+          @focus="handleFocus"
+          @blur="handleBlur"
+          @change="filterByDecade"
+        ></a-select>
       </div>
     </a-col>
 
@@ -81,7 +102,7 @@ const genres = await getGenreList();
         </a-list>
 
         <a-pagination v-model:current="current" :total="total" show-less-items
-          @change="(limit, offset) => fetchData(limit, offset)" />
+          @change="(page, pageSize) => fetchAlbums(page, pageSize)" />
       </div>
 
     </a-col>
