@@ -22,3 +22,13 @@
 .ml-32 {
     margin-left: 32px;
 }
+
+/* margin */
+.m-16 {
+    margin: 16px;
+}
+
+/* padding */
+.p-16 {
+    padding: 16px;
+}
