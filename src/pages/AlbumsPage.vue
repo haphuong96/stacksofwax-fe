@@ -4,6 +4,7 @@ import { message } from "ant-design-vue";
 import { computed, ref } from "vue";
 import router from "../router";
 import { routeNames } from "../router/route-names";
+import { Item } from "ant-design-vue/lib/menu";
 
 /**
  * Album data fetch from fetchAlbums function
@@ -28,7 +29,7 @@ const genreFilterVals = ref([]);
 async function fetchAlbums(page, pageSize) {
   try {
     const limit = pageSize || defaultPageSize;
-    const offset = (page - 1) * pageSize || defaultPage;
+    const offset = (page - 1) * pageSize || 0;
 
     console.log(decadeFilterVal.value);
     const filterParams = new URLSearchParams();
@@ -96,14 +97,15 @@ async function filterByDecade(filterVal) {
     });
 }
 
+function goToAlbumDetailPage(albumId) {
+  console.log('item: '+albumId);
+  router.push( {name: routeNames.ALBUM_DETAILS, params: {id: albumId}});
+}
+
 // fetch data
 fetchAlbums(defaultPage, defaultPageSize);
 
 
-function goToAlbumDetailPage(item) {
-  console.log('item: '+item)
-  router.push( {name: routeNames.ALBUM_DETAILS, params: {album: item.album_title.join('-'), albumId: item.album_id}});
-}
 </script>
 
 <template>
@@ -128,7 +130,7 @@ function goToAlbumDetailPage(item) {
         <a-list item-layout="horizontal" :data-source="data">
           <template #renderItem="{ item }">
             <a-list-item>
-              <a-button type="link" @click="(event) => goToAlbumDetailPage({ item })">{{ item.album_title }}</a-button>
+              <a-button type="link" @click="(event) => goToAlbumDetailPage(item.album_id)">{{ item.album_title }}</a-button>
             </a-list-item>
           </template>
         </a-list>

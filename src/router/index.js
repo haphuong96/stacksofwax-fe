@@ -57,7 +57,7 @@ const router = createRouter({
       // beforeEnter: requireLoginGuard
     },
     {
-      path: "/albums/:album",
+      path: "/albums/:id",
       name: routeNames.ALBUM_DETAILS, 
       component: AlbumDetailPage,
       meta: {
