@@ -5,6 +5,7 @@ import HomePage from "../pages/HomePage.vue";
 import LoginPage from "../pages/LoginPage.vue";
 import SignupPage from "../pages/SignupPage.vue";
 import AlbumsPage from "../pages/AlbumsPage.vue";
+import AlbumDetailPage from "../pages/AlbumDetailPage.vue";
 import { checkAuthGuard } from "./guards/check-auth.guard";
 import { routeNames } from "./route-names";
 import { screenLayout } from "./screen-layouts";
@@ -54,6 +55,14 @@ const router = createRouter({
         layout: screenLayout.DEFAULT_LAYOUT
       }
       // beforeEnter: requireLoginGuard
+    },
+    {
+      path: "/albums/:album",
+      name: routeNames.ALBUM_DETAILS, 
+      component: AlbumDetailPage,
+      meta: {
+        layout: screenLayout.DEFAULT_LAYOUT
+      }
     },
     {
       path: "/artists",

@@ -4,6 +4,7 @@ export const routeNames = {
   SIGNUP: "SIGNUP",
   HOME: "HOME",
   ALBUM: "ALBUM",
+  ALBUM_DETAILS: "ALBUM DETAILS",
   ARTIST: "ARTIST",
   COLLECTION: "COLLECTION"
 };
