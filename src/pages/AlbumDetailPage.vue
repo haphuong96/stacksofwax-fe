@@ -25,7 +25,7 @@ fetchAlbumDetail();
 
 <template>
   <a-spin tip="Loading..." :spinning="isLoading" class="m-16 p-16">
-    <a-row>
+    <a-row v-if="albumDetails">
       <a-col :span="4">
         <a-image
           src="https://static-cse.canva.com/blob/1035320/1600w-fxYFTKLArdY.jpg"
@@ -53,7 +53,7 @@ fetchAlbumDetail();
       </a-col>
       <a-col :span="4"> Rating layout </a-col>
     </a-row>
-    <a-row>
+    <a-row v-if="albumDetails">
       <a-col :span="4"></a-col>
       <a-col :span="20">Col 24</a-col>
     </a-row>
