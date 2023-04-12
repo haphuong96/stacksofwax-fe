@@ -15,21 +15,16 @@ const artistsName = ref();
 const isLoading = ref(false);
 const dataFetchComplete = ref(false);
 
+// Interact vars
+const userRating = ref(0);
+
 async function fetchAlbumDetail() {
   isLoading.value = true;
   try {
     const res = await axios.get(`http://localhost:4000/api/albums/${albumId}`);
     albumDetailTitle.value.albumTitle = res.data.album_title;
-    albumDetailTitle.value.albumArtist = [{
-      "artist_id": 1,
-      "artist_name": "Pink Floyd"
-    },
-    {
-      "artist_id": 2,
-      "artist_name": "BlackPink"
-    }
-    ];
-    // res.data.artists;
+    albumDetailTitle.value.albumArtist = res.data.artists;
+
     if (res.data.genres) {
       albumGeneralInfo.value.genres = res.data.genres;
     }
@@ -49,9 +44,9 @@ async function fetchAlbumDetail() {
     albumTracks.value = res.data.tracks;
     comments.value = res.data.comments;
 
-    albumStats.value.set("Average Rating", res.data.average_rating);
-    albumStats.value.set("Number of Ratings", res.data.total_ratings);
-    albumStats.value.set("Total in Collections", res.data.total_collected);
+    albumStats.value.set("AVG Rating:", res.data.average_rating || 0 + " / 5");
+    albumStats.value.set("Total ratings:", res.data.total_ratings || 0);
+    albumStats.value.set("Collections:", res.data.total_collected || 0);
 
     dataFetchComplete.value = true;
 
@@ -86,34 +81,33 @@ fetchAlbumDetail();
               <span>{{ albumDetailTitle.albumTitle }}</span>
             </h1>
 
-            <!-- <a-row v-for="(item, index) in albumGeneralInfo.keys()" :key="index">
-                    <a-col> {{ item }}: </a-col>
-                    <a-col> {{ albumGeneralInfo.get(item) }} </a-col>
-                  </a-row> -->
-
-            <div class="album-description-container">
-              <span class="album-description-label">Record Labels:</span>
-              <span class="album-description-value" v-for="(item, index) in albumGeneralInfo.recordLabels" :key="index">
-                {{ (index > 0) ? ", " : "" }}
-                {{ item.company_name }}
-              </span>
-            </div>
-
-            <div class="album-description-container">
-              <span class="album-description-label">Genre:</span>
-              <span class="album-description-value" v-for="(item, index) in albumGeneralInfo.genres" :key="index">
-                {{ (index > 0) ? ", " : "" }}
-                {{ item.genre_name }}
-              </span>
-            </div>
-            <div class="album-description-container">
-              <span class="album-description-label">Release Year:</span>
-              <span class="album-description-value">{{ albumGeneralInfo.release_year }}</span>
-            </div>
-            <div class="album-description-container">
-              <span class="album-description-label">Country:</span>
-              <span class="album-description-value"> {{ albumGeneralInfo.country }}</span>
-            </div>
+            
+            <a-descriptions :column="1"
+              :labelStyle="{'background-color': 'white', 'padding': '0px 0px', 'width': '20%' }"
+              :contentStyle="{ 'padding': '0px 0px' }">
+              <a-descriptions-item label="Record Label" :style="{ 'padding-bottom': '0px'}"> 
+                <span v-for="(item, index) in albumGeneralInfo.recordLabels" :key="index">
+                  {{ (index > 0) ? ", " : "" }}
+                  {{ item.company_name }}
+                </span>
+              </a-descriptions-item>
+              <a-descriptions-item label="Genre" :style="{ 'padding-bottom': '0px'}">
+                <span v-for="(item, index) in albumGeneralInfo.genres" :key="index">
+                  {{ (index > 0) ? ", " : "" }}
+                  {{ item.genre_name }}
+                </span>
+              </a-descriptions-item>
+              <a-descriptions-item label="Release Year" :style="{ 'padding-bottom': '0px'}">
+                <span>
+                  {{ albumGeneralInfo.release_year }}
+                </span>
+              </a-descriptions-item>
+              <a-descriptions-item label="Country" :style="{ 'padding-bottom': '0px'}">
+                <span>
+                  {{ albumGeneralInfo.country }}
+                </span>
+              </a-descriptions-item>
+            </a-descriptions>
           </a-col>
         </a-row>
         <a-row class="d-flex v-flex">
@@ -152,7 +146,25 @@ fetchAlbumDetail();
           </a-comment>
         </a-row>
       </a-col>
-      <a-col :span="8"> Rating layout </a-col>
+      <a-col :span="8">
+        <a-divider orientation="left" orientation-margin="0px">
+          Rate This Album
+        </a-divider>
+        <a-rate v-model:value="userRating" />
+        <a-divider orientation="left" orientation-margin="0px">
+          Statistics
+        </a-divider>
+        <a-descriptions :column="2">
+          <!-- "{ xxl: 4, xl: 3, lg: 3, md: 3, sm: 2, xs: 1 }" -->
+          <a-descriptions-item v-for="(item, index) in albumStats.keys()" :key="index" :label="item">
+            {{ albumStats.get(item) }}
+          </a-descriptions-item>
+        </a-descriptions>
+        <a-divider orientation="left" orientation-margin="0px">
+          Collections
+          <a-button type="link">Add to collection</a-button>
+        </a-divider>
+      </a-col>
     </a-row>
   </a-spin>
 </template>
@@ -179,7 +191,8 @@ fetchAlbumDetail();
 }
 
 .album-description-label {
-  width: 120px;
+  margin-right: 20px;
+  width: 100px;
   font-size: 14px;
   font-weight: 500;
 }
@@ -192,5 +205,9 @@ fetchAlbumDetail();
 
 .v-flex {
   flex-direction: column;
+}
+
+.desc-label {
+  color: red;
 }
 </style>
