@@ -1,11 +1,10 @@
 import { createRouter, createWebHistory } from "vue-router";
-import ArtistsPage from "../pages/ArtistsPage.vue";
+import AlbumDetailPage from "../pages/AlbumDetailPage.vue";
 import CollectionsPage from "../pages/CollectionsPage.vue";
+import ExplorePage from "../pages/ExplorePage.vue";
 import HomePage from "../pages/HomePage.vue";
 import LoginPage from "../pages/LoginPage.vue";
 import SignupPage from "../pages/SignupPage.vue";
-import AlbumsPage from "../pages/AlbumsPage.vue";
-import AlbumDetailPage from "../pages/AlbumDetailPage.vue";
 import { checkAuthGuard } from "./guards/check-auth.guard";
 import { routeNames } from "./route-names";
 import { screenLayout } from "./screen-layouts";
@@ -48,31 +47,40 @@ const router = createRouter({
       // beforeEnter: requireLoginGuard
     },
     {
-      path: "/albums",
-      name: routeNames.ALBUM,
-      component: AlbumsPage,
+      path: "/explore",
+      name: routeNames.EXPLORE,
+      component: ExplorePage,
       meta: {
         layout: screenLayout.DEFAULT_LAYOUT
       }
       // beforeEnter: requireLoginGuard
     },
+    // {
+    //   path: "/albums",
+    //   name: routeNames.ALBUM,
+    //   component: AlbumsPage,
+    //   meta: {
+    //     layout: screenLayout.DEFAULT_LAYOUT
+    //   }
+    //   // beforeEnter: requireLoginGuard
+    // },
     {
       path: "/albums/:id",
-      name: routeNames.ALBUM_DETAILS, 
+      name: routeNames.ALBUM_DETAILS,
       component: AlbumDetailPage,
       meta: {
         layout: screenLayout.DEFAULT_LAYOUT
       }
     },
-    {
-      path: "/artists",
-      name: routeNames.ARTIST,
-      component: ArtistsPage,
-      meta: {
-        layout: screenLayout.DEFAULT_LAYOUT
-      }
-      // beforeEnter: requireLoginGuard
-    },
+    // {
+    //   path: "/artists",
+    //   name: routeNames.ARTIST,
+    //   component: ArtistsPage,
+    //   meta: {
+    //     layout: screenLayout.DEFAULT_LAYOUT
+    //   }
+    //   // beforeEnter: requireLoginGuard
+    // },
     {
       path: "/collections",
       name: routeNames.COLLECTION,

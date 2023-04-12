@@ -12,8 +12,7 @@
       @change="onTabChanged"
     >
       <a-tab-pane :key="routeNames.HOME" tab="Home"></a-tab-pane>
-      <a-tab-pane :key="routeNames.ALBUM" tab="Albums"></a-tab-pane>
-      <a-tab-pane :key="routeNames.ARTIST" tab="Artists"></a-tab-pane>
+      <a-tab-pane :key="routeNames.EXPLORE" tab="Explore"></a-tab-pane>
       <a-tab-pane :key="routeNames.COLLECTION" tab="Collections"></a-tab-pane>
     </a-tabs>
     <div>
@@ -42,9 +41,7 @@ import router from "../router";
 import { routeNames } from "../router/route-names";
 const activeKey = ref(routeNames.HOME);
 
-computed(() => {
-  activeKey.value = router.currentRoute.value.name;
-});
+activeKey.value = router.currentRoute.value.name;
 
 function onTabChanged() {
   router.push({ name: activeKey.value });
