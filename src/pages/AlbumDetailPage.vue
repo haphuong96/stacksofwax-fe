@@ -203,10 +203,6 @@ fetchAlbumDetail();
   font-weight: 700;
 }
 
-.v-flex {
-  flex-direction: column;
-}
-
 .desc-label {
   color: red;
 }

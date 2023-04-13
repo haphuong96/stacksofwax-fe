@@ -1,37 +1,45 @@
 <template>
   <div class="nav-header-container d-flex justify-between">
-    <img
-      class="nav-logo ml-32"
-      src="@/assets/img_music.png"
-      @click="goTo(routeNames.HOME)"
-    />
-    <a-tabs
-      v-model:activeKey="activeKey"
-      size="large"
-      :tabBarGutter="48"
-      @change="onTabChanged"
-    >
+    <img class="nav-logo ml-32" src="@/assets/img_music.png" @click="goTo(routeNames.HOME)" />
+    <a-tabs v-model:activeKey="activeKey" size="large" :tabBarGutter="48" @change="onTabChanged">
       <a-tab-pane :key="routeNames.HOME" tab="Home"></a-tab-pane>
       <a-tab-pane :key="routeNames.EXPLORE" tab="Explore"></a-tab-pane>
       <a-tab-pane :key="routeNames.COLLECTION" tab="Collections"></a-tab-pane>
     </a-tabs>
-    <div>
-      <a-button
-        type="link"
-        shape="round"
-        size="large"
-        @click="goTo(routeNames.SIGNUP)"
-      >
+    <div v-if="!accessToken">
+      <a-button type="link" shape="round" size="large" @click="goTo(routeNames.SIGNUP)">
         SignUp
       </a-button>
-      <a-button
-        type="link"
-        shape="round"
-        size="large"
-        @click="goTo(routeNames.LOGIN)"
-      >
+      <a-button type="link" shape="round" size="large" @click="goTo(routeNames.LOGIN)">
         Login
       </a-button>
+    </div>
+    <div v-else class="d-flex h-flex">
+      <a-button type="link" @click="() => goTo(routeNames.MY_COLLECTION)">My Collections</a-button>
+      <div class="demo-dropdown-wrap">
+        <a-dropdown-button>
+          {{username}}
+          <template #overlay>
+            <a-menu @click="handleMenuClick">
+              <a-menu-item key="1">
+                <UserOutlined />
+                1st menu item
+              </a-menu-item>
+              <a-menu-item key="2">
+                <UserOutlined />
+                2nd menu item
+              </a-menu-item>
+              <a-menu-item key="3">
+                <UserOutlined />
+                3rd item
+              </a-menu-item>
+            </a-menu>
+          </template>
+          <template #icon>
+            <UserOutlined />
+          </template>
+        </a-dropdown-button>
+      </div>
     </div>
   </div>
 </template>
@@ -39,9 +47,14 @@
 import { computed, ref } from "vue";
 import router from "../router";
 import { routeNames } from "../router/route-names";
-const activeKey = ref(routeNames.HOME);
+import { localStorageKeys } from "../common/local-storage-keys";
+import { UserOutlined, DownOutlined } from '@ant-design/icons-vue';
 
+const activeKey = ref(routeNames.HOME);
 activeKey.value = router.currentRoute.value.name;
+
+const accessToken = ref(localStorage.getItem(localStorageKeys.ACCESS_TOKEN));
+const username = ref(localStorage.getItem(localStorageKeys.USERNAME));
 
 function onTabChanged() {
   router.push({ name: activeKey.value });
@@ -67,19 +80,22 @@ watch: {
   align-items: center;
 }
 
-.nav-header-container > .nav-logo {
+.nav-header-container>.nav-logo {
   width: 64px;
   height: 64px;
   object-fit: cover;
   cursor: pointer;
 }
 
-:deep(
-    .ant-tabs-top > .ant-tabs-nav::before,
-    .ant-tabs-bottom > .ant-tabs-nav::before,
-    .ant-tabs-top > div > .ant-tabs-nav::before,
-    .ant-tabs-bottom > div > .ant-tabs-nav::before
-  ) {
+:deep(.ant-tabs-top > .ant-tabs-nav::before,
+  .ant-tabs-bottom > .ant-tabs-nav::before,
+  .ant-tabs-top > div > .ant-tabs-nav::before,
+  .ant-tabs-bottom > div > .ant-tabs-nav::before) {
   border-bottom: none !important;
+}
+
+.demo-dropdown-wrap :deep(.ant-dropdown-button) {
+  margin-right: 8px;
+  margin-bottom: 8px;
 }
 </style>

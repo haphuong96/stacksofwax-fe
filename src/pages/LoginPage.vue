@@ -23,14 +23,17 @@ async function submitLogin() {
       password: password.value
     });
     const accessToken = res.data.access_token;
+    const user = res.data.username;
     if (accessToken) {
-      localStorage.setItem(localStorageKeys.ACCESS_TOKEN, "accessToken");
+      localStorage.setItem(localStorageKeys.ACCESS_TOKEN, accessToken);
+      localStorage.setItem(localStorageKeys.USERNAME, user);
       router.push({ name: routeNames.HOME });
-      message.error("Login successfully!");
+      message.success("Login successfully!");
     } else {
       message.error("Something went wrong! please check and try again later!");
     }
   } catch (error) {
+    console.log(error)
     message.error("Something went wrong! please check and try again later!");
   } finally {
     isLoading.value = false;

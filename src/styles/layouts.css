@@ -2,6 +2,14 @@
     display: flex;
 }
 
+.v-flex {
+    flex-direction: column;
+}
+
+.h-flex {
+    flex-direction: row;
+}
+
 .justify-center {
     justify-content: center;
 }
