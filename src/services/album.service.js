@@ -10,7 +10,7 @@ const getAlbumFilter = async () => {
         return { label, value };
       }),
       decades: decades.map((decade) => {
-        return { label: decade.release_year, value: decade.release_year };
+        return { label: decade.decade, value: decade.decade };
       })
     };
   } catch (error) {
