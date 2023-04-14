@@ -11,6 +11,8 @@ const albumTracks = ref();
 const comments = ref();
 const albumStats = ref(new Map());
 const artistsName = ref();
+const data = [
+  "test1", "test2"]
 
 const isLoading = ref(false);
 const dataFetchComplete = ref(false);
@@ -81,28 +83,28 @@ fetchAlbumDetail();
               <span>{{ albumDetailTitle.albumTitle }}</span>
             </h1>
 
-            
+
             <a-descriptions :column="1"
-              :labelStyle="{'background-color': 'white', 'padding': '0px 0px', 'width': '20%' }"
+              :labelStyle="{ 'background-color': 'white', 'padding': '0px 0px', 'width': '20%' }"
               :contentStyle="{ 'padding': '0px 0px' }">
-              <a-descriptions-item label="Record Label" :style="{ 'padding-bottom': '0px'}"> 
+              <a-descriptions-item label="Record Label" :style="{ 'padding-bottom': '0px' }">
                 <span v-for="(item, index) in albumGeneralInfo.recordLabels" :key="index">
                   {{ (index > 0) ? ", " : "" }}
                   {{ item.company_name }}
                 </span>
               </a-descriptions-item>
-              <a-descriptions-item label="Genre" :style="{ 'padding-bottom': '0px'}">
+              <a-descriptions-item label="Genre" :style="{ 'padding-bottom': '0px' }">
                 <span v-for="(item, index) in albumGeneralInfo.genres" :key="index">
                   {{ (index > 0) ? ", " : "" }}
                   {{ item.genre_name }}
                 </span>
               </a-descriptions-item>
-              <a-descriptions-item label="Release Year" :style="{ 'padding-bottom': '0px'}">
+              <a-descriptions-item label="Release Year" :style="{ 'padding-bottom': '0px' }">
                 <span>
                   {{ albumGeneralInfo.release_year }}
                 </span>
               </a-descriptions-item>
-              <a-descriptions-item label="Country" :style="{ 'padding-bottom': '0px'}">
+              <a-descriptions-item label="Country" :style="{ 'padding-bottom': '0px' }">
                 <span>
                   {{ albumGeneralInfo.country }}
                 </span>
@@ -164,6 +166,11 @@ fetchAlbumDetail();
           Collections
           <a-button type="link">Add to collection</a-button>
         </a-divider>
+        <a-list size="small" :data-source="data">
+          <template #renderItem="{ item }">
+            <a-list-item :style="{'border-bottom': 'none'}">{{ item }}</a-list-item>
+          </template>
+        </a-list>
       </a-col>
     </a-row>
   </a-spin>
