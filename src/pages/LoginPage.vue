@@ -23,10 +23,13 @@ async function submitLogin() {
       password: password.value
     });
     const accessToken = res.data.access_token;
-    const user = res.data.username;
+    const user = res.data.user;
     if (accessToken) {
       localStorage.setItem(localStorageKeys.ACCESS_TOKEN, accessToken);
-      localStorage.setItem(localStorageKeys.USERNAME, user);
+      localStorage.setItem(localStorageKeys.USER_ID, user.id);
+      localStorage.setItem(localStorageKeys.USERNAME, user.username);
+      localStorage.setItem(localStorageKeys.USER_EMAIL, user.email_address);
+
       router.push({ name: routeNames.HOME });
       message.success("Login successfully!");
     } else {

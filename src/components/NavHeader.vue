@@ -15,10 +15,10 @@
       </a-button>
     </div>
     <div v-else class="d-flex h-flex">
-      <a-button type="link" @click="() => goTo(routeNames.MY_COLLECTION)">My Collections</a-button>
+      <a-button type="link" @click="() => goTo(routeNames.MY_COLLECTION)"><CollectionIcon type="icon-music_albums_fill" :style = "{fontSize: '24px'}" /></a-button>
       <div class="demo-dropdown-wrap">
         <a-dropdown-button>
-          {{username}}
+          {{ username}}
           <template #overlay>
             <a-menu @click="handleMenuClick">
               <a-menu-item key="1">
@@ -48,7 +48,11 @@ import { computed, ref } from "vue";
 import router from "../router";
 import { routeNames } from "../router/route-names";
 import { localStorageKeys } from "../common/local-storage-keys";
-import { UserOutlined, DownOutlined } from '@ant-design/icons-vue';
+import { UserOutlined, DownOutlined, DashboardOutlined, FontSizeOutlined, createFromIconfontCN } from '@ant-design/icons-vue';
+
+const CollectionIcon = createFromIconfontCN({
+  scriptUrl: '//at.alicdn.com/t/c/font_4014814_08ddunxy7bas.js'
+});
 
 const activeKey = ref(routeNames.HOME);
 activeKey.value = router.currentRoute.value.name;
