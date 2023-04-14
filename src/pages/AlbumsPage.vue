@@ -1,7 +1,7 @@
 <script setup>
 import { message } from "ant-design-vue";
 import axios from "axios";
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import router from "../router";
 import { routeNames } from "../router/route-names";
 import { service } from "../services";
@@ -18,22 +18,28 @@ const current = ref(1);
 const defaultPage = 1;
 const defaultPageSize = 10;
 // list of genre filter
-const genres = await service.genreService.getGenreList()
+const genres = ref([]);
 // list of decades filter
-const decades = ref();
+const decades = ref([]);
 // selected decade filter
 const decadeFilterVal = ref();
 // selected genre filter
 const genreFilterVals = ref([]);
 
+onMounted(async () => {
+  const filter = await service.albumService.getAlbumFilter();
+  const { genres: genresFilter, decades: decadesFilter } = filter;
+  genres.value = genresFilter;
+  decades.value = decadesFilter;
+
+  // fetch data
+  await fetchAlbums(defaultPage, defaultPageSize);
+});
+
 async function fetchAlbums(page, pageSize) {
   try {
     const limit = pageSize || defaultPageSize;
     const offset = (page - 1) * pageSize || 0;
-
-    console.log(decadeFilterVal.value);
-    const filterParams = new URLSearchParams();
-
     if (decadeFilterVal.value) {
     }
     const res = await axios.get("http://localhost:4000/api/albums", {
@@ -44,14 +50,6 @@ async function fetchAlbums(page, pageSize) {
     });
     data.value = res.data.albums;
     total.value = res.data.total;
-    decades.value = res.data.decades.map((item) => ({
-      value: item.decade,
-      label: item.decade
-    }));
-
-    console.log(data.value);
-    console.log(total.value);
-    console.log(decades.value);
   } catch (Error) {
     message.error("Error retrieving list of albums");
   }
@@ -90,9 +88,6 @@ function goToAlbumDetailPage(albumId) {
   console.log("item: " + albumId);
   router.push({ name: routeNames.ALBUM_DETAILS, params: { id: albumId } });
 }
-
-// fetch data
-fetchAlbums(defaultPage, defaultPageSize);
 </script>
 
 <template>
