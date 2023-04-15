@@ -5,6 +5,7 @@ import { localStorageKeys } from "../common/local-storage-keys";
 import router from "../router";
 import { routeNames } from "../router/route-names";
 import { message } from "ant-design-vue";
+import { axiosIntance } from "../services/base.service";
 
 // reactive state
 const username = ref();
@@ -23,12 +24,15 @@ async function submitLogin() {
       password: password.value
     });
     const accessToken = res.data.access_token;
-    const user = res.data.user;
+
     if (accessToken) {
       localStorage.setItem(localStorageKeys.ACCESS_TOKEN, accessToken);
-      localStorage.setItem(localStorageKeys.USER_ID, user.id);
-      localStorage.setItem(localStorageKeys.USERNAME, user.username);
-      localStorage.setItem(localStorageKeys.USER_EMAIL, user.email_address);
+
+      // get user info and store in local storage
+      const me = await axiosIntance.get('get-me');
+      localStorage.setItem(localStorageKeys.USER_ID, me.data.user_id);
+      localStorage.setItem(localStorageKeys.USERNAME, me.data.username);
+      localStorage.setItem(localStorageKeys.USER_EMAIL, me.data.email_address);
 
       router.push({ name: routeNames.HOME });
       message.success("Login successfully!");

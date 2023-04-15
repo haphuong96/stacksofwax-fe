@@ -1,7 +1,7 @@
 <script setup>
 import axios from "axios";
 import { message } from "ant-design-vue";
-import { computed, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import router from "../router";
 import { routeNames } from "../router/route-names";
 import { localStorageKeys } from "../common/local-storage-keys";
@@ -9,14 +9,13 @@ import { axiosIntance } from "../services/base.service";
 
 const username = localStorage.getItem(localStorageKeys.USERNAME);
 const userId = localStorage.getItem(localStorageKeys.USER_ID);
+const myCollection = ref();
 
-const data = [{
-    title: 'Collection 1',
-}, {
-    title: 'Collection 2',
-}, {
-    title: 'Collection 3',
-}];
+onMounted(async () => {
+  const filter = await axiosIntance.get('my-collections');
+  myCollection.value = filter.data;
+  console.log(myCollection.value);
+});
 
 function goToCollections() {
     router.push({ name: routeNames.COLLECTION });
@@ -47,7 +46,7 @@ async function goToDraftCollection() {
                     </template>
                     <h4>Collection by {{ username }}</h4>
                     <a-button @click="goToDraftCollection">Create a new collection</a-button>
-                    <a-list size="small" bordered :data-source="data">
+                    <a-list size="small" bordered   v-if="myCollection" :data-source="myCollection">
                         <template #renderItem="{ item }">
                             <a-list-item>{{ item }}</a-list-item>
                         </template>
