@@ -92,7 +92,7 @@ function goToAlbumDetailPage(albumId) {
 
 <template>
   <a-row>
-    <a-col :span="8">
+    <a-col :span="4">
       <div>
         <h2>Genre</h2>
         <a-select
@@ -120,7 +120,7 @@ function goToAlbumDetailPage(albumId) {
       </div>
     </a-col>
 
-    <a-col :span="16">
+    <a-col :span="20">
       <h1 class="default-page-title">Explore Albums</h1>
       <div>
         <a-list item-layout="horizontal" :data-source="data">

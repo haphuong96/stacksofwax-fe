@@ -75,7 +75,7 @@ async function fetchMyCollections(page, pageSize) {
                             <a-list size="small" bordered v-if="myCollection" :data-source="myCollection">
                                 <template #renderItem="{ item }">
                                     <a-list-item>
-                                        <a-button type="link" @click="() => goToDraftCollections(item.collection_id)">{{
+                                        <a-button type="link" @click="(event) => goToDraftCollections(item.collection_id)">{{
                                             item.collection_name }}
                                         </a-button></a-list-item>
                                 </template>
