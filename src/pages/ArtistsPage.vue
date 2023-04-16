@@ -19,6 +19,7 @@ const defaultPageSize = 10;
 onMounted(async () => {
   fetchArtists(defaultPage, defaultPageSize);
 })
+
 async function fetchArtists(page, pageSize) {
   try {
     const limit = pageSize || defaultPageSize;
@@ -31,7 +32,8 @@ async function fetchArtists(page, pageSize) {
       }
     });
 
-    artists.value = res.data;
+    artists.value = res.data.artists;
+    total.value = res.data.total;
 
   } catch (error) {
     message.error("Cannot load artists")
