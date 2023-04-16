@@ -1,8 +1,7 @@
 <script setup>
-import axios from 'axios';
-import { onMounted, ref } from 'vue';
-import { axiosIntance } from '../services/base.service';
-import { message } from 'ant-design-vue';
+import { message } from "ant-design-vue";
+import { onMounted, ref } from "vue";
+import { axiosIntance } from "../services/base.service";
 
 /**
  * Album data fetch from fetchAlbums function
@@ -18,14 +17,14 @@ const defaultPageSize = 10;
 
 onMounted(async () => {
   fetchArtists(defaultPage, defaultPageSize);
-})
+});
 
 async function fetchArtists(page, pageSize) {
   try {
     const limit = pageSize || defaultPageSize;
     const offset = (page - 1) * pageSize || 0;
-    
-    const res = await axiosIntance.get('artists', {
+
+    const res = await axiosIntance.get("artists", {
       params: {
         limit,
         offset
@@ -34,9 +33,8 @@ async function fetchArtists(page, pageSize) {
 
     artists.value = res.data.artists;
     total.value = res.data.total;
-
   } catch (error) {
-    message.error("Cannot load artists")
+    message.error("Cannot load artists");
   }
 }
 </script>
@@ -44,7 +42,7 @@ async function fetchArtists(page, pageSize) {
 <template>
   <a-row>
     <!-- class="m-16 p-16" -->
-    <a-col :span="4">
+    <a-col :span="4" class="px-32">
       <div>Explore the hottest artists</div>
       <!-- <div>
         <h2>Genre</h2>

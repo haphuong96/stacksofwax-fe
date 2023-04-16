@@ -32,3 +32,8 @@
 .p-16 {
     padding: 16px;
 }
+
+.px-32 {
+    padding-left: 32px;
+    padding-right: 32px;
+}

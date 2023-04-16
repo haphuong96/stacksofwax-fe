@@ -92,7 +92,7 @@ function goToAlbumDetailPage(albumId) {
 
 <template>
   <a-row>
-    <a-col :span="4">
+    <a-col :span="4" class="px-32">
       <div>
         <h2>Genre</h2>
         <a-select
