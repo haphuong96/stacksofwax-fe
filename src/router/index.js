@@ -7,6 +7,8 @@ import LoginPage from "../pages/LoginPage.vue";
 import SignupPage from "../pages/SignupPage.vue";
 import MyCollectionPage from "../pages/MyCollectionPage.vue";
 import DraftCollectionPage from "../pages/DraftCollectionPage.vue";
+import CollectionDetailPage from "../pages/CollectionDetailPage.vue";
+
 import { checkAuthGuard } from "./guards/check-auth.guard";
 import { routeNames } from "./route-names";
 import { screenLayout } from "./screen-layouts";
@@ -87,6 +89,15 @@ const router = createRouter({
       path: "/collections",
       name: routeNames.COLLECTION,
       component: CollectionsPage,
+      meta: {
+        layout: screenLayout.DEFAULT_LAYOUT
+      }
+      // beforeEnter: requireLoginGuard
+    },
+    {
+      path: "/collections/:id",
+      name: routeNames.COLLECTION_DETAILS,
+      component: CollectionDetailPage,
       meta: {
         layout: screenLayout.DEFAULT_LAYOUT
       }

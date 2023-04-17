@@ -3,6 +3,8 @@ import axios from "axios";
 import { message } from "ant-design-vue";
 import { computed, onMounted, ref } from "vue";
 import { axiosIntance } from "../services/base.service";
+import router from "../router";
+import { routeNames } from "../router/route-names";
 
 const collections = ref();
 const favCollections = ref([]);
@@ -55,6 +57,10 @@ async function fetchCollections(page, pageSize) {
     message.error("Cannot load collections")
   }
 }
+
+function goToCollectionDetail(collectionId) {
+  router.push({name: routeNames.COLLECTION_DETAILS, params: {id: collectionId}});
+}
 </script>
 
 <template>
@@ -82,7 +88,7 @@ async function fetchCollections(page, pageSize) {
                 {{ item.collection_desc }}
               </template>
               <template #title>
-                <a href="https://www.antdv.com/">{{ item.collection_name }}</a>
+                <a @click="() => goToCollectionDetail(item.collection_id)">{{ item.collection_name }}</a>
               </template>
               <template #avatar>
                 <a-avatar src="https://joeschmoe.io/api/v1/random" />
