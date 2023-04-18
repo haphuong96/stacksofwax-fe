@@ -130,12 +130,10 @@ async function searchAlbum() {
 
 const showAllDescription = ref(false);
 const displayDescription = computed(() => {
-  // console.log(collectionData.value)
-  // const collectionDesc = collectionData.value.collection_desc;
-  if (!collectionData.value?.collection_desc) return "";
-  if (showAllDescription.value || collectionData.value?.collection_desc.lenght)
-    return collectionData.value?.collection_desc;
-  return `${collectionData.value?.collection_desc.slice(0, 250)} ${
+  if (!collectionDesc.value) return "";
+  if (showAllDescription.value || collectionDesc.value?.length <= 250)
+    return collectionDesc.value;
+  return `${collectionDesc.value.slice(0, 250)} ${
     showAllDescription.value ? "" : "..."
   }`;
 });
@@ -223,9 +221,11 @@ async function deleteAlbumFromCollection(albumId) {
         <a-col :span="24">
           <div class="fs-16 mt-16">
             {{ displayDescription }}
-            <a @click="showAllDescription = !showAllDescription">{{
-              showAllDescription ? "Show less" : "Show more"
-            }}</a>
+            <a
+              @click="showAllDescription = !showAllDescription"
+              v-if="(collectionDesc || '').lenght > 250"
+              >{{ showAllDescription ? "Show less" : "Show more" }}</a
+            >
           </div>
         </a-col>
       </a-row>
