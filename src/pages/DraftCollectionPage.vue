@@ -61,8 +61,11 @@ async function updateCollection() {
       collection_desc: editCollectionDesc.value || undefined
     });
     const { collection_name, collection_desc } = res.data;
-    // collectionName.value = collection_name;
-    // collectionDesc.value = collection_desc;
+
+    if (collectionData.value) {
+      collectionData.value.collection_name = collection_name;
+      collectionData.value.collection_desc = collection_desc;
+    }
 
     editCollectionName.value = cloneDeep(collection_name);
     editCollectionDesc.value = cloneDeep(collection_desc);
@@ -130,7 +133,10 @@ async function searchAlbum() {
 const showAllDescription = ref(false);
 const displayDescription = computed(() => {
   if (!collectionData.value?.collection_desc) return "";
-  if (showAllDescription.value || collectionData.value?.collection_desc.length <= 250)
+  if (
+    showAllDescription.value ||
+    collectionData.value?.collection_desc.length <= 250
+  )
     return collectionData.value?.collection_desc;
   return `${collectionData.value?.collection_desc.slice(0, 250)} ${
     showAllDescription.value ? "" : "..."
