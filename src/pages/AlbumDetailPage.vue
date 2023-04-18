@@ -43,6 +43,10 @@ async function fetchAlbumDetail() {
       albumGeneralInfo.value.recordLabels = res.data.record_labels;
     }
 
+    if (res.data.img_path) {
+      albumGeneralInfo.value.imgPath = res.data.img_path;
+    }
+
     albumTracks.value = res.data.tracks;
     comments.value = res.data.comments;
 
@@ -70,7 +74,7 @@ fetchAlbumDetail();
       <a-col :span="16">
         <a-row>
           <a-col :span="8">
-            <a-image src="https://static-cse.canva.com/blob/1035320/1600w-fxYFTKLArdY.jpg" :width="200" :height="200"
+            <a-image :src="albumGeneralInfo.imgPath" :width="200" :height="200"
               class="album-img" />
           </a-col>
           <a-col :span="16">

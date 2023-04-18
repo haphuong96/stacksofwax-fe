@@ -75,9 +75,13 @@ async function updateCollection() {
 }
 
 async function fetchCollectionDetailById() {
-    const res = await axiosIntance.get(`collections/${collectionId}/details`);
-    const {user_id, username, ...collection } = res.data;
-    
+    const res = await axiosIntance.get(`collections/${collectionId}`, {
+        params: {
+            operationName: 'fetchCollectionDetails'
+        }
+    });
+    const { user_id, username, ...collection } = res.data;
+
     collectionData.value = collection;
     console.log(collectionData.value)
     createdByData.value = {
@@ -87,11 +91,15 @@ async function fetchCollectionDetailById() {
 
     editCollectionName.value = cloneDeep(collection.collection_name);
     editCollectionDesc.value = cloneDeep(collection.collection_desc);
-    
+
 }
 
 async function fetchCollectionAlbumById() {
-    const res = await axiosIntance.get(`collections/${collectionId}/albums`);
+    const res = await axiosIntance.get(`collections/${collectionId}`, {
+        params: {
+            operationName: 'fetchCollectionAlbums'
+        }
+    });
     albumsData.value = res.data;
 }
 
@@ -118,7 +126,8 @@ async function searchAlbum() {
         }
     });
     searchAlbumData.value = res.data.albums;
-    console.log(searchAlbumData.value)};
+    console.log(searchAlbumData.value)
+};
 
 const showAllDescription = ref(false);
 const displayDescription = computed(() => {
@@ -129,11 +138,21 @@ const displayDescription = computed(() => {
         return collectionData.value?.collection_desc;
     return `${collectionData.value?.collection_desc.slice(0, 250)} ${showAllDescription.value ? "" : "..."
         }`;
-}); 
+});
 
 async function addAlbumToCollection(albumId) {
-    const res = await axiosIntance.post(`collections/${collectionData.value.collection_id}/add-album`, {
+    const res = await axiosIntance.post(`my-collections/${collectionId}/manage-album/add`, {
         album_id: albumId
+    });
+
+    fetchCollectionAlbumById();
+}
+
+async function deleteAlbumFromCollection(albumId) {
+    const res = await axiosIntance.delete(`my-collections/${collectionId}/manage-album/delete`, {
+        data: {
+            album_id: albumId
+        }
     });
 
     fetchCollectionAlbumById();
@@ -185,17 +204,20 @@ async function addAlbumToCollection(albumId) {
                     <h1>Album List</h1>
                     <a-list bordered :data-source="albumsData">
                         <template #renderItem="{ item }">
-                            <a-list-item>{{ item.album_title }}</a-list-item>
+                            <a-list-item>{{ item.album_title }} <a-button type="link"
+                                    @click="deleteAlbumFromCollection(item.album_id)"
+                                    v-if="isSearchAlbumMode"><close-outlined /></a-button></a-list-item>
                         </template>
                     </a-list>
-                    <a-button type="link" v-if="!isSearchAlbumMode" @click="showHideAlbumSearchSection">Find
-                        album</a-button>
+                    <a-button type="link" v-if="!isSearchAlbumMode" @click="showHideAlbumSearchSection">Edit
+                        album list</a-button>
                     <div v-if="isSearchAlbumMode">
                         <a-input-search v-model:value="searchAlbumKeyword" placeholder="Search album" style="width: 200px"
                             @search="searchAlbum" /> <a @click="showHideAlbumSearchSection"><close-outlined /></a>
                         <a-list bordered :data-source="searchAlbumData" v-if="searchAlbumData.length > 0">
                             <template #renderItem="{ item }">
-                                <a-list-item>{{ item.album_title }} <a-button @click="() => addAlbumToCollection(item.album_id)">Add</a-button></a-list-item>
+                                <a-list-item>{{ item.album_title }} <a-button
+                                        @click="() => addAlbumToCollection(item.album_id)">Add</a-button></a-list-item>
                             </template>
                         </a-list>
                     </div>
@@ -208,5 +230,4 @@ async function addAlbumToCollection(albumId) {
 <style scoped>
 .fs-16 {
     font-size: 16px;
-}
-</style>
+}</style>
