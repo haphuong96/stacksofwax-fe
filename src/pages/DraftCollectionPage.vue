@@ -124,10 +124,10 @@ const showAllDescription = ref(false);
 const displayDescription = computed(() => {
     // console.log(collectionData.value)
     // const collectionDesc = collectionData.value.collection_desc;
-    if (!collectionData.value.collection_desc) return "";
-    if (showAllDescription.value || collectionData.value.collection_desc?.lenght)
-        return collectionData.value.collection_desc;
-    return `${collectionData.value.collection_desc.slice(0, 250)} ${showAllDescription.value ? "" : "..."
+    if (!collectionData.value?.collection_desc) return "";
+    if (showAllDescription.value || collectionData.value?.collection_desc.lenght)
+        return collectionData.value?.collection_desc;
+    return `${collectionData.value?.collection_desc.slice(0, 250)} ${showAllDescription.value ? "" : "..."
         }`;
 }); 
 
