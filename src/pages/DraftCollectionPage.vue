@@ -26,9 +26,9 @@ const searchAlbumKeyword = ref();
 const isEditMode = ref(false);
 const isSearchAlbumMode = ref(false);
 
-const collectionName = ref();
+// const collectionName = ref();
 const editCollectionName = ref();
-const collectionDesc = ref();
+// const collectionDesc = ref();
 
 const editCollectionDesc = ref();
 
@@ -48,7 +48,9 @@ const cancelEdit = () => {
 };
 
 onMounted(async () => {
-    fetchCollectionById();
+    fetchCollectionDetailById();
+    fetchCollectionAlbumById();
+    // fetchCollectionById();
 });
 
 async function updateCollection() {
@@ -59,8 +61,8 @@ async function updateCollection() {
             collection_desc: editCollectionDesc.value || undefined
         });
         const { collection_name, collection_desc } = res.data;
-        collectionName.value = collection_name;
-        collectionDesc.value = collection_desc;
+        // collectionName.value = collection_name;
+        // collectionDesc.value = collection_desc;
 
         editCollectionName.value = cloneDeep(collection_name);
         editCollectionDesc.value = cloneDeep(collection_desc);
@@ -72,19 +74,40 @@ async function updateCollection() {
     }
 }
 
-async function fetchCollectionById() {
-    const res = await axiosIntance.get(`collections/${collectionId}`);
-    const { albums, created_by, ...collection } = res.data;
-    collectionName.value = collection.collection_name;
-    collectionDesc.value = collection.collection_desc;
+async function fetchCollectionDetailById() {
+    const res = await axiosIntance.get(`collections/${collectionId}/details`);
+    const {user_id, username, ...collection } = res.data;
+    
+    collectionData.value = collection;
+    console.log(collectionData.value)
+    createdByData.value = {
+        user_id,
+        username
+    };
 
     editCollectionName.value = cloneDeep(collection.collection_name);
     editCollectionDesc.value = cloneDeep(collection.collection_desc);
-
-    albumsData.value = albums;
-    collectionData.value = collection;
-    createdByData.value = created_by;
+    
 }
+
+async function fetchCollectionAlbumById() {
+    const res = await axiosIntance.get(`collections/${collectionId}/albums`);
+    albumsData.value = res.data;
+}
+
+// async function fetchCollectionById() {
+//     const res = await axiosIntance.get(`collections/${collectionId}`);
+//     const { albums, created_by, ...collection } = res.data;
+//     collectionName.value = collection.collection_name;
+//     collectionDesc.value = collection.collection_desc;
+
+//     editCollectionName.value = cloneDeep(collection.collection_name);
+//     editCollectionDesc.value = cloneDeep(collection.collection_desc);
+
+//     albumsData.value = albums;
+//     collectionData.value = collection;
+//     createdByData.value = created_by;
+// }
 
 async function searchAlbum() {
     const res = await axiosIntance.get(`albums`, {
@@ -99,10 +122,12 @@ async function searchAlbum() {
 
 const showAllDescription = ref(false);
 const displayDescription = computed(() => {
-    if (!collectionDesc.value) return "";
-    if (showAllDescription.value || collectionDesc.value?.lenght)
-        return collectionDesc.value;
-    return `${collectionDesc.value.slice(0, 250)} ${showAllDescription.value ? "" : "..."
+    // console.log(collectionData.value)
+    // const collectionDesc = collectionData.value.collection_desc;
+    if (!collectionData.value.collection_desc) return "";
+    if (showAllDescription.value || collectionData.value.collection_desc?.lenght)
+        return collectionData.value.collection_desc;
+    return `${collectionData.value.collection_desc.slice(0, 250)} ${showAllDescription.value ? "" : "..."
         }`;
 }); 
 
@@ -111,8 +136,7 @@ async function addAlbumToCollection(albumId) {
         album_id: albumId
     });
 
-    fetchCollectionById();
-    
+    fetchCollectionAlbumById();
 }
 </script>
 
@@ -142,7 +166,7 @@ async function addAlbumToCollection(albumId) {
                             </template>
                         </a-modal>
                     </div>
-                    <h1>{{ collectionName }}</h1>
+                    <h1>{{ collectionData.collection_name }}</h1>
                     <div>By {{ createdByData.username }}</div>
                 </a-col>
             </a-row>
