@@ -6,11 +6,27 @@ import router from "../router";
 import { routeNames } from "../router/route-names";
 import { localStorageKeys } from "../common/local-storage-keys";
 import { axiosIntance } from "../services/base.service";
-import {
-  HeartTwoTone,
-  getTwoToneColor,
-  setTwoToneColor
-} from "@ant-design/icons-vue";
+import {  HeartOutlined,  HeartFilled } from "@ant-design/icons-vue";
+
+const comments = ref([]);
+const submitting = ref(false);
+const value = ref('');
+const handleSubmit = () => {
+    if (!value.value) {
+    return;
+    }
+    submitting.value = true;
+    setTimeout(() => {
+    submitting.value = false;
+    comments.value = [{
+        author: 'Han Solo',
+        avatar: 'https://joeschmoe.io/api/v1/random',
+        content: value.value,
+        datetime: dayjs().fromNow(),
+    }, ...comments.value];
+    value.value = '';
+    }, 1000);
+};
 
 const collectionId = router.currentRoute.value.params.id.split("-")[0];
 
@@ -20,11 +36,30 @@ const userId = localStorage.getItem(localStorageKeys.USER_ID);
 const albumsData = ref();
 const collectionData = ref();
 const createdByData = ref();
+const isLiked = ref();
 
 onMounted(async () => {
   fetchCollectionDetailById();
   fetchCollectionAlbumById();
+  checkUserLikedCollection();
 });
+
+async function postComment() {
+
+}
+
+async function checkUserLikedCollection() {
+  try {
+    const res = await axiosIntance.get(
+      `collections/${collectionId}/like/check`
+    );
+
+    isLiked.value = res.data.is_liked;
+    console.log(isLiked.value);
+  } catch (error) {
+    isLiked.value = false;
+  }
+}
 
 async function fetchCollectionDetailById() {
   const res = await axiosIntance.get(`collections/${collectionId}`, {
@@ -35,14 +70,11 @@ async function fetchCollectionDetailById() {
   const { user_id, username, ...collection } = res.data;
 
   collectionData.value = collection;
-  console.log(collectionData.value);
+
   createdByData.value = {
     user_id,
     username
   };
-
-  editCollectionName.value = cloneDeep(collection.collection_name);
-  editCollectionDesc.value = cloneDeep(collection.collection_desc);
 }
 
 async function fetchCollectionAlbumById() {
@@ -52,6 +84,17 @@ async function fetchCollectionAlbumById() {
     }
   });
   albumsData.value = res.data;
+}
+
+async function toggleLikeCollection() {
+  if (isLiked.value) {
+    await axiosIntance.delete(`collections/${collectionId}/like/delete`);
+  } else {
+    await axiosIntance.post(`collections/${collectionId}/like/post`);
+  }
+
+  fetchCollectionDetailById();
+  checkUserLikedCollection();
 }
 
 async function fetchCollectionById() {
@@ -80,12 +123,62 @@ async function fetchCollectionById() {
           <div>By {{ createdByData.username }}</div>
         </a-col>
         <a-col>
-          <a-button><heart-two-tone /> Favorite</a-button>
+          <a-button @click="toggleLikeCollection"
+            ><heart-outlined v-if="!isLiked" /><heart-filled v-else />
+            Like</a-button
+          >
         </a-col>
       </a-row>
       <a-row>
         <a-col :span="24">
           <h1>Description</h1>
+        </a-col>
+      </a-row>
+      <a-row>
+        <a-col :span="24">
+            <h1>Reviews</h1>
+          <a-list
+            v-if="comments.length"
+            :data-source="comments"
+            :header="`${comments.length} ${
+              comments.length > 1 ? 'replies' : 'reply'
+            }`"
+            item-layout="horizontal"
+          >
+            <template #renderItem="{ item }">
+              <a-list-item>
+                <a-comment
+                  :author="item.author"
+                  :avatar="item.avatar"
+                  :content="item.content"
+                  :datetime="item.datetime"
+                />
+              </a-list-item>
+            </template>
+          </a-list>
+          <a-comment>
+            <template #avatar>
+              <a-avatar
+                src="https://joeschmoe.io/api/v1/random"
+                alt="Han Solo"
+              />
+            </template>
+            <template #content>
+              <a-form-item>
+                <a-textarea v-model:value="draftComment" :rows="4" />
+              </a-form-item>
+              <a-form-item>
+                <a-button
+                  html-type="submit"
+                  :loading="submitting"
+                  type="primary"
+                  @click="postComment"
+                >
+                  Add Comment
+                </a-button>
+              </a-form-item>
+            </template>
+          </a-comment>
         </a-col>
       </a-row>
     </a-col>
