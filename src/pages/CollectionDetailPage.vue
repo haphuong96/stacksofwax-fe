@@ -6,27 +6,16 @@ import router from "../router";
 import { routeNames } from "../router/route-names";
 import { localStorageKeys } from "../common/local-storage-keys";
 import { axiosIntance } from "../services/base.service";
-import {  HeartOutlined,  HeartFilled } from "@ant-design/icons-vue";
+import { HeartOutlined, HeartFilled } from "@ant-design/icons-vue";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+// var relativeTime = require('dayjs/plugin/relativeTime')
+// const dayjs = require('dayjs')
+dayjs.extend(relativeTime);
 
 const comments = ref([]);
 const submitting = ref(false);
-const value = ref('');
-const handleSubmit = () => {
-    if (!value.value) {
-    return;
-    }
-    submitting.value = true;
-    setTimeout(() => {
-    submitting.value = false;
-    comments.value = [{
-        author: 'Han Solo',
-        avatar: 'https://joeschmoe.io/api/v1/random',
-        content: value.value,
-        datetime: dayjs().fromNow(),
-    }, ...comments.value];
-    value.value = '';
-    }, 1000);
-};
+const draftComment = ref("");
 
 const collectionId = router.currentRoute.value.params.id.split("-")[0];
 
@@ -42,10 +31,54 @@ onMounted(async () => {
   fetchCollectionDetailById();
   fetchCollectionAlbumById();
   checkUserLikedCollection();
+  fetchCollectionComments();
 });
 
 async function postComment() {
+  if (!draftComment.value) {
+    return;
+  }
 
+  submitting.value = true;
+  try {
+    const postCmt = await axiosIntance.post(
+      `collections/${collectionId}/comment`,
+      {
+        comment: draftComment.value
+      }
+    );
+
+    fetchCollectionComments();
+
+    draftComment.value = "";
+  } catch (error) {
+  } finally {
+    submitting.value = false;
+  }
+
+  // setTimeout(() => {
+  //   submitting.value = false;
+  //   comments.value = [
+  //     {
+  //       author: "Han Solo",
+  //       avatar: "https://joeschmoe.io/api/v1/random",
+  //       content: value.value,
+  //       datetime: dayjs().fromNow()
+  //     },
+  //     ...comments.value
+  //   ];
+  //   value.value = "";
+  // }, 1000);
+}
+
+async function fetchCollectionComments() {
+  const res = await axiosIntance.get(`collections/${collectionId}`, {
+    params: {
+      operationName: `fetchCollectionComments`
+    }
+  });
+
+  comments.value = res.data;
 }
 
 async function checkUserLikedCollection() {
@@ -93,7 +126,6 @@ async function toggleLikeCollection() {
     await axiosIntance.post(`collections/${collectionId}/like/post`);
   }
 
-  fetchCollectionDetailById();
   checkUserLikedCollection();
 }
 
@@ -134,9 +166,19 @@ async function fetchCollectionById() {
           <h1>Description</h1>
         </a-col>
       </a-row>
+      <a-row
+        ><a-col :span = "24">
+          <h1>Album List</h1>
+          <a-list bordered :data-source="albumsData">
+            <template #renderItem="{ item }">
+              <a-list-item>{{ item.album_title }} </a-list-item>
+            </template>
+          </a-list>
+        </a-col>
+      </a-row>
       <a-row>
         <a-col :span="24">
-            <h1>Reviews</h1>
+          <h1>Reviews</h1>
           <a-list
             v-if="comments.length"
             :data-source="comments"
@@ -148,10 +190,10 @@ async function fetchCollectionById() {
             <template #renderItem="{ item }">
               <a-list-item>
                 <a-comment
-                  :author="item.author"
+                  :author="item.username"
                   :avatar="item.avatar"
-                  :content="item.content"
-                  :datetime="item.datetime"
+                  :content="item.comment"
+                  :datetime="dayjs(item.created_datetime).fromNow()"
                 />
               </a-list-item>
             </template>
