@@ -8,6 +8,7 @@ import SignupPage from "../pages/SignupPage.vue";
 import MyCollectionPage from "../pages/MyCollectionPage.vue";
 import DraftCollectionPage from "../pages/DraftCollectionPage.vue";
 import CollectionDetailPage from "../pages/CollectionDetailPage.vue";
+import ArtistDetailPage from "../pages/ArtistDetailPage.vue";
 
 import { checkAuthGuard } from "./guards/check-auth.guard";
 import { routeNames } from "./route-names";
@@ -72,6 +73,14 @@ const router = createRouter({
       path: "/albums/:id",
       name: routeNames.ALBUM_DETAILS,
       component: AlbumDetailPage,
+      meta: {
+        layout: screenLayout.DEFAULT_LAYOUT
+      }
+    },
+    {
+      path: "/artists/:id",
+      name: routeNames.ARTIST_DETAILS,
+      component: ArtistDetailPage,
       meta: {
         layout: screenLayout.DEFAULT_LAYOUT
       }

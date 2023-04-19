@@ -2,6 +2,8 @@
 import { message } from "ant-design-vue";
 import { onMounted, ref } from "vue";
 import { axiosIntance } from "../services/base.service";
+import router from "../router";
+import { routeNames } from "../router/route-names";
 
 /**
  * Album data fetch from fetchAlbums function
@@ -36,6 +38,12 @@ async function fetchArtists(page, pageSize) {
   } catch (error) {
     message.error("Cannot load artists");
   }
+}
+
+function goToArtistDetailPage(artistId) {
+  router.push({name: routeNames.ARTIST_DETAILS, params: {
+    id: artistId
+  }})
 }
 </script>
 
