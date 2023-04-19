@@ -1,10 +1,11 @@
 <script setup>
 import { message } from "ant-design-vue";
 import axios from "axios";
-import { onMounted, ref } from "vue";
+import { onBeforeUnmount, onMounted, ref } from "vue";
 import router from "../router";
 import { routeNames } from "../router/route-names";
 import { service } from "../services";
+import emitter from "../utils/emitter.helper";
 
 /**
  * Album data fetch from fetchAlbums function
@@ -25,8 +26,11 @@ const decades = ref([]);
 const decadeFilterVal = ref();
 // selected genre filter
 const genreFilterVals = ref([]);
+let searchKeyword = "";
 
 onMounted(async () => {
+  searchKeyword = "";
+  emitter.on("ON_SEARCH_CHANGE", onSearchChange);
   const filter = await service.albumService.getAlbumFilter();
   const { genres: genresFilter, decades: decadesFilter } = filter;
   genres.value = genresFilter;
@@ -36,17 +40,28 @@ onMounted(async () => {
   await fetchAlbums(defaultPage, defaultPageSize);
 });
 
+onBeforeUnmount(() => {
+  emitter.off("ON_SEARCH_CHANGE", onSearchChange);
+});
+
 async function fetchAlbums(page, pageSize) {
   try {
     const limit = pageSize || defaultPageSize;
     const offset = (page - 1) * pageSize || 0;
     if (decadeFilterVal.value) {
     }
+
+    let params = {
+      limit,
+      offset
+    };
+    console.log("searchKeyword", searchKeyword);
+    if (searchKeyword) {
+      params = { ...params, search: searchKeyword };
+    }
+
     const res = await axios.get("http://localhost:4000/api/albums", {
-      params: {
-        limit,
-        offset
-      }
+      params
     });
     data.value = res.data.albums;
     total.value = res.data.total;
@@ -87,6 +102,11 @@ async function filterByDecade(filterVal) {
 function goToAlbumDetailPage(albumId) {
   console.log("item: " + albumId);
   router.push({ name: routeNames.ALBUM_DETAILS, params: { id: albumId } });
+}
+
+async function onSearchChange(_searchKeyword) {
+  searchKeyword = _searchKeyword;
+  fetchAlbums();
 }
 </script>
 
