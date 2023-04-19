@@ -28,6 +28,13 @@ const decadeFilterVal = ref();
 const genreFilterVals = ref([]);
 let searchKeyword = "";
 
+const props = defineProps({
+  currentActiveTab: {
+    type: String,
+    default: ""
+  }
+});
+
 onMounted(async () => {
   searchKeyword = "";
   emitter.on("ON_SEARCH_CHANGE", onSearchChange);
@@ -55,7 +62,6 @@ async function fetchAlbums(page, pageSize) {
       limit,
       offset
     };
-    console.log("searchKeyword", searchKeyword);
     if (searchKeyword) {
       params = { ...params, search: searchKeyword };
     }
@@ -105,6 +111,7 @@ function goToAlbumDetailPage(albumId) {
 }
 
 async function onSearchChange(_searchKeyword) {
+  if (props.currentActiveTab !== "1") return;
   searchKeyword = _searchKeyword;
   fetchAlbums();
 }

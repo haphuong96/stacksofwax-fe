@@ -1,9 +1,10 @@
 <script setup>
 import { message } from "ant-design-vue";
-import { onMounted, ref } from "vue";
+import { onBeforeUnmount, onMounted, ref } from "vue";
 import { axiosIntance } from "../services/base.service";
 import router from "../router";
 import { routeNames } from "../router/route-names";
+import emitter from "../utils/emitter.helper";
 
 /**
  * Album data fetch from fetchAlbums function
@@ -16,9 +17,23 @@ const current = ref(1);
 // limit offset
 const defaultPage = 1;
 const defaultPageSize = 10;
+let searchKeyword = "";
+
+const props = defineProps({
+  currentActiveTab: {
+    type: String,
+    default: ""
+  }
+});
 
 onMounted(async () => {
+  searchKeyword = "";
+  emitter.on("ON_SEARCH_CHANGE", onSearchChange);
   fetchArtists(defaultPage, defaultPageSize);
+});
+
+onBeforeUnmount(() => {
+  emitter.off("ON_SEARCH_CHANGE", onSearchChange);
 });
 
 async function fetchArtists(page, pageSize) {
@@ -26,11 +41,16 @@ async function fetchArtists(page, pageSize) {
     const limit = pageSize || defaultPageSize;
     const offset = (page - 1) * pageSize || 0;
 
+    let params = {
+      limit,
+      offset
+    };
+    if (searchKeyword) {
+      params = { ...params, search: searchKeyword };
+    }
+
     const res = await axiosIntance.get("artists", {
-      params: {
-        limit,
-        offset
-      }
+      params
     });
 
     artists.value = res.data.artists;
@@ -41,9 +61,18 @@ async function fetchArtists(page, pageSize) {
 }
 
 function goToArtistDetailPage(artistId) {
-  router.push({name: routeNames.ARTIST_DETAILS, params: {
-    id: artistId
-  }})
+  router.push({
+    name: routeNames.ARTIST_DETAILS,
+    params: {
+      id: artistId
+    }
+  });
+}
+
+async function onSearchChange(_searchKeyword) {
+  if(props.currentActiveTab !== '2') return
+  searchKeyword = _searchKeyword;
+  fetchArtists();
 }
 </script>
 
