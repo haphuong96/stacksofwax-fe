@@ -228,7 +228,7 @@ async function deleteAlbumFromCollection(albumId) {
             {{ displayDescription }}
             <a
               @click="showAllDescription = !showAllDescription"
-              v-if="(collectionData?.collection_desc || '').lenght > 250"
+              v-if="(collectionData?.collection_desc || '').length > 250"
               >{{ showAllDescription ? "Show less" : "Show more" }}</a
             >
           </div>
