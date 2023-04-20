@@ -8,33 +8,47 @@ import { axiosIntance } from "../services/base.service";
 
 const artistId = router.currentRoute.value.params.id.split("-")[0];
 
-const artistDetails = ref();
+const artistData = ref();
+const albumsData = ref();
 
 onMounted(async () => {
-  fetchArtistDetail();
+  fetchArtistDetails();
 })
 
-async function fetchArtistDetail() {
+async function fetchArtistDetails() {
   const res = await axiosIntance.get(`artists/${artistId}`);
-  console.log(res)
-  artistDetails.value = res.data;
+
+  const {albums, ...details} = res.data;
+  artistData.value = details;
+  albumsData.value = albums;
 }
+
 </script>
 
 <template>
   <a-row class="m-16 p-16">
     <a-col :span="24">
-      <a-row v-if="artistDetails">
+      <a-row v-if="artistData">
         <a-col :span="4">
           <a-image
             :width="200"
-            :src="artistDetails.img_path"
+            :src="artistData.img_path"
           />
         </a-col>
         <a-col>
           <div>Artist</div>
-          <h1>{{ artistDetails.artist_name }}</h1>
-          <div>{{ artistDetails.artist_description }}</div>
+          <h1>{{ artistData.artist_name }}</h1>
+          <div>{{ artistData.artist_description }}</div>
+        </a-col>
+      </a-row>
+      <a-row v-if="albumsData">
+        <a-col :span="24">
+          <h1>Album List</h1>
+          <a-list bordered :data-source="albumsData">
+            <template #renderItem="{ item }">
+              <a-list-item>{{ item.album_title }} </a-list-item>
+            </template>
+          </a-list>
         </a-col>
       </a-row>
     </a-col>

@@ -10,12 +10,24 @@ import { axiosIntance } from "../services/base.service";
 const username = localStorage.getItem(localStorageKeys.USERNAME);
 const userId = localStorage.getItem(localStorageKeys.USER_ID);
 
+const activeKey = ref(1);
+
 const defaultPage = 1;
 const defaultPageSize = 10;
 
 const myCollection = ref();
+const favoriteCollection = ref();
+
 const total = ref();
 
+function tabChange(activeKey) {
+    console.log(activeKey);
+    switch (activeKey) {
+        case 1: fetchMyCollections();break;
+        case 2: fetchMyFavoriteCollections();break;
+        default:
+    }
+}
 onMounted(async () => {
     fetchMyCollections();
 });
@@ -27,6 +39,11 @@ function goToCollections() {
 function goToDraftCollections(collectionId) {
 
     router.push({ name: routeNames.DRAFT_COLLECTION_DETAIL, params: { id: collectionId } });
+}
+
+function goToPublicCollections(collectionId) {
+
+    router.push({ name: routeNames.COLLECTION_DETAILS, params: { id: collectionId}});
 }
 
 async function createCollection() {
@@ -53,6 +70,21 @@ async function fetchMyCollections(page, pageSize) {
     myCollection.value = res.data.collections;
     total.value = res.data.total;
 }
+
+async function fetchMyFavoriteCollections() {
+    console.log('my-fav')
+    const limit = pageSize || defaultPageSize;
+    const offset = (page - 1) * pageSize || 0;
+    const res = await axiosIntance.get(`me/favorite-collections`, {
+        params: {
+            limit,
+            offset
+        }
+    });
+
+    favoriteCollection.value = res.data;
+
+}
 </script>
 
 <template>
@@ -61,7 +93,7 @@ async function fetchMyCollections(page, pageSize) {
             <h3>Want to explore other collections from the Stacks of Wax Community? Check out <a
                     @click="goToCollections">Recent
                     List</a>!</h3>
-            <a-tabs v-model:activeKey="activeKey">
+            <a-tabs v-model:activeKey="activeKey" @change="tabChange">
                 <a-tab-pane key="1">
                     <template #tab>
                         <span>
@@ -89,11 +121,26 @@ async function fetchMyCollections(page, pageSize) {
                 <a-tab-pane key="2">
                     <template #tab>
                         <span>
-                            <android-outlined />
                             Liked Collections
                         </span>
                     </template>
-                    Tab 2
+                    <a-row>
+                        <a-col :span="24">
+                            <h4>Liked collections</h4>
+                            <a-list size="default" bordered v-if="favoriteCollection" :data-source="favoriteCollection">
+                                <template #renderItem="{ item }">
+                                    <a-list-item>
+                                        <a-button type="link" @click="(event) => goToPublicCollections(item.collection_id)">{{
+                                            item.collection_name }}
+                                        </a-button>
+                                    </a-list-item>
+                                </template>
+                            </a-list>
+
+                            <a-pagination v-model:current="current" :total="total" show-less-items
+                                @change="(page, pageSize) => fetchMyFavoriteCollections(page, pageSize)" />
+                        </a-col>
+                    </a-row>
                 </a-tab-pane>
             </a-tabs>
         </a-col>

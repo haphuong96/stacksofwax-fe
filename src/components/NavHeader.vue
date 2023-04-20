@@ -6,13 +6,14 @@
         src="@/assets/img_music.png"
         @click="goTo(routeNames.HOME)"
       />
+      <!-- v-if="isSupportSearch" -->
       <a-input-search
-        v-if="isSupportSearch"
+        
         class="ml-80"
-        placeholder="input search text"
+        placeholder="Search Albums, Artists and More..."
         @search="onSearch"
       />
-      <div v-else style="width: 215px" class="ml-80" />
+      <!-- <div style="width: 215px" class="ml-80" /> -->
     </div>
     <a-tabs
       v-model:activeKey="activeKey"
