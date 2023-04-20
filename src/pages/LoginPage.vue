@@ -29,7 +29,7 @@ async function submitLogin() {
       localStorage.setItem(localStorageKeys.ACCESS_TOKEN, accessToken);
 
       // get user info and store in local storage
-      const me = await axiosIntance.get('get-me');
+      const me = await axiosIntance.get("get-me");
       localStorage.setItem(localStorageKeys.USER_ID, me.data.user_id);
       localStorage.setItem(localStorageKeys.USERNAME, me.data.username);
       localStorage.setItem(localStorageKeys.USER_EMAIL, me.data.email_address);
@@ -40,7 +40,7 @@ async function submitLogin() {
       message.error("Something went wrong! please check and try again later!");
     }
   } catch (error) {
-    console.log(error)
+    console.log(error);
     message.error("Something went wrong! please check and try again later!");
   } finally {
     isLoading.value = false;
@@ -53,7 +53,7 @@ function goToSignUp() {
 </script>
 
 <template>
-  <div class="page-title mt-80 mb-32">Login</div>
+  <div class="page-title mt-80 mb-32 login-page-title">Login</div>
   <a-form
     name="basic"
     :label-col="{ span: 8 }"
@@ -86,4 +86,8 @@ function goToSignUp() {
   </a-form>
 </template>
 
-<style scoped></style>
+<style scoped>
+.login-page-title {
+  text-align: center;
+}
+</style>

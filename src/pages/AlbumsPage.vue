@@ -1,7 +1,13 @@
 <script setup>
 import { message } from "ant-design-vue";
 import axios from "axios";
-import { onBeforeUnmount, onMounted, ref } from "vue";
+import {
+  onActivated,
+  onBeforeUnmount,
+  onDeactivated,
+  onMounted,
+  ref
+} from "vue";
 import router from "../router";
 import { routeNames } from "../router/route-names";
 import { service } from "../services";
@@ -37,7 +43,8 @@ const props = defineProps({
 
 onMounted(async () => {
   searchKeyword = "";
-  emitter.on("ON_SEARCH_CHANGE", onSearchChange);
+  emitter.on("ON_EXPLORE_SEARCH_CHANG_KEY", onSearchChange);
+  emitter.on("ON_EXPLORE_TAB_CHANGED", onTabChanged);
   const filter = await service.albumService.getAlbumFilter();
   const { genres: genresFilter, decades: decadesFilter } = filter;
   genres.value = genresFilter;
@@ -48,7 +55,8 @@ onMounted(async () => {
 });
 
 onBeforeUnmount(() => {
-  emitter.off("ON_SEARCH_CHANGE", onSearchChange);
+  emitter.off("ON_EXPLORE_SEARCH_CHANG_KEY", onSearchChange);
+  emitter.off("ON_EXPLORE_TAB_CHANGED", onTabChanged);
 });
 
 async function fetchAlbums(page, pageSize) {
@@ -113,6 +121,12 @@ function goToAlbumDetailPage(albumId) {
 async function onSearchChange(_searchKeyword) {
   if (props.currentActiveTab !== "1") return;
   searchKeyword = _searchKeyword;
+  fetchAlbums();
+}
+
+async function onTabChanged(tabIndex) {
+  if (tabIndex === "1" || !searchKeyword) return;
+  searchKeyword = "";
   fetchAlbums();
 }
 </script>

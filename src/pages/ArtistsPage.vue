@@ -28,12 +28,14 @@ const props = defineProps({
 
 onMounted(async () => {
   searchKeyword = "";
-  emitter.on("ON_SEARCH_CHANGE", onSearchChange);
+  emitter.on("ON_EXPLORE_SEARCH_CHANG_KEY", onSearchChange);
+  emitter.on("ON_EXPLORE_TAB_CHANGED", onTabChanged);
   fetchArtists(defaultPage, defaultPageSize);
 });
 
 onBeforeUnmount(() => {
-  emitter.off("ON_SEARCH_CHANGE", onSearchChange);
+  emitter.off("ON_EXPLORE_SEARCH_CHANG_KEY", onSearchChange);
+  emitter.off("ON_EXPLORE_TAB_CHANGED", onTabChanged);
 });
 
 async function fetchArtists(page, pageSize) {
@@ -72,6 +74,12 @@ function goToArtistDetailPage(artistId) {
 async function onSearchChange(_searchKeyword) {
   if(props.currentActiveTab !== '2') return
   searchKeyword = _searchKeyword;
+  fetchArtists();
+}
+
+async function onTabChanged(tabIndex) {
+  if (tabIndex === "2" || !searchKeyword) return;
+  searchKeyword = "";
   fetchArtists();
 }
 </script>

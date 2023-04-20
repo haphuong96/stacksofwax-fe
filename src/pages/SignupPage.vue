@@ -56,7 +56,7 @@ function goToLogin() {
 </script>
 
 <template>
-  <div class="page-title mt-80 mb-32">Sign Up</div>
+  <div class="page-title mt-80 mb-32 signup-page-title">Sign Up</div>
   <a-form
     name="basic"
     :label-col="{ span: 8 }"
@@ -100,4 +100,8 @@ function goToLogin() {
   </a-form>
 </template>
 
-<style scoped></style>
+<style scoped>
+.signup-page-title {
+  text-align: center;
+}
+</style>
