@@ -130,22 +130,19 @@ async function onTabChanged(tabIndex) {
         <a-list item-layout="horizontal" :data-source="albums">
           <template #renderItem="{ item }">
             <a-list-item>
-              <a-list-item-meta>
+              <a-list-item-meta >
                 <template #title>
-                  <a href="https://www.antdv.com/">{{ item.album_title }}</a>
+                  <a 
+                    type="link"
+                    @click="(event) => goToAlbumDetailPage(item.album_id)"
+                    >{{ item.album_title }}</a
+                  >
                 </template>
                 <template #avatar>
-                  <img :src="item.img_path" class="w-50">
-                  <!-- <a-avatar :src="item.img_path" /> -->
+                  <img :src="item.img_path" class="w-50" />
                 </template>
               </a-list-item-meta>
-            </a-list-item>
-            <a-list-item>
-              <a-button
-                type="link"
-                @click="(event) => goToAlbumDetailPage(item.album_id)"
-                >{{ item.album_title }}</a-button
-              >
+              {{ item.artists[0].artist_name }}
             </a-list-item>
           </template>
         </a-list>
@@ -163,4 +160,7 @@ async function onTabChanged(tabIndex) {
 </template>
 
 <style scoped>
+.w-50 {
+  width: 50px;
+}
 </style>
