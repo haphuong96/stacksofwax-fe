@@ -35,27 +35,26 @@ const getAlbums = async (page, pageSize, filters) => {
 
     const filterParams = new URLSearchParams();
 
-    if (filters.genres.length) {
+    if (filters?.genres?.length) {
       filters.genres.forEach((genre) => {
         filterParams.append("genreId", genre.id);
       });
     }
 
-    if (filters.decade) {
+    if (filters?.decade) {
       filterParams.append("decade", filters.decade);
     }
 
-    if (filters.searchKeyword) {
+    if (filters?.searchKeyword) {
       filterParams.append("search", filters.searchKeyword);
     }
 
     filterParams.append("limit", limit);
     filterParams.append("offset", offset);
 
-    const res = await axios.get("http://localhost:4000/api/albums", {
+    const res = await axiosIntance.get("/albums", {
       params: filterParams
     });
-
     console.log(res);
     const { total, albums } = res.data;
     // console.log('total ' +total)
