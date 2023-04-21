@@ -87,7 +87,7 @@ async function onTabChanged(tabIndex) {
 <template>
   <a-row>
     <!-- class="m-16 p-16" -->
-    <a-col :span="4" class="px-32">
+    <a-col :span="5" class="px-32">
       <div>Explore the hottest artists</div>
       <!-- <div>
         <h2>Genre</h2>
@@ -116,7 +116,7 @@ async function onTabChanged(tabIndex) {
       </div> -->
     </a-col>
 
-    <a-col :span="20">
+    <a-col :span="19">
       <h1 class="default-page-title">Explore Artists</h1>
       <div v-if="artists">
         <a-list item-layout="horizontal" :data-source="artists">
