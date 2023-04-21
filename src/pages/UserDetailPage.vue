@@ -73,13 +73,20 @@ const createdAt = ref("");
 const lastActiveTime = ref("");
 const totalCollections = ref(0);
 const activeKey = ref("1");
-const activeCollectionKey = ref("1");
-const current = ref(1);
 const collections = ref([]);
+
+// limit offset
+const defaultPage = 1;
+const defaultPageSize = 10;
+const current = ref(defaultPage);
 
 onMounted(async () => {
   isLoading.value = true;
-  const userInfo = await service.userService.fetchUserInfo(15);
+  const userInfo = await service.userService.fetchUserInfo(
+    15,
+    current.value,
+    defaultPageSize
+  );
   isLoading.value = false;
   if (userInfo) {
     name.value = userInfo.username;
