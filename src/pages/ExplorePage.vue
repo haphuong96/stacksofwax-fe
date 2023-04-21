@@ -10,7 +10,7 @@
   <a-tabs
     v-model:activeKey="activeKey"
     type="card"
-    class="mt-32"
+    class="mt-16"
     @change="onTabChanged"
   >
     <template #leftExtra> <div class="mock-left-extra"></div></template>
@@ -59,6 +59,6 @@ const onTabChanged = () => {
 }
 
 .mock-left-extra {
-  width: calc(100vw / 24 * 4);
+  width: calc(100vw / 24 * 5);
 }
 </style>
