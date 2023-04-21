@@ -17,17 +17,19 @@ const current = ref(1);
 // limit offset
 const defaultPage = 1;
 const defaultPageSize = 10;
-let searchKeyword = "";
 
 const props = defineProps({
   currentActiveTab: {
+    type: String,
+    default: ""
+  },
+  searchKeyword: {
     type: String,
     default: ""
   }
 });
 
 onMounted(async () => {
-  searchKeyword = "";
   emitter.on("ON_EXPLORE_SEARCH_CHANG_KEY", onSearchChange);
   emitter.on("ON_EXPLORE_TAB_CHANGED", onTabChanged);
   fetchArtists(defaultPage, defaultPageSize);
@@ -47,8 +49,8 @@ async function fetchArtists(page, pageSize) {
       limit,
       offset
     };
-    if (searchKeyword) {
-      params = { ...params, search: searchKeyword };
+    if (props.searchKeyword) {
+      params = { ...params, search: props.searchKeyword };
     }
 
     const res = await axiosIntance.get("artists", {
@@ -72,15 +74,13 @@ function goToArtistDetailPage(artistId) {
 }
 
 async function onSearchChange(_searchKeyword) {
-  if(props.currentActiveTab !== '2') return
-  searchKeyword = _searchKeyword;
   fetchArtists();
 }
 
 async function onTabChanged(tabIndex) {
-  if (tabIndex === "2" || !searchKeyword) return;
-  searchKeyword = "";
-  fetchArtists();
+  // if (tabIndex === "2" || !searchKeyword) return;
+  // searchKeyword = "";
+  // fetchArtists();
 }
 </script>
 

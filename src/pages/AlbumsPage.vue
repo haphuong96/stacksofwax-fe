@@ -31,17 +31,19 @@ const decades = ref([]);
 const decadeFilterVal = ref();
 // selected genre filter
 const genreFilterVals = ref([]);
-let searchKeyword = "";
 
 const props = defineProps({
   currentActiveTab: {
+    type: String,
+    default: ""
+  },
+  searchKeyword: {
     type: String,
     default: ""
   }
 });
 
 onMounted(async () => {
-  searchKeyword = "";
   emitter.on("ON_EXPLORE_SEARCH_CHANG_KEY", onSearchChange);
   emitter.on("ON_EXPLORE_TAB_CHANGED", onTabChanged);
   const filter = await service.albumService.getAlbumFilter();
@@ -60,12 +62,16 @@ onBeforeUnmount(() => {
 
 async function fetchAlbums(page, pageSize) {
   try {
-    const res = await service.albumService.getAlbums(page, pageSize);
-    
+    const res = await service.albumService.getAlbums(page, pageSize, {
+      searchKeyword: props.searchKeyword,
+      // genres: genreFilterVals.value,
+      // decade: decadeFilterVal.value
+    });
+
     total.value = res.total;
     albums.value = res.albums;
   } catch (Error) {
-    console.log(Error)
+    console.log(Error);
     message.error("Error retrieving list of albums");
   }
 }
@@ -105,15 +111,13 @@ function goToAlbumDetailPage(albumId) {
 }
 
 async function onSearchChange(_searchKeyword) {
-  if (props.currentActiveTab !== "1") return;
-  searchKeyword = _searchKeyword;
   fetchAlbums();
 }
 
 async function onTabChanged(tabIndex) {
-  if (tabIndex === "1" || !searchKeyword) return;
-  searchKeyword = "";
-  fetchAlbums();
+  // if (tabIndex === "1" || !searchKeyword) return;
+  // searchKeyword = "";
+  // fetchAlbums();
 }
 </script>
 

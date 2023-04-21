@@ -14,10 +14,10 @@
     @change="onTabChanged"
   >
     <a-tab-pane key="1" tab="Albums">
-      <AlbumsPage :currentActiveTab="activeKey"></AlbumsPage>
+      <AlbumsPage :currentActiveTab="activeKey" :searchKeyword="searchKeyword"></AlbumsPage>
     </a-tab-pane>
     <a-tab-pane key="2" tab="Artists">
-      <ArtistsPage :currentActiveTab="activeKey"></ArtistsPage>
+      <ArtistsPage :currentActiveTab="activeKey" :searchKeyword="searchKeyword"></ArtistsPage>
     </a-tab-pane>
     <template #rightExtra>
     </template>
@@ -37,7 +37,6 @@ const onSearch = (searchValue) => {
 };
 
 const onTabChanged = () => {
-  searchKeyword.value = "";
   emitter.emit("ON_EXPLORE_TAB_CHANGED", activeKey.value);
 };
 </script>
