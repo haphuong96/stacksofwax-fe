@@ -1,4 +1,12 @@
 <template>
+  <div class="search-container">
+        <a-input-search
+          v-model:value="searchKeyword"
+          class="seach-input"
+          placeholder="Search Albums, Artists and More..."
+          @search="onSearch"
+        />
+      </div>
   <a-tabs
     v-model:activeKey="activeKey"
     type="card"
@@ -12,14 +20,6 @@
       <ArtistsPage :currentActiveTab="activeKey"></ArtistsPage>
     </a-tab-pane>
     <template #rightExtra>
-      <div class="search-container">
-        <a-input-search
-          v-model:value="searchKeyword"
-          class="seach-input"
-          placeholder="Search Albums, Artists and More..."
-          @search="onSearch"
-        />
-      </div>
     </template>
   </a-tabs>
 </template>

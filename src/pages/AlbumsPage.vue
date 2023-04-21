@@ -12,18 +12,17 @@ import router from "../router";
 import { routeNames } from "../router/route-names";
 import { service } from "../services";
 import emitter from "../utils/emitter.helper";
+import pagination from "../utils/pagination.helper";
 
 /**
  * Album data fetch from fetchAlbums function
  */
-const data = ref();
+const albums = ref();
 //total number of returned data
 const total = ref(0);
 // current page
 const current = ref(1);
-// limit offset
-const defaultPage = 1;
-const defaultPageSize = 10;
+
 // list of genre filter
 const genres = ref([]);
 // list of decades filter
@@ -51,7 +50,7 @@ onMounted(async () => {
   decades.value = decadesFilter;
 
   // fetch data
-  await fetchAlbums(defaultPage, defaultPageSize);
+  await fetchAlbums();
 });
 
 onBeforeUnmount(() => {
@@ -61,57 +60,44 @@ onBeforeUnmount(() => {
 
 async function fetchAlbums(page, pageSize) {
   try {
-    const limit = pageSize || defaultPageSize;
-    const offset = (page - 1) * pageSize || 0;
-    if (decadeFilterVal.value) {
-    }
-
-    let params = {
-      limit,
-      offset
-    };
-    if (searchKeyword) {
-      params = { ...params, search: searchKeyword };
-    }
-
-    const res = await axios.get("http://localhost:4000/api/albums", {
-      params
-    });
-    data.value = res.data.albums;
-    total.value = res.data.total;
+    const res = await service.albumService.getAlbums(page, pageSize);
+    
+    total.value = res.total;
+    albums.value = res.albums;
   } catch (Error) {
+    console.log(Error)
     message.error("Error retrieving list of albums");
   }
 }
 
-async function filterByGenre(_filterVals, filterObjs) {
-  try {
-    const filterParams = new URLSearchParams();
+// async function filterByGenre(_filterVals, filterObjs) {
+//   try {
+//     const filterParams = new URLSearchParams();
 
-    filterObjs.forEach((genre) => {
-      filterParams.append("genreId", genre.id);
-    });
+//     filterObjs.forEach((genre) => {
+//       filterParams.append("genreId", genre.id);
+//     });
 
-    // pass limit offset
-    filterParams.append("limit", defaultPageSize);
-    filterParams.append("offset", 0);
+//     // pass limit offset
+//     filterParams.append("limit", defaultPageSize);
+//     filterParams.append("offset", 0);
 
-    const res = await axios.get("http://localhost:4000/api/albums", {
-      params: filterParams
-    });
-    console.log(res);
-    data.value = res.data.albums;
-  } catch (Error) {
-    console.log(Error);
-    message.error("Error retrieving list of albums");
-  }
-}
+//     const res = await axios.get("http://localhost:4000/api/albums", {
+//       params: filterParams
+//     });
+//     console.log(res);
+//     data.value = res.data.albums;
+//   } catch (Error) {
+//     console.log(Error);
+//     message.error("Error retrieving list of albums");
+//   }
+// }
 
-async function filterByDecade(filterVal) {
-  const res = await axios.get("http://localhost:4000/api/albums", {
-    params: filterParams
-  });
-}
+// async function filterByDecade(filterVal) {
+//   const res = await axios.get("http://localhost:4000/api/albums", {
+//     params: filterParams
+//   });
+// }
 
 function goToAlbumDetailPage(albumId) {
   console.log("item: " + albumId);
@@ -164,7 +150,7 @@ async function onTabChanged(tabIndex) {
     <a-col :span="20">
       <h1 class="default-page-title">Explore Albums</h1>
       <div>
-        <a-list item-layout="horizontal" :data-source="data">
+        <a-list item-layout="horizontal" :data-source="albums">
           <template #renderItem="{ item }">
             <a-list-item>
               <a-button

@@ -78,19 +78,31 @@ fetchAlbumDetail();
               class="album-img" />
           </a-col>
           <a-col :span="16">
+            <div>Album</div>
+            <span>
             <h1>
-              <span v-for="(item, index) in albumDetailTitle.albumArtist" :key="index">
+              <!-- <span v-for="(item, index) in albumDetailTitle.albumArtist" :key="index">
                 {{ (index > 0) ? ", " : "" }}
                 <a href="#">{{ item.artist_name }}</a>
               </span>
-              -
+              - -->
               <span>{{ albumDetailTitle.albumTitle }}</span>
             </h1>
-
+            <!-- <h4><span v-for="(item, index) in albumDetailTitle.albumArtist" :key="index">
+                {{ (index > 0) ? ", " : "" }}
+                <a href="#">{{ item.artist_name }}</a>
+              </span></h4> -->
+            </span>
 
             <a-descriptions :column="1"
               :labelStyle="{ 'background-color': 'white', 'padding': '0px 0px', 'width': '20%' }"
               :contentStyle="{ 'padding': '0px 0px' }">
+              <a-descriptions-item label = "Artist" :style="{ 'padding-bottom': '0px' }">
+                <span v-for="(item, index) in albumDetailTitle.albumArtist" :key="index">
+                {{ (index > 0) ? ", " : "" }}
+                <a href="#">{{ item.artist_name }}</a>
+              </span>
+              </a-descriptions-item>
               <a-descriptions-item label="Record Label" :style="{ 'padding-bottom': '0px' }">
                 <span v-for="(item, index) in albumGeneralInfo.recordLabels" :key="index">
                   {{ (index > 0) ? ", " : "" }}
@@ -108,11 +120,11 @@ fetchAlbumDetail();
                   {{ albumGeneralInfo.release_year }}
                 </span>
               </a-descriptions-item>
-              <a-descriptions-item label="Country" :style="{ 'padding-bottom': '0px' }">
+              <!-- <a-descriptions-item label="Country" :style="{ 'padding-bottom': '0px' }">
                 <span>
                   {{ albumGeneralInfo.country }}
                 </span>
-              </a-descriptions-item>
+              </a-descriptions-item> -->
             </a-descriptions>
           </a-col>
         </a-row>

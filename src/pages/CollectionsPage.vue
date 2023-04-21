@@ -16,14 +16,17 @@ const defaultPageSize = 10;
 
 onMounted(async () => {
   fetchCollections(defaultPage, defaultPageSize);
+  fetchFavoriteCollections(defaultPage, defaultPageSize);
 });
 
-async function fetchFavoriteCollections() {
+async function fetchFavoriteCollections(page, pageSize) {
   try {
+    const limit = pageSize || defaultPageSize;
+    const offset = (page - 1) * pageSize || 0;
 
     const sortParams = new URLSearchParams();
 
-    sortParams.append("sort", "like");
+    sortParams.append("sort", "-likes");
     sortParams.append("limit", 3);
     sortParams.append("offset", 0);
 
@@ -31,7 +34,7 @@ async function fetchFavoriteCollections() {
       params: sortParams
     });
 
-    favCollections.value = res.data;
+    favCollections.value = res.data.collections;
 
   } catch (error) {
     message.error("Cannot load favorite collections")
@@ -67,10 +70,10 @@ function goToCollectionDetail(collectionId) {
   <a-row>
     <a-col :span="24" class="m-16 p-16">
       <a-divider orientation="left">Top Favorite Collections</a-divider>
-      <a-list :grid="{ gutter: 16, xs: 1, sm: 2, md: 4, lg: 4, xl: 6, xxl: 3, xxxl: 2 }" :data-source="favCollections">
+      <a-list :grid="{ gutter: 16, xs: 1, sm: 2, md: 4, lg: 4, xl: 6, xxl: 3, xxxl: 2 }" :data-source="favCollections" v-if="favCollections">
         <template #renderItem="{ item }">
           <a-list-item>
-            <a-card :title="item.title">Card content</a-card>
+            <a-card :title="item.collection_name">Card content</a-card>
           </a-list-item>
         </template>
       </a-list>
