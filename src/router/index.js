@@ -9,6 +9,7 @@ import MyCollectionPage from "../pages/MyCollectionPage.vue";
 import DraftCollectionPage from "../pages/DraftCollectionPage.vue";
 import CollectionDetailPage from "../pages/CollectionDetailPage.vue";
 import ArtistDetailPage from "../pages/ArtistDetailPage.vue";
+import UserDetailPage from "../pages/UserDetailPage.vue";
 
 import { checkAuthGuard } from "./guards/check-auth.guard";
 import { routeNames } from "./route-names";
@@ -129,6 +130,14 @@ const router = createRouter({
         layout: screenLayout.DEFAULT_LAYOUT
       }
       // beforeEnter: requireLoginGuard
+    },
+    {
+      path: "/user/:id",
+      name: routeNames.USER_DETAIL,
+      component: UserDetailPage,
+      meta: {
+        layout: screenLayout.DEFAULT_LAYOUT
+      }
     }
   ]
 });

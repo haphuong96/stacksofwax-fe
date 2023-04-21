@@ -34,7 +34,6 @@ const getAlbums = async (page, pageSize, filters) => {
     const { limit, offset } = pagination(page, pageSize);
 
     const filterParams = new URLSearchParams();
-
     if (filters?.genres?.length) {
       filters.genres.forEach((genre) => {
         filterParams.append("genreId", genre.id);
