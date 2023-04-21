@@ -62,10 +62,11 @@ onBeforeUnmount(() => {
 
 async function fetchAlbums(page, pageSize) {
   try {
+    console.log(Array.isArray(genreFilterVals.value));
     const res = await service.albumService.getAlbums(page, pageSize, {
       searchKeyword: props.searchKeyword,
-      // genres: genreFilterVals.value,
-      // decade: decadeFilterVal.value
+      genres: genreFilterVals.value,
+      decade: decadeFilterVal.value
     });
 
     total.value = res.total;
@@ -75,35 +76,6 @@ async function fetchAlbums(page, pageSize) {
     message.error("Error retrieving list of albums");
   }
 }
-
-// async function filterByGenre(_filterVals, filterObjs) {
-//   try {
-//     const filterParams = new URLSearchParams();
-
-//     filterObjs.forEach((genre) => {
-//       filterParams.append("genreId", genre.id);
-//     });
-
-//     // pass limit offset
-//     filterParams.append("limit", defaultPageSize);
-//     filterParams.append("offset", 0);
-
-//     const res = await axios.get("http://localhost:4000/api/albums", {
-//       params: filterParams
-//     });
-//     console.log(res);
-//     data.value = res.data.albums;
-//   } catch (Error) {
-//     console.log(Error);
-//     message.error("Error retrieving list of albums");
-//   }
-// }
-
-// async function filterByDecade(filterVal) {
-//   const res = await axios.get("http://localhost:4000/api/albums", {
-//     params: filterParams
-//   });
-// }
 
 function goToAlbumDetailPage(albumId) {
   console.log("item: " + albumId);
@@ -144,6 +116,7 @@ async function onTabChanged(tabIndex) {
           style="width: 100%"
           :options="decades"
           :filter-option="filterOption"
+          :allowClear="true"
           @focus="handleFocus"
           @blur="handleBlur"
           @change="(_filterVal, _filterObjs) => fetchAlbums()"
@@ -157,6 +130,17 @@ async function onTabChanged(tabIndex) {
         <a-list item-layout="horizontal" :data-source="albums">
           <template #renderItem="{ item }">
             <a-list-item>
+              <a-list-item-meta>
+                <template #title>
+                  <a href="https://www.antdv.com/">{{ item.album_title }}</a>
+                </template>
+                <template #avatar>
+                  <img :src="item.img_path" class="w-50">
+                  <!-- <a-avatar :src="item.img_path" /> -->
+                </template>
+              </a-list-item-meta>
+            </a-list-item>
+            <a-list-item>
               <a-button
                 type="link"
                 @click="(event) => goToAlbumDetailPage(item.album_id)"
@@ -165,7 +149,8 @@ async function onTabChanged(tabIndex) {
             </a-list-item>
           </template>
         </a-list>
-
+      </div>
+      <div>
         <a-pagination
           v-model:current="current"
           :total="total"
@@ -177,4 +162,5 @@ async function onTabChanged(tabIndex) {
   </a-row>
 </template>
 
-<style scoped></style>
+<style scoped>
+</style>

@@ -35,9 +35,10 @@ const getAlbums = async (page, pageSize, filters) => {
 
     const filterParams = new URLSearchParams();
 
+    console.log('inside getalbum filters.genres ' + filters.genres)
     if (filters?.genres?.length) {
       filters.genres.forEach((genre) => {
-        filterParams.append("genreId", genre.id);
+        filterParams.append("genreId", genre);
       });
     }
 
@@ -57,7 +58,7 @@ const getAlbums = async (page, pageSize, filters) => {
     });
     console.log(res);
     const { total, albums } = res.data;
-    // console.log('total ' +total)
+
     return {
       total,
       albums
