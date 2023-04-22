@@ -3,14 +3,11 @@
     <div class="page-container">
       <a-row>
         <a-col :span="3">
-          <a-image
-            :width="120"
-            :height="120"
-            class="profile-image"
-            :fallback="fallbackImage"
+          <CircleImage
+            :size="120"
+            :failed-image="fallbackImage"
             :src="profileImage"
-            :placeholder="true"
-          />
+          ></CircleImage>
         </a-col>
         <a-col :span="21">
           <div class="user-detail__lbl-name">#{{ name }}</div>
@@ -73,7 +70,8 @@ import router from "../router";
 import { message } from "ant-design-vue";
 import formatDistanceToNow from "date-fns/formatDistanceToNow";
 import format from "date-fns/format";
-import fallbackImage from '../assets/ic_user.png'
+import fallbackImage from "../assets/ic_user.png";
+import CircleImage from "../components/CircleImage.vue";
 
 const isLoading = ref(false);
 const name = ref("");
@@ -158,10 +156,5 @@ function formatFromNow(date) {
 .public-collection-label {
   font-size: 18px;
   color: black;
-}
-
-:deep(.ant-image-img) {
-  border-radius: 72px;
-  border: 4px solid lightgray;
 }
 </style>

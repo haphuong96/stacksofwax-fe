@@ -1,9 +1,6 @@
 <script setup>
-import { message } from "ant-design-vue";
-import { computed, onMounted, ref } from "vue";
+import { onMounted, ref } from "vue";
 import router from "../router";
-import { routeNames } from "../router/route-names";
-import { localStorageKeys } from "../common/local-storage-keys";
 import { axiosIntance } from "../services/base.service";
 
 const artistId = router.currentRoute.value.params.id.split("-")[0];
@@ -13,16 +10,15 @@ const albumsData = ref();
 
 onMounted(async () => {
   fetchArtistDetails();
-})
+});
 
 async function fetchArtistDetails() {
   const res = await axiosIntance.get(`artists/${artistId}`);
 
-  const {albums, ...details} = res.data;
+  const { albums, ...details } = res.data;
   artistData.value = details;
   albumsData.value = albums;
 }
-
 </script>
 
 <template>
@@ -30,16 +26,7 @@ async function fetchArtistDetails() {
     <a-col :span="24">
       <a-row v-if="artistData">
         <a-col :span="4">
-
-          <!-- <a-avatar :size="200"
-            :src="artistData.img_path"></a-avatar> -->
-          <!-- <a-image
-            :width="200"
-            :height="200"
-            :src="artistData.img_path"
-            :style="{'border-radius': '50%'}"
-          /> -->
-          
+          <a-image :width="200" :src="artistData.img_path" />
         </a-col>
         <a-col :span="20" class="mt-16">
           <div>Artist</div>

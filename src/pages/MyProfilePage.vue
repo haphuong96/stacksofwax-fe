@@ -3,7 +3,12 @@
     <div class="page-container">
       <div class="d-flex justify-center">
         <div class="profile-container">
-          <a-image
+          <CircleImage
+            :size="120"
+            :failed-image="fallbackImage"
+            :src="profileImage"
+          ></CircleImage>
+          <!-- <a-image
             :width="120"
             :height="120"
             class="profile-image"
@@ -11,7 +16,7 @@
             :src="profileImage"
             :placeholder="true"
             :preview="false"
-          />
+          /> -->
           <EditFilled
             class="edit-pen"
             @click="visibleChangeProfilePictureModal = true"
@@ -80,6 +85,7 @@ import format from "date-fns/format";
 import fallbackImage from "../assets/ic_user.png";
 
 import { EditFilled } from "@ant-design/icons-vue";
+import CircleImage from "../components/CircleImage.vue";
 
 const isLoading = ref(false);
 const name = ref("");
@@ -189,10 +195,5 @@ async function saveNewProfilePicture() {
   padding: 2px;
   border-radius: 12px;
   background-color: white;
-}
-
-:deep(.ant-image-img) {
-  border-radius: 72px;
-  border: 4px solid lightgray;
 }
 </style>
