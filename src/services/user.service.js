@@ -1,5 +1,6 @@
 import pagination from "../utils/pagination.helper";
 import { axiosIntance } from "./base.service";
+import router from "../router";
 
 async function fetchUserInfo(userId, page = 1, pageSize = 10) {
   try {
