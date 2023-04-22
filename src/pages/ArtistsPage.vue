@@ -79,13 +79,16 @@ async function onTabChanged(tabIndex) {
       <div v-if="searchQuery" class="mb-16">
         <search-outlined /> Search Keyword: {{ searchQuery }}
       </div>
-      <div v-else class="mb-16" style="height: 32px"></div>
 
       <div v-if="artists">
         <a-list
           item-layout="horizontal"
           :data-source="artists"
-          class="artist-page-list-artist"
+          :class="
+            searchQuery
+              ? 'artist-page__list-artist__search'
+              : 'artist-page__list-artist'
+          "
         >
           <template #renderItem="{ item }">
             <a-list-item>
@@ -130,8 +133,13 @@ async function onTabChanged(tabIndex) {
 </template>
 
 <style scoped>
-.artist-page-list-artist {
-  height: calc(100vh - 350px);
+.artist-page__list-artist {
+  height: calc(100vh - 320px);
+  overflow: scroll;
+}
+
+.artist-page__list-artist__search {
+  height: calc(100vh - 358px);
   overflow: scroll;
 }
 </style>

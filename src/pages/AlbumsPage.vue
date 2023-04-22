@@ -118,12 +118,15 @@ async function onTabChanged(tabIndex) {
       <div v-if="searchQuery" class="mb-16">
         <search-outlined /> Search Keyword: {{ searchQuery }}
       </div>
-      <div v-else class="mb-16" style="height: 22px;"></div>
       <div>
         <a-list
           item-layout="horizontal"
           :data-source="albums"
-          class="album-page-list-album"
+          :class="
+            searchQuery
+              ? 'album-page__list-album__search'
+              : 'album-page__list-album'
+          "
         >
           <template #renderItem="{ item }">
             <a-list-item>
@@ -208,8 +211,13 @@ async function onTabChanged(tabIndex) {
   color: #1890ff;
 }
 
-.album-page-list-album {
-  height: calc(100vh - 340px);
+.album-page__list-album {
+  height: calc(100vh - 320px);
+  overflow: scroll;
+}
+
+.album-page__list-album__search {
+  height: calc(100vh - 358px);
   overflow: scroll;
 }
 </style>
