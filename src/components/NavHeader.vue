@@ -14,7 +14,7 @@
       @change="onTabChanged"
     >
       <a-tab-pane :key="routeNames.HOME" tab="Home"></a-tab-pane>
-      <a-tab-pane :key="routeNames.EXPLORE" tab="Explore"></a-tab-pane>
+      <a-tab-pane :key="routeNames.EXPLORE" tab="Music Database"></a-tab-pane>
       <a-tab-pane :key="routeNames.COLLECTION" tab="Collections"></a-tab-pane>
     </a-tabs>
     <div v-if="!isLoggedIn" class="d-flex h-flex justify-flex-end">

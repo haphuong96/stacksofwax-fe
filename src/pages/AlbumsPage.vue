@@ -8,12 +8,11 @@ import {
   onMounted,
   ref
 } from "vue";
-import router from "../router";
-import { routeNames } from "../router/route-names";
 import { service } from "../services";
 import emitter from "../utils/emitter.helper";
-import pagination from "../utils/pagination.helper";
+import { SearchOutlined } from "@ant-design/icons-vue";
 
+const { albumService, navigationService } = service;
 /**
  * Album data fetch from fetchAlbums function
  */
@@ -22,6 +21,8 @@ const albums = ref();
 const total = ref(0);
 // current page
 const current = ref(1);
+
+const searchQuery = ref();
 
 // list of genre filter
 const genres = ref([]);
@@ -46,7 +47,7 @@ const props = defineProps({
 onMounted(async () => {
   emitter.on("ON_EXPLORE_SEARCH_CHANG_KEY", onSearchChange);
   emitter.on("ON_EXPLORE_TAB_CHANGED", onTabChanged);
-  const filter = await service.albumService.getAlbumFilter();
+  const filter = await albumService.getAlbumFilter();
   const { genres: genresFilter, decades: decadesFilter } = filter;
   genres.value = genresFilter;
   decades.value = decadesFilter;
@@ -62,7 +63,7 @@ onBeforeUnmount(() => {
 
 async function fetchAlbums(page, pageSize) {
   try {
-    const res = await service.albumService.getAlbums(page, pageSize, {
+    const res = await albumService.getAlbums(page, pageSize, {
       searchKeyword: props.searchKeyword,
       genres: genreFilterVals.value,
       decade: decadeFilterVal.value
@@ -76,12 +77,8 @@ async function fetchAlbums(page, pageSize) {
   }
 }
 
-function goToAlbumDetailPage(albumId) {
-  console.log("item: " + albumId);
-  router.push({ name: routeNames.ALBUM_DETAILS, params: { id: albumId } });
-}
-
-async function onSearchChange(_searchKeyword) {
+async function onSearchChange(searchKeyword) {
+  searchQuery.value = searchKeyword
   fetchAlbums();
 }
 
@@ -125,33 +122,49 @@ async function onTabChanged(tabIndex) {
 
     <a-col :span="19">
       <h1 class="default-page-title">Explore Albums</h1>
+      <div v-if="searchQuery" class="mb-16"><search-outlined /> Search Keyword: {{ searchQuery }}</div>
       <div>
         <a-list item-layout="horizontal" :data-source="albums">
           <template #renderItem="{ item }">
             <a-list-item>
               <a-list-item-meta>
                 <template #description>
+                  <span class="a-description">
+                    <a
+                      @click="navigationService.goToArtistDetailPage(item.artists[0].artist_id)"
+                      >{{ item.artists[0].artist_name }}</a
+                    >
+                  </span>
+                  <span
+                    v-for="n in item.artists.length - 1"
+                    class="a-description"
+                  >
+                    {{ ", " }}
+                    <a
+                      @click="navigationService.goToArtistDetailPage(item.artists[n].artist_id)"
+                      >{{ item.artists[n].artist_name }}</a
+                    >
+                  </span>
+                  •
                   <span>
-                  {{ item.artists[0].artist_name }}
-                  
-                </span>
-                <span v-if="item.artists.length > 1" v-for="n in item.artists.length - 1">
-                 {{ ", " }}{{ item.artists[n].artist_name }}
-                </span>
+                    {{ item.release_year }}
+                  </span>
                 </template>
                 <template #title>
-                  <a 
+                  <a
                     type="link"
-                    @click="(event) => goToAlbumDetailPage(item.album_id)"
+                    @click="(event) => navigationService.goToAlbumDetailPage(item.album_id)"
                     >{{ item.album_title }}</a
                   >
                 </template>
                 <template #avatar>
-                  <img :src="item.img_path" class="w-50" />
+                  <a
+                    type="link"
+                    @click="(event) => navigationService.goToAlbumDetailPage(item.album_id)"
+                    ><img :src="item.img_path" class="w-50"
+                  /></a>
                 </template>
               </a-list-item-meta>
-              
-              
             </a-list-item>
           </template>
         </a-list>
@@ -173,7 +186,11 @@ async function onTabChanged(tabIndex) {
   width: 50px;
 }
 
-.left-align {
-  /* margin-left: 0; */
+.a-description a {
+  color: inherit;
+}
+
+.a-description > a:hover {
+  color: #1890ff;
 }
 </style>

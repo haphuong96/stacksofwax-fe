@@ -28,6 +28,11 @@
     margin-top: 16px;
 }
 
+/* margin bottom */
+.mb-16 {
+    margin-bottom: 16px;
+}
+
 /* margin */
 .m-16 {
     margin: 16px;
