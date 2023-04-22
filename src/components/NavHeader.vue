@@ -42,7 +42,7 @@
           :style="{ fontSize: '24px' }"
       /></a-button>
       <div class="demo-dropdown-wrap">
-        <a-dropdown-button>
+        <a-dropdown-button @click="goToMyProfile">
           {{ username }}
           <template #overlay>
             <a-menu @click="handleMenuClick">
@@ -74,6 +74,7 @@ import { ref } from "vue";
 import { localStorageKeys } from "../common/local-storage-keys";
 import router from "../router";
 import { routeNames } from "../router/route-names";
+import { service } from "../services";
 
 const CollectionIcon = createFromIconfontCN({
   scriptUrl: "//at.alicdn.com/t/c/font_4014814_08ddunxy7bas.js"
@@ -92,12 +93,14 @@ function goTo(routeName) {
   router.push({ name: routeName });
 }
 
-const signout = () => {
-  localStorage.clear();
+function goToMyProfile() {
+  router.push({ name: routeNames.ME });
+}
+
+function signout() {
+  service.userService.signout();
   isLoggedIn.value = false;
-  router.push({ name: routeNames.HOME });
-  window.location.reload();
-};
+}
 
 watch: {
   router.currentRoute.value.name,

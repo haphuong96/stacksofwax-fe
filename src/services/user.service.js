@@ -13,6 +13,35 @@ async function fetchUserInfo(userId, page = 1, pageSize = 10) {
   }
 }
 
+async function getMyProfile() {
+  try {
+    const rs = await axiosIntance.get(`/get-me`);
+    return rs?.data;
+  } catch (error) {
+    return undefined;
+  }
+}
+
+async function signout() {
+  localStorage.clear();
+  router.push({ name: routeNames.HOME });
+  window.location.reload();
+}
+
+async function updateUserProfilePicture(profilePictureUrl) {
+  try {
+    const rs = await axiosIntance.post("/me/profile-picture", {
+      img_path: profilePictureUrl
+    });
+    return rs.data;
+  } catch (error) {
+    return false;
+  }
+}
+
 export const userService = {
-  fetchUserInfo
+  fetchUserInfo,
+  getMyProfile,
+  signout,
+  updateUserProfilePicture
 };

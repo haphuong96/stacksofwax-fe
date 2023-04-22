@@ -1,69 +1,74 @@
 <template>
   <a-spin :spinning="isLoading">
     <div class="page-container">
-      <a-row>
-        <a-col :span="3">
+      <div class="d-flex justify-center">
+        <div class="profile-container">
           <a-image
             :width="120"
             :height="120"
             class="profile-image"
-            fallback="../assets/ic_user.png"
+            :fallback="fallbackImage"
             :src="profileImage"
+            :placeholder="true"
+            :preview="false"
           />
-        </a-col>
-        <a-col :span="21">
-          <div class="user-detail__lbl-name">#{{ name }}</div>
-          <div class="user-detail__lbl-detail">
+          <EditFilled
+            class="edit-pen"
+            @click="visibleChangeProfilePictureModal = true"
+          />
+        </div>
+      </div>
+      <a-row>
+        <a-col :span="24" class="my-profile-center-layout">
+          <div class="my-profile__lbl-name">#{{ name }}</div>
+          <div class="my-profile__lbl-detail">
             {{ createdAt ? `Joined on ${createdAt}` : "" }}
           </div>
-          <div class="user-detail__lbl-detail">
+          <div class="my-profile__lbl-detail">
             {{ lastActiveTime ? `Last online ${lastActiveTime}` : "" }}
           </div>
         </a-col>
       </a-row>
-      <a-row class="user-collection-container">
-        <a-tabs class="user-collection-container" v-model:activeKey="activeKey">
-          <a-tab-pane key="1" :tab="`Collection Library (${totalCollections})`">
-            <div>
-              <div class="public-collection-label">Public Collection</div>
-              <a-list item-layout="horizontal" :data-source="collections">
-                <template #renderItem="{ item }">
-                  <a-list-item>
-                    <a-list-item-meta>
-                      <template #description>
-                        {{ item.collection_desc }}
-                      </template>
-                      <template #title>
-                        <a
-                          @click="
-                            () => goToCollectionDetail(item.collection_id)
-                          "
-                          >{{ item.collection_name }}</a
-                        >
-                      </template>
-                      <template #avatar>
-                        <a-avatar src="https://joeschmoe.io/api/v1/random" />
-                      </template>
-                    </a-list-item-meta>
-                  </a-list-item>
-                </template>
-              </a-list>
-
-              <a-pagination
-                v-model:current="current"
-                :total="totalCollections"
-                show-less-items
-                @change="(page, pageSize) => fetchUserInfo()"
-              />
-            </div>
-          </a-tab-pane>
-          <a-tab-pane key="2" tab="Reviews" force-render>
-            <div class="public-collection-label">Reviews Content</div>
-          </a-tab-pane>
-        </a-tabs>
-      </a-row>
     </div>
   </a-spin>
+  <a-modal
+    v-model:visible="visibleChangeProfilePictureModal"
+    title="Change Profile Picture"
+    @ok="handleOk"
+  >
+    <template #footer>
+      <a-button key="back" @click="visibleChangeProfilePictureModal = false">
+        Cancel
+      </a-button>
+      <a-button
+        key="submit"
+        type="primary"
+        :loading="loading"
+        @click="saveNewProfilePicture"
+      >
+        Update
+      </a-button>
+    </template>
+    <div>Please enter your profile image url:</div>
+    <a-input v-model:value="newProfileImageUrl"></a-input>
+    <div class="mt-16">or select default image</div>
+    <a-list
+      class="mt-8"
+      :grid="{ gutter: 16, xs: 1, sm: 2, md: 4, lg: 4, xl: 4, xxl: 3, xxxl: 2 }"
+      :data-source="defaultImage"
+    >
+      <template #renderItem="{ item }">
+        <a-list-item>
+          <a-image
+            :src="item"
+            :preview="false"
+            style="cursor: pointer"
+            @click="newProfileImageUrl = item"
+          />
+        </a-list-item>
+      </template>
+    </a-list>
+  </a-modal>
 </template>
 <script setup>
 import { onMounted, ref } from "vue";
@@ -72,28 +77,33 @@ import router from "../router";
 import { message } from "ant-design-vue";
 import formatDistanceToNow from "date-fns/formatDistanceToNow";
 import format from "date-fns/format";
+import fallbackImage from "../assets/ic_user.png";
+
+import { EditFilled } from "@ant-design/icons-vue";
 
 const isLoading = ref(false);
 const name = ref("");
 const createdAt = ref("");
 const lastActiveTime = ref("");
-const totalCollections = ref(0);
-const activeKey = ref("1");
-const collections = ref([]);
 const profileImage = ref("");
+const newProfileImageUrl = ref("");
 
-// limit offset
-const defaultPage = 1;
-const defaultPageSize = 10;
-const current = ref(defaultPage);
+const visibleChangeProfilePictureModal = ref(false);
+const defaultImage = ref([
+  "https://randomuser.me/api/portraits/lego/1.jpg",
+  "https://randomuser.me/api/portraits/lego/8.jpg",
+  "https://randomuser.me/api/portraits/lego/4.jpg",
+  "https://randomuser.me/api/portraits/lego/3.jpg",
+  "https://randomuser.me/api/portraits/lego/5.jpg",
+  "https://randomuser.me/api/portraits/lego/2.jpg",
+  "https://randomuser.me/api/portraits/lego/0.jpg",
+  "https://randomuser.me/api/portraits/lego/7.jpg",
+  "https://randomuser.me/api/portraits/lego/6.jpg"
+]);
 
 onMounted(async () => {
   isLoading.value = true;
-  const userInfo = await service.userService.fetchUserInfo(
-    15,
-    current.value,
-    defaultPageSize
-  );
+  const userInfo = await service.userService.getMyProfile();
   isLoading.value = false;
   if (userInfo) {
     name.value = userInfo.username;
@@ -103,8 +113,6 @@ onMounted(async () => {
       "MMM dd yyyy"
     );
     lastActiveTime.value = formatFromNow(userInfo.last_active);
-    totalCollections.value = userInfo.collections?.total || 0;
-    collections.value = userInfo.collections?.data || [];
   } else {
     router.go(-1);
     message.error("Cannot get user info");
@@ -117,6 +125,25 @@ function formatFromNow(date) {
     includeSeconds: true
   });
 }
+
+async function saveNewProfilePicture() {
+  try {
+    const isSuccess = await service.userService.updateUserProfilePicture(
+      newProfileImageUrl.value
+    );
+    if (isSuccess) {
+      message.success("Update successfully!");
+      profileImage.value = newProfileImageUrl.value;
+      visibleChangeProfilePictureModal.value = false;
+      return;
+    }
+    message.error("Update failed!");
+  } catch (error) {
+    message.error(error);
+  } finally {
+    newProfileImageUrl.value = "";
+  }
+}
 </script>
 <style scoped>
 .page-container {
@@ -127,34 +154,41 @@ function formatFromNow(date) {
   padding-top: 32px;
 }
 
-.profile-image {
-  height: 120px;
-  width: 120px;
-  background-color: white;
-  padding: 8px;
-  object-fit: cover;
-  border-radius: 60px;
-  border: 4px solid lightgray;
-  overflow: hidden;
-}
-
-.user-detail__lbl-name {
+.my-profile__lbl-name {
   font-size: 24px;
   color: black;
 }
 
-.user-detail__lbl-detail {
+.my-profile__lbl-detail {
   font-size: 14px;
   color: black;
 }
 
-.user-collection-container {
-  height: calc(100vh - 140px);
+.my-profile-center-layout {
+  text-align: center;
 }
 
-.public-collection-label {
-  font-size: 18px;
-  color: black;
+.profile-container {
+  position: relative;
+}
+
+.profile-image {
+  position: absolute;
+}
+
+.default-profile-image {
+  cursor: pointer;
+}
+
+.edit-pen {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  cursor: pointer;
+  border: 2px solid lightgray;
+  padding: 2px;
+  border-radius: 12px;
+  background-color: white;
 }
 
 :deep(.ant-image-img) {
