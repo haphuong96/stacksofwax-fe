@@ -73,11 +73,11 @@ fetchAlbumDetail();
     <a-row v-if="dataFetchComplete" class="m-16">
       <a-col :span="16">
         <a-row>
-          <a-col :span="8">
+          <a-col :span="6">
             <a-image :src="albumGeneralInfo.imgPath" :width="200" :height="200"
               class="album-img" />
           </a-col>
-          <a-col :span="16">
+          <a-col :span="18" class="mt-16">
             <div>Album</div>
             <span>
             <h1>

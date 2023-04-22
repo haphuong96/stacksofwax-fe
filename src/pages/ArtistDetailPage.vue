@@ -26,19 +26,25 @@ async function fetchArtistDetails() {
 </script>
 
 <template>
-  <a-row class="m-16 p-16">
+  <a-row class="m-16">
     <a-col :span="24">
       <a-row v-if="artistData">
         <a-col :span="4">
-          <a-image
+
+          <!-- <a-avatar :size="200"
+            :src="artistData.img_path"></a-avatar> -->
+          <!-- <a-image
             :width="200"
+            :height="200"
             :src="artistData.img_path"
-          />
+            :style="{'border-radius': '50%'}"
+          /> -->
+          
         </a-col>
-        <a-col>
+        <a-col :span="20" class="mt-16">
           <div>Artist</div>
           <h1>{{ artistData.artist_name }}</h1>
-          <div>{{ artistData.artist_description }}</div>
+          <!-- <div>{{ artistData.artist_description }}</div> -->
         </a-col>
       </a-row>
       <a-row v-if="albumsData">
@@ -55,4 +61,5 @@ async function fetchArtistDetails() {
   </a-row>
 </template>
 
-<style scoped></style>
+<style scoped>
+</style>

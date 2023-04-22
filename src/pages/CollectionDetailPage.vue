@@ -149,7 +149,7 @@ async function fetchCollectionById() {
             src="https://static-cse.canva.com/blob/1035320/1600w-fxYFTKLArdY.jpg"
           />
         </a-col>
-        <a-col>
+        <a-col class="mt-16">
           <div>Collection</div>
           <h1>{{ collectionData.collection_name }}</h1>
           <div>By {{ createdByData.username }}</div>

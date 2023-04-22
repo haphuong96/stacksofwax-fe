@@ -125,6 +125,7 @@ async function onTabChanged(tabIndex) {
           v-model:current="current"
           :total="total"
           show-less-items
+          :showSizeChanger="true"
           @change="(page, pageSize) => fetchArtists(page, pageSize)"
         />
       </div>
