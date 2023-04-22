@@ -14,13 +14,13 @@
     @change="onTabChanged"
   >
     <template #leftExtra> <div class="mock-left-extra"></div></template>
-    <a-tab-pane key="Albums" tab="Albums">
+    <a-tab-pane key="albums" tab="Albums">
       <AlbumsPage
         :currentActiveTab="activeKey"
         :searchKeyword="searchKeyword"
       ></AlbumsPage>
     </a-tab-pane>
-    <a-tab-pane key="Artists" tab="Artists">
+    <a-tab-pane key="artists" tab="Artists">
       <ArtistsPage
         :currentActiveTab="activeKey"
         :searchKeyword="searchKeyword"
@@ -36,17 +36,17 @@ import emitter from "../utils/emitter.helper";
 import router from "../router";
 import { routeNames } from "../router/route-names";
 
-const activeKey = ref("Albums");
+const activeKey = ref("albums");
 const searchKeyword = ref("");
 
 onMounted(() => {
   const currentTab = router.currentRoute.value.query?.currentTab;
-  activeKey.value = currentTab || "Albums";
+  activeKey.value = currentTab || "albums";
   if (!currentTab) {
     console.log("currentTab", currentTab);
     router.push({
       name: routeNames.EXPLORE,
-      query: { currentTab: currentTab || "Albums" }
+      query: { currentTab: currentTab || "albums" }
     });
   }
 });

@@ -38,6 +38,14 @@
     margin: 16px;
 }
 
+.my-16 {
+    margin: 16px 0px;
+}
+
+.mx-16 {
+    margin: 0px 16px;
+}
+
 /* padding */
 .p-16 {
     padding: 16px;

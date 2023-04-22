@@ -3,6 +3,7 @@ import { onMounted, ref } from "vue";
 import router from "../router";
 import { axiosIntance } from "../services/base.service";
 import CircleImage from "../components/CircleImage.vue";
+import { navigationService } from "../services/navigation.service";
 
 const artistId = router.currentRoute.value.params.id.split("-")[0];
 
@@ -27,20 +28,25 @@ async function fetchArtistDetails() {
     <a-col :span="24">
       <a-row v-if="artistData">
         <a-col :span="4">
-          <CircleImage :size="200" :src="artistData.img_path"/>
+          <!-- <CircleImage :size="200" :src="artistData.img_path"/> -->
+          <CircleImage 
+          :size="200"
+          :failed-image="fallbackImage"
+          :src="artistData.img_path"
+          ></CircleImage>
         </a-col>
         <a-col :span="20" class="mt-16">
           <div>Artist</div>
           <h1>{{ artistData.artist_name }}</h1>
-          <!-- <div>{{ artistData.artist_description }}</div> -->
+          <div>{{ artistData.artist_description }}</div>
         </a-col>
       </a-row>
       <a-row v-if="albumsData">
         <a-col :span="24">
-          <h1>Album List</h1>
+          <h1 class="my-16">Album List</h1>
           <a-list bordered :data-source="albumsData">
             <template #renderItem="{ item }">
-              <a-list-item>{{ item.album_title }} </a-list-item>
+              <a @click="navigationService.goToAlbumDetailPage(item.album_id)"><a-list-item>{{ item.album_title }} </a-list-item></a>
             </template>
           </a-list>
         </a-col>

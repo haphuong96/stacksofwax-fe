@@ -3,6 +3,7 @@ import axios from "axios";
 import { message } from "ant-design-vue";
 import { computed, ref } from "vue";
 import router from "../router";
+import { navigationService } from "../services/navigation.service";
 
 const albumId = router.currentRoute.value.params.id.split("-")[0];
 const albumDetailTitle = ref({});
@@ -11,8 +12,7 @@ const albumTracks = ref();
 const comments = ref();
 const albumStats = ref(new Map());
 const artistsName = ref();
-const data = [
-  "test1", "test2"]
+const data = ["test1", "test2"];
 
 const isLoading = ref(false);
 const dataFetchComplete = ref(false);
@@ -55,7 +55,6 @@ async function fetchAlbumDetail() {
     albumStats.value.set("Collections:", res.data.total_collected || 0);
 
     dataFetchComplete.value = true;
-
   } catch (error) {
     console.log(error);
     message.error("Cannot load album detail");
@@ -74,48 +73,68 @@ fetchAlbumDetail();
       <a-col :span="16">
         <a-row>
           <a-col :span="6">
-            <a-image :src="albumGeneralInfo.imgPath" :width="200" :height="200"
-              class="album-img" />
+            <a-image
+              :src="albumGeneralInfo.imgPath"
+              :width="200"
+              :height="200"
+              class="album-img"
+            />
           </a-col>
           <a-col :span="18" class="mt-16">
             <div>Album</div>
-            <span>
             <h1>
-              <!-- <span v-for="(item, index) in albumDetailTitle.albumArtist" :key="index">
-                {{ (index > 0) ? ", " : "" }}
-                <a href="#">{{ item.artist_name }}</a>
-              </span>
-              - -->
-              <span>{{ albumDetailTitle.albumTitle }}</span>
+              {{ albumDetailTitle.albumTitle }}
             </h1>
-            <!-- <h4><span v-for="(item, index) in albumDetailTitle.albumArtist" :key="index">
-                {{ (index > 0) ? ", " : "" }}
-                <a href="#">{{ item.artist_name }}</a>
-              </span></h4> -->
-            </span>
 
-            <a-descriptions :column="1"
-              :labelStyle="{ 'background-color': 'white', 'padding': '0px 0px', 'width': '20%' }"
-              :contentStyle="{ 'padding': '0px 0px' }">
-              <a-descriptions-item label = "Artist" :style="{ 'padding-bottom': '0px' }">
-                <span v-for="(item, index) in albumDetailTitle.albumArtist" :key="index">
-                {{ (index > 0) ? ", " : "" }}
-                <a href="#">{{ item.artist_name }}</a>
-              </span>
+            <a-descriptions
+              :column="1"
+              :labelStyle="{
+                'background-color': 'white',
+                padding: '0px 0px',
+                width: '20%'
+              }"
+              :contentStyle="{ padding: '0px 0px' }"
+            >
+              <a-descriptions-item
+                label="Artist"
+                :style="{ 'padding-bottom': '0px' }"
+              >
+                <span
+                  v-for="(item, index) in albumDetailTitle.albumArtist"
+                  :key="index"
+                >
+                  {{ index > 0 ? ", " : "" }}
+                  <a @click="navigationService.goToArtistDetailPage(item.artist_id)">{{ item.artist_name }}</a>
+                </span>
               </a-descriptions-item>
-              <a-descriptions-item label="Record Label" :style="{ 'padding-bottom': '0px' }">
-                <span v-for="(item, index) in albumGeneralInfo.recordLabels" :key="index">
-                  {{ (index > 0) ? ", " : "" }}
+              <a-descriptions-item
+                label="Record Label"
+                :style="{ 'padding-bottom': '0px' }"
+              >
+                <span
+                  v-for="(item, index) in albumGeneralInfo.recordLabels"
+                  :key="index"
+                >
+                  {{ index > 0 ? ", " : "" }}
                   {{ item.company_name }}
                 </span>
               </a-descriptions-item>
-              <a-descriptions-item label="Genre" :style="{ 'padding-bottom': '0px' }">
-                <span v-for="(item, index) in albumGeneralInfo.genres" :key="index">
-                  {{ (index > 0) ? ", " : "" }}
+              <a-descriptions-item
+                label="Genre"
+                :style="{ 'padding-bottom': '0px' }"
+              >
+                <span
+                  v-for="(item, index) in albumGeneralInfo.genres"
+                  :key="index"
+                >
+                  {{ index > 0 ? ", " : "" }}
                   {{ item.genre_name }}
                 </span>
               </a-descriptions-item>
-              <a-descriptions-item label="Release Year" :style="{ 'padding-bottom': '0px' }">
+              <a-descriptions-item
+                label="Release Year"
+                :style="{ 'padding-bottom': '0px' }"
+              >
                 <span>
                   {{ albumGeneralInfo.release_year }}
                 </span>
@@ -129,7 +148,7 @@ fetchAlbumDetail();
           </a-col>
         </a-row>
         <a-row class="d-flex v-flex">
-          <h1 :style="{ margin: '16px 0' }">Tracklist</h1>
+          <h1 class="my-16">Tracklist</h1>
           <a-list size="small" bordered :data-source="albumTracks">
             <template #renderItem="{ item }">
               <a-list-item>{{ item.track_title }}</a-list-item>
@@ -137,26 +156,44 @@ fetchAlbumDetail();
           </a-list>
         </a-row>
         <a-row class="d-flex v-flex">
-          <h1 :style="{ margin: '16px 0' }">Reviews</h1>
-          <a-list v-if="comments.length" :data-source="comments"
-            :header="`${comments.length} ${comments.length > 1 ? 'replies' : 'reply'}`" item-layout="horizontal">
+          <h1 class="my-16">Reviews</h1>
+          <a-list
+            v-if="comments.length"
+            :data-source="comments"
+            :header="`${comments.length} ${
+              comments.length > 1 ? 'replies' : 'reply'
+            }`"
+            item-layout="horizontal"
+          >
             <template #renderItem="{ item }">
               <a-list-item>
-                <a-comment :author="item.author" :avatar="item.avatar" :content="item.content"
-                  :datetime="item.datetime" />
+                <a-comment
+                  :author="item.author"
+                  :avatar="item.avatar"
+                  :content="item.content"
+                  :datetime="item.datetime"
+                />
               </a-list-item>
             </template>
           </a-list>
           <a-comment>
             <template #avatar>
-              <a-avatar src="https://joeschmoe.io/api/v1/random" alt="Han Solo" />
+              <a-avatar
+                src="https://joeschmoe.io/api/v1/random"
+                alt="Han Solo"
+              />
             </template>
             <template #content>
               <a-form-item>
                 <a-textarea v-model:value="value" :rows="4" />
               </a-form-item>
               <a-form-item>
-                <a-button html-type="submit" :loading="submitting" type="primary" @click="handleSubmit">
+                <a-button
+                  html-type="submit"
+                  :loading="submitting"
+                  type="primary"
+                  @click="handleSubmit"
+                >
                   Add Comment
                 </a-button>
               </a-form-item>
@@ -174,7 +211,11 @@ fetchAlbumDetail();
         </a-divider>
         <a-descriptions :column="2">
           <!-- "{ xxl: 4, xl: 3, lg: 3, md: 3, sm: 2, xs: 1 }" -->
-          <a-descriptions-item v-for="(item, index) in albumStats.keys()" :key="index" :label="item">
+          <a-descriptions-item
+            v-for="(item, index) in albumStats.keys()"
+            :key="index"
+            :label="item"
+          >
             {{ albumStats.get(item) }}
           </a-descriptions-item>
         </a-descriptions>
@@ -184,7 +225,9 @@ fetchAlbumDetail();
         </a-divider>
         <a-list size="small" :data-source="data">
           <template #renderItem="{ item }">
-            <a-list-item :style="{'border-bottom': 'none'}">{{ item }}</a-list-item>
+            <a-list-item :style="{ 'border-bottom': 'none' }">{{
+              item
+            }}</a-list-item>
           </template>
         </a-list>
       </a-col>
