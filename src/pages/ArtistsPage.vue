@@ -76,9 +76,17 @@ async function onTabChanged(tabIndex) {
 
     <a-col :span="19">
       <h1 class="default-page-title">Explore Artists</h1>
-      <div v-if="searchQuery" class="mb-16"><search-outlined /> Search Keyword: {{ searchQuery }}</div>
+      <div v-if="searchQuery" class="mb-16">
+        <search-outlined /> Search Keyword: {{ searchQuery }}
+      </div>
+      <div v-else class="mb-16" style="height: 32px"></div>
+
       <div v-if="artists">
-        <a-list item-layout="horizontal" :data-source="artists">
+        <a-list
+          item-layout="horizontal"
+          :data-source="artists"
+          class="artist-page-list-artist"
+        >
           <template #renderItem="{ item }">
             <a-list-item>
               <a-list-item-meta description="Artist">
@@ -121,4 +129,9 @@ async function onTabChanged(tabIndex) {
   </a-row>
 </template>
 
-<style scoped></style>
+<style scoped>
+.artist-page-list-artist {
+  height: calc(100vh - 350px);
+  overflow: scroll;
+}
+</style>

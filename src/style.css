@@ -20,6 +20,33 @@
   --page-title-text-size: 32px;
 }
 
+::-webkit-scrollbar {
+  width: 10px;
+  border: none;
+  padding: 1px;
+  background-color: transparent;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  border: 1px solid transparent;
+  background: transparent;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #9FD1FF;
+  border-radius: 5px;
+  width: 8px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #9FD1FF;
+  border-radius: 5px;
+  width: 8px;
+}
+
 #app {
   position: absolute;
   left: 0;

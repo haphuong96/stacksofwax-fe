@@ -1,16 +1,9 @@
 <script setup>
+import { SearchOutlined } from "@ant-design/icons-vue";
 import { message } from "ant-design-vue";
-import axios from "axios";
-import {
-  onActivated,
-  onBeforeUnmount,
-  onDeactivated,
-  onMounted,
-  ref
-} from "vue";
+import { onBeforeUnmount, onMounted, ref } from "vue";
 import { service } from "../services";
 import emitter from "../utils/emitter.helper";
-import { SearchOutlined } from "@ant-design/icons-vue";
 
 const { albumService, navigationService } = service;
 /**
@@ -78,7 +71,7 @@ async function fetchAlbums(page, pageSize) {
 }
 
 async function onSearchChange(searchKeyword) {
-  searchQuery.value = searchKeyword
+  searchQuery.value = searchKeyword;
   fetchAlbums();
 }
 
@@ -122,16 +115,27 @@ async function onTabChanged(tabIndex) {
 
     <a-col :span="19">
       <h1 class="default-page-title">Explore Albums</h1>
-      <div v-if="searchQuery" class="mb-16"><search-outlined /> Search Keyword: {{ searchQuery }}</div>
+      <div v-if="searchQuery" class="mb-16">
+        <search-outlined /> Search Keyword: {{ searchQuery }}
+      </div>
+      <div v-else class="mb-16" style="height: 22px;"></div>
       <div>
-        <a-list item-layout="horizontal" :data-source="albums">
+        <a-list
+          item-layout="horizontal"
+          :data-source="albums"
+          class="album-page-list-album"
+        >
           <template #renderItem="{ item }">
             <a-list-item>
               <a-list-item-meta>
                 <template #description>
                   <span class="a-description">
                     <a
-                      @click="navigationService.goToArtistDetailPage(item.artists[0].artist_id)"
+                      @click="
+                        navigationService.goToArtistDetailPage(
+                          item.artists[0].artist_id
+                        )
+                      "
                       >{{ item.artists[0].artist_name }}</a
                     >
                   </span>
@@ -141,7 +145,11 @@ async function onTabChanged(tabIndex) {
                   >
                     {{ ", " }}
                     <a
-                      @click="navigationService.goToArtistDetailPage(item.artists[n].artist_id)"
+                      @click="
+                        navigationService.goToArtistDetailPage(
+                          item.artists[n].artist_id
+                        )
+                      "
                       >{{ item.artists[n].artist_name }}</a
                     >
                   </span>
@@ -153,14 +161,20 @@ async function onTabChanged(tabIndex) {
                 <template #title>
                   <a
                     type="link"
-                    @click="(event) => navigationService.goToAlbumDetailPage(item.album_id)"
+                    @click="
+                      (event) =>
+                        navigationService.goToAlbumDetailPage(item.album_id)
+                    "
                     >{{ item.album_title }}</a
                   >
                 </template>
                 <template #avatar>
                   <a
                     type="link"
-                    @click="(event) => navigationService.goToAlbumDetailPage(item.album_id)"
+                    @click="
+                      (event) =>
+                        navigationService.goToAlbumDetailPage(item.album_id)
+                    "
                     ><img :src="item.img_path" class="w-50"
                   /></a>
                 </template>
@@ -192,5 +206,10 @@ async function onTabChanged(tabIndex) {
 
 .a-description > a:hover {
   color: #1890ff;
+}
+
+.album-page-list-album {
+  height: calc(100vh - 340px);
+  overflow: scroll;
 }
 </style>
