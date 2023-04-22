@@ -3,7 +3,7 @@ import { localStorageKeys } from "../common/local-storage-keys";
 import { userService } from "./user.service";
 
 export const axiosIntance = axios.create({
-  baseURL: "http://localhost:4000/api",
+  baseURL: import.meta.env.VITE_BACKEND_URL,
   timeout: 15000
 });
 

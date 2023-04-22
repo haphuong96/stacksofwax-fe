@@ -64,7 +64,18 @@ async function fetchAlbumDetail() {
 }
 
 fetchAlbumDetail();
-// {{ artistsName.join(", ") }} - {{ albumDetails.album_title }}
+
+const listGenrers = computed(() => {
+  if (!albumGeneralInfo.value?.genres?.length) return "";
+  return albumGeneralInfo.value?.genres
+    .map((genre) => {
+      const genreDetailUrl = `${import.meta.env.VITE_BASE_URL}/genrer/${
+        genre.genre_id
+      }`;
+      return `<a href="${genreDetailUrl}">${genre.genre_name}</a>`;
+    })
+    .join(', ');
+});
 </script>
 
 <template>
@@ -104,7 +115,12 @@ fetchAlbumDetail();
                   :key="index"
                 >
                   {{ index > 0 ? ", " : "" }}
-                  <a @click="navigationService.goToArtistDetailPage(item.artist_id)">{{ item.artist_name }}</a>
+                  <a
+                    @click="
+                      navigationService.goToArtistDetailPage(item.artist_id)
+                    "
+                    >{{ item.artist_name }}</a
+                  >
                 </span>
               </a-descriptions-item>
               <a-descriptions-item
@@ -123,13 +139,7 @@ fetchAlbumDetail();
                 label="Genre"
                 :style="{ 'padding-bottom': '0px' }"
               >
-                <span
-                  v-for="(item, index) in albumGeneralInfo.genres"
-                  :key="index"
-                >
-                  {{ index > 0 ? ", " : "" }}
-                  {{ item.genre_name }}
-                </span>
+                <div v-html="listGenrers"></div>
               </a-descriptions-item>
               <a-descriptions-item
                 label="Release Year"
