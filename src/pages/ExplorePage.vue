@@ -29,13 +29,27 @@
   </a-tabs>
 </template>
 <script setup>
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import AlbumsPage from "./AlbumsPage.vue";
 import ArtistsPage from "./ArtistsPage.vue";
 import emitter from "../utils/emitter.helper";
+import router from "../router";
+import { routeNames } from "../router/route-names";
 
 const activeKey = ref("1");
 const searchKeyword = ref("");
+
+onMounted(() => {
+  const currentTab = router.currentRoute.value.query?.currentTab;
+  activeKey.value = currentTab || "1";
+  if (!currentTab) {
+    console.log("currentTab", currentTab);
+    router.push({
+      name: routeNames.EXPLORE,
+      query: { currentTab: currentTab || "1" }
+    });
+  }
+});
 
 const onSearch = (searchValue) => {
   emitter.emit("ON_EXPLORE_SEARCH_CHANG_KEY", searchValue);
@@ -43,6 +57,10 @@ const onSearch = (searchValue) => {
 
 const onTabChanged = () => {
   emitter.emit("ON_EXPLORE_TAB_CHANGED", activeKey.value);
+  router.push({
+    name: routeNames.EXPLORE,
+    query: { currentTab: activeKey.value }
+  });
 };
 </script>
 <style scoped>
