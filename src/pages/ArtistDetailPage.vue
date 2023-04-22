@@ -2,6 +2,7 @@
 import { onMounted, ref } from "vue";
 import router from "../router";
 import { axiosIntance } from "../services/base.service";
+import CircleImage from "../components/CircleImage.vue";
 
 const artistId = router.currentRoute.value.params.id.split("-")[0];
 
@@ -26,7 +27,7 @@ async function fetchArtistDetails() {
     <a-col :span="24">
       <a-row v-if="artistData">
         <a-col :span="4">
-          <a-image :width="200" :src="artistData.img_path" />
+          <CircleImage :size="200" :src="artistData.img_path"/>
         </a-col>
         <a-col>
           <div>Artist</div>

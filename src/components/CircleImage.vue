@@ -4,10 +4,18 @@
     :style="{
       width: size + 'px',
       height: size + 'px',
-      borderRadius: size / 2 + 'px'
+      borderRadius: size / 2 + 'px',
+      border: bordered ? '4px solid lightgray' : ''
     }"
   >
-    <a-image :height="size" :width="size" :src="src" :fallback="failedImage" />
+    <a-image
+      :style="{
+        width: size + 'px',
+        height: size + 'px'
+      }"
+      :src="src"
+      :fallback="failedImage"
+    />
   </div>
 </template>
 <script setup>
@@ -23,14 +31,20 @@ const props = defineProps({
   failedImage: {
     type: String,
     default: ""
+  },
+  bordered: {
+    type: Boolean,
+    default: false
   }
 });
 </script>
 <style scoped>
 .circle-image {
-  border: 4px solid lightgray;
   background-color: white;
   overflow: hidden;
-  object-fit: cover;
+}
+
+:deep(.ant-image-img) {
+  object-fit: cover !important;
 }
 </style>
