@@ -54,7 +54,7 @@ const getAlbums = async (page, pageSize, filters) => {
     const res = await axiosIntance.get("/albums", {
       params: filterParams
     });
-    console.log(res);
+
     const { total, albums } = res.data;
 
     return {

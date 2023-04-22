@@ -5,6 +5,7 @@ import { axiosIntance } from "../services/base.service";
 import router from "../router";
 import { routeNames } from "../router/route-names";
 import emitter from "../utils/emitter.helper";
+import { artistService } from "../services/artist.service";
 
 /**
  * Album data fetch from fetchAlbums function
@@ -14,9 +15,6 @@ const artists = ref();
 const total = ref(0);
 // current page
 const current = ref(1);
-// limit offset
-const defaultPage = 1;
-const defaultPageSize = 10;
 
 const props = defineProps({
   currentActiveTab: {
@@ -32,7 +30,7 @@ const props = defineProps({
 onMounted(async () => {
   emitter.on("ON_EXPLORE_SEARCH_CHANG_KEY", onSearchChange);
   emitter.on("ON_EXPLORE_TAB_CHANGED", onTabChanged);
-  fetchArtists(defaultPage, defaultPageSize);
+  fetchArtists();
 });
 
 onBeforeUnmount(() => {
@@ -42,23 +40,11 @@ onBeforeUnmount(() => {
 
 async function fetchArtists(page, pageSize) {
   try {
-    const limit = pageSize || defaultPageSize;
-    const offset = (page - 1) * pageSize || 0;
+    const res = await artistService.getArtists(page, pageSize, props.searchKeyword);
 
-    let params = {
-      limit,
-      offset
-    };
-    if (props.searchKeyword) {
-      params = { ...params, search: props.searchKeyword };
-    }
+    artists.value = res.artists;
+    total.value = res.total;
 
-    const res = await axiosIntance.get("artists", {
-      params
-    });
-
-    artists.value = res.data.artists;
-    total.value = res.data.total;
   } catch (error) {
     message.error("Cannot load artists");
   }
@@ -88,32 +74,7 @@ async function onTabChanged(tabIndex) {
   <a-row>
     <!-- class="m-16 p-16" -->
     <a-col :span="5" class="px-32">
-      <div>Explore the hottest artists</div>
-      <!-- <div>
-        <h2>Genre</h2>
-        <a-select
-          v-model:value="genreFilterVals"
-          mode="multiple"
-          style="width: 100%"
-          placeholder="Please select"
-          :options="genres"
-          @change="(_filterVal, _filterObjs) => fetchAlbums()"
-        ></a-select>
-      </div>
-      <div>
-        <h2>Decade</h2>
-        <a-select
-          v-model:value="decadeFilterVal"
-          show-search
-          placeholder="Select a decade"
-          style="width: 100%"
-          :options="decades"
-          :filter-option="filterOption"
-          @focus="handleFocus"
-          @blur="handleBlur"
-          @change="(_filterVal, _filterObjs) => fetchAlbums()"
-        ></a-select>
-      </div> -->
+      <!-- <div>Explore the hottest artists</div> -->
     </a-col>
 
     <a-col :span="19">
@@ -122,11 +83,23 @@ async function onTabChanged(tabIndex) {
         <a-list item-layout="horizontal" :data-source="artists">
           <template #renderItem="{ item }">
             <a-list-item>
-              <a-button
+              <a-list-item-meta >
+                <template #title>
+                  <a 
+                    type="link"
+                    @click="(event) => goToArtistDetailPage(item.artist_id)"
+                    >{{ item.artist_name }}</a
+                  >
+                </template>
+                <template #avatar>
+                  <a-avatar :src="item.img_path" :style="{'width': '50px', 'height': '50px'}"></a-avatar>
+                </template>
+              </a-list-item-meta>
+              <!-- <a-button
                 type="link"
                 @click="(event) => goToArtistDetailPage(item.artist_id)"
                 >{{ item.artist_name }}</a-button
-              >
+              > -->
             </a-list-item>
           </template>
         </a-list>
@@ -142,4 +115,5 @@ async function onTabChanged(tabIndex) {
   </a-row>
 </template>
 
-<style scoped></style>
+<style scoped>
+</style>

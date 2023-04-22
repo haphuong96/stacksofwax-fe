@@ -62,7 +62,6 @@ onBeforeUnmount(() => {
 
 async function fetchAlbums(page, pageSize) {
   try {
-    console.log(Array.isArray(genreFilterVals.value));
     const res = await service.albumService.getAlbums(page, pageSize, {
       searchKeyword: props.searchKeyword,
       genres: genreFilterVals.value,
@@ -130,7 +129,16 @@ async function onTabChanged(tabIndex) {
         <a-list item-layout="horizontal" :data-source="albums">
           <template #renderItem="{ item }">
             <a-list-item>
-              <a-list-item-meta >
+              <a-list-item-meta>
+                <template #description>
+                  <span>
+                  {{ item.artists[0].artist_name }}
+                  
+                </span>
+                <span v-if="item.artists.length > 1" v-for="n in item.artists.length - 1">
+                 {{ ", " }}{{ item.artists[n].artist_name }}
+                </span>
+                </template>
                 <template #title>
                   <a 
                     type="link"
@@ -142,7 +150,8 @@ async function onTabChanged(tabIndex) {
                   <img :src="item.img_path" class="w-50" />
                 </template>
               </a-list-item-meta>
-              {{ item.artists[0].artist_name }}
+              
+              
             </a-list-item>
           </template>
         </a-list>
@@ -162,5 +171,9 @@ async function onTabChanged(tabIndex) {
 <style scoped>
 .w-50 {
   width: 50px;
+}
+
+.left-align {
+  /* margin-left: 0; */
 }
 </style>
