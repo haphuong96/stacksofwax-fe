@@ -15,6 +15,7 @@
       }"
       :src="src"
       :fallback="failedImage"
+      :preview="showPreviewer"
     />
   </div>
 </template>
@@ -35,6 +36,10 @@ const props = defineProps({
   bordered: {
     type: Boolean,
     default: false
+  },
+  showPreviewer: {
+    type: Boolean,
+    default: true
   }
 });
 </script>
