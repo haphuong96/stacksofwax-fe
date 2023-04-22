@@ -1,18 +1,24 @@
 <script setup>
 import axios from "axios";
 import { message } from "ant-design-vue";
-import { computed, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import router from "../router";
-import { navigationService } from "../services/navigation.service";
+import { service } from "../services";
+
+const { albumService, navigationService } = service;
 
 const albumId = router.currentRoute.value.params.id.split("-")[0];
+
+const albumDetails = ref();
+
 const albumDetailTitle = ref({});
 const albumGeneralInfo = ref({});
 const albumTracks = ref();
 const comments = ref();
 const albumStats = ref(new Map());
 const artistsName = ref();
-const data = ["test1", "test2"];
+// const data = ["test1", "test2"];
+const albumCollections = ref([]);
 
 const isLoading = ref(false);
 const dataFetchComplete = ref(false);
@@ -20,41 +26,61 @@ const dataFetchComplete = ref(false);
 // Interact vars
 const userRating = ref(0);
 
+const AddToCollectionVisible = ref(false);
+
+function showAddToCollectionModal() {
+  AddToCollectionVisible.value = true;
+}
+
+onMounted(async () => {
+  fetchAlbumDetail();
+  fetchCollectionsByAlbum();
+
+});
+
+async function fetchCollectionsByAlbum(page, pageSize) {
+  try {
+    albumCollections.value = albumService.getCollectionsByAlbum(page, pageSize, albumId);
+
+  } catch (error) {
+    message.error("Erorr retrieving collections")
+  }
+}
+
 async function fetchAlbumDetail() {
   isLoading.value = true;
   try {
-    const res = await axios.get(`http://localhost:4000/api/albums/${albumId}`);
-    albumDetailTitle.value.albumTitle = res.data.album_title;
-    albumDetailTitle.value.albumArtist = res.data.artists;
+    const data = albumService.getAlbumDetail(albumId);
 
-    if (res.data.genres) {
-      albumGeneralInfo.value.genres = res.data.genres;
-    }
+    albumDetails.value = data;
+    console.log(albumDetails.value);
+    // if (res.data.genres) {
+    //   albumGeneralInfo.value.genres = res.data.genres;
+    // }
 
-    if (res.data.release_year) {
-      albumGeneralInfo.value.release_year = res.data.release_year;
-    }
+    // if (res.data.release_year) {
+    //   albumGeneralInfo.value.release_year = res.data.release_year;
+    // }
 
-    if (res.data.country) {
-      albumGeneralInfo.value.country = res.data.country;
-    }
+    // if (res.data.country) {
+    //   albumGeneralInfo.value.country = res.data.country;
+    // }
 
-    if (res.data.record_labels) {
-      albumGeneralInfo.value.recordLabels = res.data.record_labels;
-    }
+    // if (res.data.record_labels) {
+    //   albumGeneralInfo.value.recordLabels = res.data.record_labels;
+    // }
 
-    if (res.data.img_path) {
-      albumGeneralInfo.value.imgPath = res.data.img_path;
-    }
+    // if (res.data.img_path) {
+    //   albumGeneralInfo.value.imgPath = res.data.img_path;
+    // }
 
-    albumTracks.value = res.data.tracks;
+    // albumTracks.value = res.data.tracks;
     comments.value = res.data.comments;
 
     albumStats.value.set("AVG Rating:", res.data.average_rating || 0 + " / 5");
     albumStats.value.set("Total ratings:", res.data.total_ratings || 0);
     albumStats.value.set("Collections:", res.data.total_collected || 0);
 
-    dataFetchComplete.value = true;
   } catch (error) {
     console.log(error);
     message.error("Cannot load album detail");
@@ -62,19 +88,16 @@ async function fetchAlbumDetail() {
     isLoading.value = false;
   }
 }
-
-fetchAlbumDetail();
-// {{ artistsName.join(", ") }} - {{ albumDetails.album_title }}
 </script>
 
 <template>
   <a-spin tip="Loading..." :spinning="isLoading" class="m-16 p-16">
-    <a-row v-if="dataFetchComplete" class="m-16">
+    <a-row class="m-16" v-if="albumDetails">
       <a-col :span="16">
         <a-row>
           <a-col :span="6">
             <a-image
-              :src="albumGeneralInfo.imgPath"
+              :src="albumDetails.img_path"
               :width="200"
               :height="200"
               class="album-img"
@@ -83,7 +106,7 @@ fetchAlbumDetail();
           <a-col :span="18" class="mt-16">
             <div>Album</div>
             <h1>
-              {{ albumDetailTitle.albumTitle }}
+              {{ albumDetails.album_title }}
             </h1>
 
             <a-descriptions
@@ -100,11 +123,16 @@ fetchAlbumDetail();
                 :style="{ 'padding-bottom': '0px' }"
               >
                 <span
-                  v-for="(item, index) in albumDetailTitle.albumArtist"
+                  v-for="(item, index) in albumDetails.artists"
                   :key="index"
                 >
                   {{ index > 0 ? ", " : "" }}
-                  <a @click="navigationService.goToArtistDetailPage(item.artist_id)">{{ item.artist_name }}</a>
+                  <a
+                    @click="
+                      navigationService.goToArtistDetailPage(item.artist_id)
+                    "
+                    >{{ item.artist_name }}</a
+                  >
                 </span>
               </a-descriptions-item>
               <a-descriptions-item
@@ -201,7 +229,7 @@ fetchAlbumDetail();
           </a-comment>
         </a-row>
       </a-col>
-      <a-col :span="8">
+      <a-col :span="8" class="pl-16">
         <a-divider orientation="left" orientation-margin="0px">
           Rate This Album
         </a-divider>
@@ -221,21 +249,57 @@ fetchAlbumDetail();
         </a-descriptions>
         <a-divider orientation="left" orientation-margin="0px">
           Collections
-          <a-button type="link">Add to collection</a-button>
+          <a-button type="link" @click="showAddToCollectionModal"
+            >Add to collection</a-button
+          >
+          <a-modal
+            v-model:visible="AddToCollectionVisible"
+            title="Add To Collection"
+            :maskClosable="false"
+            :footer="null"
+          >
+          </a-modal>
         </a-divider>
-        <a-list size="small" :data-source="data">
+        <a-list
+          size="small"
+          :data-source="albumCollections"
+          item-layout="horizontal"
+          class="collection-list"
+         v-if="albumCollections">
           <template #renderItem="{ item }">
-            <a-list-item :style="{ 'border-bottom': 'none' }">{{
-              item
-            }}</a-list-item>
+            <a-list-item>
+              <span
+                ><a
+                  @click="
+                    navigationService.goToCollectionDetail(item.collection_id)
+                  "
+                  >{{ item.collection_name }}</a
+                ></span
+              >
+              |
+              <span style="color: grey">
+                By <a @click="navigationService.goToUserDetail(item.created_by)">{{ item.username }}</a></span
+              ></a-list-item
+            >
           </template>
         </a-list>
+        <a-pagination
+          v-model:current="current"
+          :total="total"
+          show-less-items
+          @change="(page, pageSize) => albumService.getCollectionsByAlbum(page, pageSize)"
+        />
       </a-col>
     </a-row>
   </a-spin>
 </template>
 
 <style scoped>
+.collection-list :deep(.ant-list-item) {
+  padding: 0px;
+  border-bottom: none;
+}
+
 .album-img {
   width: 200px;
 

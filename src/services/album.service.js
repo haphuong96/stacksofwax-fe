@@ -62,12 +62,47 @@ const getAlbums = async (page, pageSize, filters) => {
       albums
     }
 
-  } catch (Error) {
+  } catch (error) {
     message.error("Error retrieving list of albums");
+  }
+}
+
+const getAlbumDetail = async (albumId) => {
+  try {
+    const res = await axiosIntance.get(`albums/${albumId}`);
+
+    const details = res.data;
+
+    return details;
+    
+  } catch (error) {
+    message.error('Error loading album detail')
+  }
+}
+
+const getCollectionsByAlbum = async (page, pageSize, albumId) => {
+  try {
+    const { limit, offset } = pagination(page, pageSize);
+
+    const res = await axiosIntance.get(`albums/${albumId}/collections`, {
+      params: {
+        limit,
+        offset
+      }
+    });
+
+    const collections = res.data;
+
+    // console.log('collections ' + collections)
+    return collections;
+
+  } catch (error) {
+    message.error("Error retrieving album collections list")
   }
 }
 
 export const albumService = {
   getAlbumFilter,
-  getAlbums
+  getAlbums,
+  getCollectionsByAlbum
 };

@@ -9,8 +9,17 @@ const goToArtistDetailPage = (artistId) => {
     router.push({ name: routeNames.ARTIST_DETAILS, params: { id: artistId } });
 }
 
+function goToCollectionDetail(collectionId) {
+    router.push({name: routeNames.COLLECTION_DETAILS, params: {id: collectionId}});
+}
+
+function goToUserDetail(userId) {
+    router.push({name: routeNames.USER_DETAIL, params: {id: userId}});
+}
 
 export const navigationService = {
     goToAlbumDetailPage,
-    goToArtistDetailPage
+    goToArtistDetailPage,
+    goToCollectionDetail,
+    goToUserDetail
 };
