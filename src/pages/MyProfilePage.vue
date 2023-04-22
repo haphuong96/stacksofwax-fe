@@ -7,9 +7,8 @@
             :width="120"
             :height="120"
             class="profile-image"
-            :fallback="fallbackImage"
+            fallback="../assets/ic_user.png"
             :src="profileImage"
-            :placeholder="true"
           />
         </a-col>
         <a-col :span="21">
@@ -73,7 +72,6 @@ import router from "../router";
 import { message } from "ant-design-vue";
 import formatDistanceToNow from "date-fns/formatDistanceToNow";
 import format from "date-fns/format";
-import fallbackImage from '../assets/ic_user.png'
 
 const isLoading = ref(false);
 const name = ref("");
@@ -91,9 +89,8 @@ const current = ref(defaultPage);
 
 onMounted(async () => {
   isLoading.value = true;
-  const userId = router.currentRoute.value.params.id;
   const userInfo = await service.userService.fetchUserInfo(
-    userId,
+    15,
     current.value,
     defaultPageSize
   );

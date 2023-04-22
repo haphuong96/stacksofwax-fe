@@ -9,7 +9,6 @@ async function fetchUserInfo(userId, page = 1, pageSize = 10) {
     });
     return rs?.data;
   } catch (error) {
-    debugger;
     return undefined;
   }
 }
