@@ -38,14 +38,8 @@ async function submitCommentAlbum() {
   try {
     await albumService.postCommentAlbum(albumId, draftCommentAlbum.value);
 
-    // const postCmt = await axiosIntance.post(
-    //   `collections/${collectionId}/comments`,
-    //   {
-    //     comment: draftCommentAlbum.value
-    //   }
-    // );
 
-    fetchAlbumComments();
+    await fetchAlbumComments();
 
     draftCommentAlbum.value = "";
   } catch (error) {
@@ -55,10 +49,10 @@ async function submitCommentAlbum() {
   }
 }
 
-async function fetchAlbumComments() {
+async function fetchAlbumComments(page, pageSize) {
   try {
-    const data = await albumService.getCommentAlbum(albumId);
-    console.log(data);
+    const data = await albumService.getCommentAlbum(albumId, page, pageSize);
+    // console.log(data);
     comments.value = data.comments;
     totalAlbumComments.value = data.total;
 

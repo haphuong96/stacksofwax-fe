@@ -103,20 +103,18 @@ const getCollectionsByAlbum = async (page, pageSize, albumId) => {
 const postCommentAlbum = async (albumId, comment) => {
   try {
     await axiosIntance.post(`albums/${albumId}/comments`, {
-      params: {
-        comment: comment
-      }
+      comment: comment
     });
   } catch (error) {
     message.error("error posting comment");
   }
 };
 
-const getCommentAlbum = async (albumId) => {
+const getCommentAlbum = async (albumId, page, pageSize) => {
   try {
     const { limit, offset } = pagination(page, pageSize);
 
-    const { total, comments } = await axiosIntance.get(
+    const res = await axiosIntance.get(
       `albums/${albumId}/comments`,
       {
         params: {
@@ -126,11 +124,14 @@ const getCommentAlbum = async (albumId) => {
       }
     );
 
+    const { total, comments } = res.data;
+
     return {
       total,
       comments
     };
   } catch (error) {
+    console.log(error)
     message.error("error loading comments");
   }
 };
