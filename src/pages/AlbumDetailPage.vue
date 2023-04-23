@@ -144,6 +144,12 @@ const listRecordLabels = computed(() => {
 });
 
 async function onRate() {
+  if (!localStorage.getItem(localStorageKeys.ACCESS_TOKEN)) {
+    message.error(
+      "This action requires login. Please log in before rating this album."
+    );
+    return;
+  }
   try {
     const isSuccess = await service.albumService.rateAlbum(
       albumId,

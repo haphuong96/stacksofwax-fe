@@ -30,7 +30,9 @@ const isLiked = ref();
 onMounted(async () => {
   fetchCollectionDetailById();
   fetchCollectionAlbumById();
-  checkUserLikedCollection();
+  if (localStorage.getItem(localStorageKeys.ACCESS_TOKEN)) {
+    checkUserLikedCollection();
+  }
   fetchCollectionComments();
 });
 
@@ -135,7 +137,6 @@ async function fetchCollectionById() {
   albumsData.value = albums;
   collectionData.value = collection;
   createdByData.value = created_by;
-  console.log(createdByData.value);
 }
 </script>
 
@@ -167,7 +168,7 @@ async function fetchCollectionById() {
         </a-col>
       </a-row>
       <a-row
-        ><a-col :span = "24">
+        ><a-col :span="24">
           <h1>Album List</h1>
           <a-list bordered :data-source="albumsData">
             <template #renderItem="{ item }">
