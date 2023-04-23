@@ -6,6 +6,7 @@ import router from "../router";
 import { service } from "../services";
 import { localStorageKeys } from "../common/local-storage-keys";
 import { CloseCircleFilled } from "@ant-design/icons-vue";
+import { formatFromNow } from "../utils/datetime.helper";
 
 const { albumService, navigationService } = service;
 
@@ -55,7 +56,12 @@ async function fetchAlbumComments(page, pageSize) {
   try {
     const data = await albumService.getCommentAlbum(albumId, page, pageSize);
     // console.log(data);
-    comments.value = data.comments;
+    comments.value = data.comments.map((comment) => {
+      const commentTime = comment?.created_datetime
+        ? formatFromNow(comment?.created_datetime)
+        : "";
+      return { ...comment, created_datetime: commentTime };
+    });
     totalAlbumComments.value = data.total;
   } catch (error) {
     console.log(error);
@@ -71,7 +77,8 @@ onMounted(async () => {
   await Promise.all([
     fetchAlbumDetail(),
     getUserRating(),
-    fetchCollectionsByAlbum()
+    fetchCollectionsByAlbum(),
+    fetchAlbumComments()
   ]);
 });
 
@@ -101,7 +108,9 @@ async function fetchAlbumDetail() {
     console.log(albumDetails.value);
 
     // albumTracks.value = res.data.tracks;
-    comments.value = data.comments;
+    // comments.value = data.comments.map((comment) => {
+    //   const commentTime = formatFromNow;
+    // });
 
     albumStats.value.set("AVG Rating", data.average_rating || 0 + " / 5");
     albumStats.value.set("Total ratings", data.total_ratings || 0);
@@ -157,6 +166,7 @@ async function onRate() {
     );
     if (isSuccess) {
       isRated.value = true;
+      await fetchAlbumDetail();
       message.success("Rate album successfully!");
     } else message.error("Rate album failed!");
   } catch (error) {
@@ -169,6 +179,7 @@ async function unrateAlbum() {
     const isSuccess = await service.albumService.unrateAlbum(albumId);
     if (isSuccess) {
       isRated.value = false;
+      await fetchAlbumDetail();
       message.success("Unrate album successfully!");
       userRating.value = 0;
     } else message.error("Unrate album failed!");
