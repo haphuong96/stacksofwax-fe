@@ -42,7 +42,7 @@ async function postComment() {
   submitting.value = true;
   try {
     const postCmt = await axiosIntance.post(
-      `collections/${collectionId}/comment`,
+      `collections/${collectionId}/comments`,
       {
         comment: draftComment.value
       }

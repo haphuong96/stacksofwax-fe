@@ -80,6 +80,19 @@ async function onTabChanged(tabIndex) {
   // searchKeyword = "";
   // fetchAlbums();
 }
+
+const listArtists = computed(() => {
+  if (!albumDetails.value?.artists?.length) return "";
+  return albumDetails.value?.artists
+    .map((artist) => {
+      const artistDetailUrl = `${import.meta.env.VITE_BASE_URL}/artists/${
+        artist.artist_id
+      }`;
+      return `<a href="${artistDetailUrl}">${artist.artist_name}</a>`;
+    })
+    .join(", ");
+});
+
 </script>
 
 <template>

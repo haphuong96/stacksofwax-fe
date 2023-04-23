@@ -60,12 +60,11 @@ const getAlbums = async (page, pageSize, filters) => {
     return {
       total,
       albums
-    }
-
+    };
   } catch (error) {
     message.error("Error retrieving list of albums");
   }
-}
+};
 
 const getAlbumDetail = async (albumId) => {
   try {
@@ -74,11 +73,10 @@ const getAlbumDetail = async (albumId) => {
     const details = res.data;
 
     return details;
-    
   } catch (error) {
-    message.error('Error loading album detail')
+    message.error("Error loading album detail");
   }
-}
+};
 
 const getCollectionsByAlbum = async (page, pageSize, albumId) => {
   try {
@@ -91,18 +89,57 @@ const getCollectionsByAlbum = async (page, pageSize, albumId) => {
       }
     });
 
-    const collections = res.data;
+    const { total, collections } = res.data;
 
-    // console.log('collections ' + collections)
-    return collections;
-
+    return {
+      total,
+      collections
+    };
   } catch (error) {
-    message.error("Error retrieving album collections list")
+    message.error("Error retrieving album collections list");
   }
-}
+};
+
+const postCommentAlbum = async (albumId, comment) => {
+  try {
+    await axiosIntance.post(`albums/${albumId}/comments`, {
+      params: {
+        comment: comment
+      }
+    });
+  } catch (error) {
+    message.error("error posting comment");
+  }
+};
+
+const getCommentAlbum = async (albumId) => {
+  try {
+    const { limit, offset } = pagination(page, pageSize);
+
+    const { total, comments } = await axiosIntance.get(
+      `albums/${albumId}/comments`,
+      {
+        params: {
+          limit,
+          offset
+        }
+      }
+    );
+
+    return {
+      total,
+      comments
+    };
+  } catch (error) {
+    message.error("error loading comments");
+  }
+};
 
 export const albumService = {
   getAlbumFilter,
   getAlbums,
-  getCollectionsByAlbum
+  getCollectionsByAlbum,
+  getAlbumDetail,
+  postCommentAlbum,
+  getCommentAlbum
 };

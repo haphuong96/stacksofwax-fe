@@ -11,22 +11,62 @@ const albumId = router.currentRoute.value.params.id.split("-")[0];
 
 const albumDetails = ref();
 
-const albumDetailTitle = ref({});
-const albumGeneralInfo = ref({});
-const albumTracks = ref();
-const comments = ref();
+const comments = ref([]);
+const totalAlbumComments = ref(0);
+
 const albumStats = ref(new Map());
-const artistsName = ref();
-// const data = ["test1", "test2"];
+
 const albumCollections = ref([]);
+const totalAlbumCollections = ref();
 
 const isLoading = ref(false);
-const dataFetchComplete = ref(false);
 
 // Interact vars
 const userRating = ref(0);
 
 const AddToCollectionVisible = ref(false);
+
+const submitting = ref(false);
+const draftCommentAlbum = ref();
+
+async function submitCommentAlbum() {
+  if (!draftCommentAlbum.value) {
+    return;
+  }
+
+  submitting.value = true;
+  try {
+    await albumService.postCommentAlbum(albumId, draftCommentAlbum.value);
+
+    // const postCmt = await axiosIntance.post(
+    //   `collections/${collectionId}/comments`,
+    //   {
+    //     comment: draftCommentAlbum.value
+    //   }
+    // );
+
+    fetchAlbumComments();
+
+    draftCommentAlbum.value = "";
+  } catch (error) {
+    message.error("error posting comment")
+  } finally {
+    submitting.value = false;
+  }
+}
+
+async function fetchAlbumComments() {
+  try {
+    const data = await albumService.getCommentAlbum(albumId);
+    console.log(data);
+    comments.value = data.comments;
+    totalAlbumComments.value = data.total;
+
+  } catch (error) {
+    console.log(error)
+    message.error("error loading comments")
+  }
+}
 
 function showAddToCollectionModal() {
   AddToCollectionVisible.value = true;
@@ -35,51 +75,38 @@ function showAddToCollectionModal() {
 onMounted(async () => {
   fetchAlbumDetail();
   fetchCollectionsByAlbum();
-
 });
 
 async function fetchCollectionsByAlbum(page, pageSize) {
   try {
-    albumCollections.value = albumService.getCollectionsByAlbum(page, pageSize, albumId);
+    const { total, collections} = await albumService.getCollectionsByAlbum(
+      page,
+      pageSize,
+      albumId
+    );
 
+    totalAlbumCollections.value = total;
+    albumCollections.value = collections;
+
+    albumStats.value.set("Collections", totalAlbumCollections.value || 0);
   } catch (error) {
-    message.error("Erorr retrieving collections")
+    message.error("Erorr retrieving collections");
   }
 }
 
 async function fetchAlbumDetail() {
   isLoading.value = true;
   try {
-    const data = albumService.getAlbumDetail(albumId);
+    const data = await albumService.getAlbumDetail(albumId);
 
     albumDetails.value = data;
     console.log(albumDetails.value);
-    // if (res.data.genres) {
-    //   albumGeneralInfo.value.genres = res.data.genres;
-    // }
-
-    // if (res.data.release_year) {
-    //   albumGeneralInfo.value.release_year = res.data.release_year;
-    // }
-
-    // if (res.data.country) {
-    //   albumGeneralInfo.value.country = res.data.country;
-    // }
-
-    // if (res.data.record_labels) {
-    //   albumGeneralInfo.value.recordLabels = res.data.record_labels;
-    // }
-
-    // if (res.data.img_path) {
-    //   albumGeneralInfo.value.imgPath = res.data.img_path;
-    // }
 
     // albumTracks.value = res.data.tracks;
-    comments.value = res.data.comments;
+    comments.value = data.comments;
 
-    albumStats.value.set("AVG Rating:", res.data.average_rating || 0 + " / 5");
-    albumStats.value.set("Total ratings:", res.data.total_ratings || 0);
-    albumStats.value.set("Collections:", res.data.total_collected || 0);
+    albumStats.value.set("AVG Rating", data.average_rating || 0 + " / 5");
+    albumStats.value.set("Total ratings", data.total_ratings || 0);
 
   } catch (error) {
     console.log(error);
@@ -88,6 +115,36 @@ async function fetchAlbumDetail() {
     isLoading.value = false;
   }
 }
+
+const listGenres = computed(() => {
+  if (!albumDetails.value?.genres?.length) return "";
+  return albumDetails.value?.genres
+    .map((genre) => {
+      return `${genre.genre_name}`;
+    })
+    .join(", ");
+});
+
+const listArtists = computed(() => {
+  if (!albumDetails.value?.artists?.length) return "";
+  return albumDetails.value?.artists
+    .map((artist) => {
+      const artistDetailUrl = `${import.meta.env.VITE_BASE_URL}/artists/${
+        artist.artist_id
+      }`;
+      return `<a href="${artistDetailUrl}">${artist.artist_name}</a>`;
+    })
+    .join(", ");
+});
+
+const listRecordLabels = computed(() => {
+  if (!albumDetails.value?.record_labels?.length) return "";
+  return albumDetails.value?.record_labels
+    .map((recordLabel) => {
+      return `${recordLabel.company_name}`;
+    })
+    .join(", ");
+});
 </script>
 
 <template>
@@ -103,81 +160,31 @@ async function fetchAlbumDetail() {
               class="album-img"
             />
           </a-col>
-          <a-col :span="18" class="mt-16">
+          <a-col :span="18" class="mt-16 album-details">
             <div>Album</div>
             <h1>
               {{ albumDetails.album_title }}
             </h1>
 
-            <a-descriptions
-              :column="1"
-              :labelStyle="{
-                'background-color': 'white',
-                padding: '0px 0px',
-                width: '20%'
-              }"
-              :contentStyle="{ padding: '0px 0px' }"
-            >
-              <a-descriptions-item
-                label="Artist"
-                :style="{ 'padding-bottom': '0px' }"
-              >
-                <span
-                  v-for="(item, index) in albumDetails.artists"
-                  :key="index"
-                >
-                  {{ index > 0 ? ", " : "" }}
-                  <a
-                    @click="
-                      navigationService.goToArtistDetailPage(item.artist_id)
-                    "
-                    >{{ item.artist_name }}</a
-                  >
-                </span>
+            <a-descriptions :column="1">
+              <a-descriptions-item label="Artist">
+                <div v-html="listArtists"></div>
               </a-descriptions-item>
-              <a-descriptions-item
-                label="Record Label"
-                :style="{ 'padding-bottom': '0px' }"
-              >
-                <span
-                  v-for="(item, index) in albumGeneralInfo.recordLabels"
-                  :key="index"
-                >
-                  {{ index > 0 ? ", " : "" }}
-                  {{ item.company_name }}
-                </span>
+              <a-descriptions-item label="Record Label">
+                <div v-html="listRecordLabels"></div>
               </a-descriptions-item>
-              <a-descriptions-item
-                label="Genre"
-                :style="{ 'padding-bottom': '0px' }"
-              >
-                <span
-                  v-for="(item, index) in albumGeneralInfo.genres"
-                  :key="index"
-                >
-                  {{ index > 0 ? ", " : "" }}
-                  {{ item.genre_name }}
-                </span>
+              <a-descriptions-item label="Genre">
+                <div v-html="listGenres"></div>
               </a-descriptions-item>
-              <a-descriptions-item
-                label="Release Year"
-                :style="{ 'padding-bottom': '0px' }"
-              >
-                <span>
-                  {{ albumGeneralInfo.release_year }}
-                </span>
+              <a-descriptions-item label="Release Year">
+                {{ albumDetails.release_year }}
               </a-descriptions-item>
-              <!-- <a-descriptions-item label="Country" :style="{ 'padding-bottom': '0px' }">
-                <span>
-                  {{ albumGeneralInfo.country }}
-                </span>
-              </a-descriptions-item> -->
             </a-descriptions>
           </a-col>
         </a-row>
         <a-row class="d-flex v-flex">
           <h1 class="my-16">Tracklist</h1>
-          <a-list size="small" bordered :data-source="albumTracks">
+          <a-list size="small" bordered :data-source="albumDetails.tracks">
             <template #renderItem="{ item }">
               <a-list-item>{{ item.track_title }}</a-list-item>
             </template>
@@ -186,7 +193,7 @@ async function fetchAlbumDetail() {
         <a-row class="d-flex v-flex">
           <h1 class="my-16">Reviews</h1>
           <a-list
-            v-if="comments.length"
+            v-if="comments?.length"
             :data-source="comments"
             :header="`${comments.length} ${
               comments.length > 1 ? 'replies' : 'reply'
@@ -196,10 +203,10 @@ async function fetchAlbumDetail() {
             <template #renderItem="{ item }">
               <a-list-item>
                 <a-comment
-                  :author="item.author"
+                  :author="item.username"
                   :avatar="item.avatar"
-                  :content="item.content"
-                  :datetime="item.datetime"
+                  :content="item.comment"
+                  :datetime="item.created_datetime"
                 />
               </a-list-item>
             </template>
@@ -213,14 +220,14 @@ async function fetchAlbumDetail() {
             </template>
             <template #content>
               <a-form-item>
-                <a-textarea v-model:value="value" :rows="4" />
+                <a-textarea v-model:value="draftCommentAlbum" :rows="4" />
               </a-form-item>
               <a-form-item>
                 <a-button
                   html-type="submit"
                   :loading="submitting"
                   type="primary"
-                  @click="handleSubmit"
+                  @click="submitCommentAlbum"
                 >
                   Add Comment
                 </a-button>
@@ -265,75 +272,75 @@ async function fetchAlbumDetail() {
           :data-source="albumCollections"
           item-layout="horizontal"
           class="collection-list"
-         v-if="albumCollections">
+          v-if="albumCollections"
+        >
           <template #renderItem="{ item }">
             <a-list-item>
-              <span
+              <span class="collection-name"
                 ><a
                   @click="
                     navigationService.goToCollectionDetail(item.collection_id)
                   "
+
                   >{{ item.collection_name }}</a
                 ></span
               >
               |
-              <span style="color: grey">
-                By <a @click="navigationService.goToUserDetail(item.created_by)">{{ item.username }}</a></span
+              <span class="collection-created-by">
+                By
+                <a @click="navigationService.goToUserDetail(item.created_by)">{{
+                  item.username
+                }}</a></span
               ></a-list-item
             >
           </template>
         </a-list>
-        <a-pagination
+        <!-- <a-pagination
           v-model:current="current"
           :total="total"
           show-less-items
-          @change="(page, pageSize) => albumService.getCollectionsByAlbum(page, pageSize)"
-        />
+          @change="
+            (page, pageSize) =>
+              albumService.getCollectionsByAlbum(page, pageSize)
+          "
+        /> -->
       </a-col>
     </a-row>
   </a-spin>
 </template>
 
 <style scoped>
-.collection-list :deep(.ant-list-item) {
-  padding: 0px;
+/* .collection-name {
+  font-weight: 500;
+} */
+.collection-created-by {
+  color: #00000073
+}
+.collection-list a {
+  color: inherit;
+}
+
+.collection-list a:hover {
+  color: #1890ff;
+}
+
+.collection-list .ant-list-item {
+  padding: 5px 0px;
+  padding-top: 0px;
   border-bottom: none;
 }
 
 .album-img {
   width: 200px;
-
   height: 200px;
   object-fit: cover;
-  background-color: red;
 }
 
-.desc-item {
-  text-align: left;
+.album-details :deep(.ant-descriptions-item-label) {
+  width: 20%;
 }
 
-.left-align {
-  text-align: left;
-}
-
-.album-description-container {
-  width: 100%;
-}
-
-.album-description-label {
-  margin-right: 20px;
-  width: 100px;
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.album-description-value {
-  /* width: 70%; */
-  font-size: 14px;
-  font-weight: 700;
-}
-
-.desc-label {
-  color: red;
+.album-details :deep(.ant-descriptions-item) {
+  padding-bottom: 0px;
 }
 </style>
