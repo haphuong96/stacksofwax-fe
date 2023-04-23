@@ -4,6 +4,8 @@ import { message } from "ant-design-vue";
 import { computed, onMounted, ref } from "vue";
 import router from "../router";
 import { service } from "../services";
+import { localStorageKeys } from "../common/local-storage-keys";
+import { CloseCircleFilled } from "@ant-design/icons-vue";
 
 const { albumService, navigationService } = service;
 
@@ -28,6 +30,7 @@ const AddToCollectionVisible = ref(false);
 
 const submitting = ref(false);
 const draftCommentAlbum = ref();
+const isRated = ref(false);
 
 async function submitCommentAlbum() {
   if (!draftCommentAlbum.value) {
@@ -38,12 +41,11 @@ async function submitCommentAlbum() {
   try {
     await albumService.postCommentAlbum(albumId, draftCommentAlbum.value);
 
-
     await fetchAlbumComments();
 
     draftCommentAlbum.value = "";
   } catch (error) {
-    message.error("error posting comment")
+    message.error("error posting comment");
   } finally {
     submitting.value = false;
   }
@@ -55,10 +57,9 @@ async function fetchAlbumComments(page, pageSize) {
     // console.log(data);
     comments.value = data.comments;
     totalAlbumComments.value = data.total;
-
   } catch (error) {
-    console.log(error)
-    message.error("error loading comments")
+    console.log(error);
+    message.error("error loading comments");
   }
 }
 
@@ -67,13 +68,16 @@ function showAddToCollectionModal() {
 }
 
 onMounted(async () => {
-  fetchAlbumDetail();
-  fetchCollectionsByAlbum();
+  await Promise.all([
+    fetchAlbumDetail(),
+    getUserRating(),
+    fetchCollectionsByAlbum()
+  ]);
 });
 
 async function fetchCollectionsByAlbum(page, pageSize) {
   try {
-    const { total, collections} = await albumService.getCollectionsByAlbum(
+    const { total, collections } = await albumService.getCollectionsByAlbum(
       page,
       pageSize,
       albumId
@@ -101,7 +105,6 @@ async function fetchAlbumDetail() {
 
     albumStats.value.set("AVG Rating", data.average_rating || 0 + " / 5");
     albumStats.value.set("Total ratings", data.total_ratings || 0);
-
   } catch (error) {
     console.log(error);
     message.error("Cannot load album detail");
@@ -139,6 +142,43 @@ const listRecordLabels = computed(() => {
     })
     .join(", ");
 });
+
+async function onRate() {
+  try {
+    const isSuccess = await service.albumService.rateAlbum(
+      albumId,
+      userRating.value
+    );
+    if (isSuccess) {
+      isRated.value = true;
+      message.success("Rate album successfully!");
+    } else message.error("Rate album failed!");
+  } catch (error) {
+    message.error("Rate album failed!");
+  }
+}
+
+async function unrateAlbum() {
+  try {
+    const isSuccess = await service.albumService.unrateAlbum(albumId);
+    if (isSuccess) {
+      isRated.value = false;
+      message.success("Unrate album successfully!");
+      userRating.value = 0;
+    } else message.error("Unrate album failed!");
+  } catch (error) {
+    message.error("Unrate album failed!");
+  }
+}
+
+async function getUserRating() {
+  if (!localStorage.getItem(localStorageKeys.ACCESS_TOKEN)) return;
+  const rating = await service.albumService.getUserRatingAlbum(albumId);
+  if (rating) {
+    userRating.value = rating;
+    isRated.value = true;
+  }
+}
 </script>
 
 <template>
@@ -234,7 +274,12 @@ const listRecordLabels = computed(() => {
         <a-divider orientation="left" orientation-margin="0px">
           Rate This Album
         </a-divider>
-        <a-rate v-model:value="userRating" />
+        <a-rate v-model:value="userRating" @change="onRate" />
+        <CloseCircleFilled
+          class="ml-16 unrate-button"
+          @click="unrateAlbum"
+          v-if="isRated"
+        ></CloseCircleFilled>
         <a-divider orientation="left" orientation-margin="0px">
           Statistics
         </a-divider>
@@ -275,7 +320,6 @@ const listRecordLabels = computed(() => {
                   @click="
                     navigationService.goToCollectionDetail(item.collection_id)
                   "
-
                   >{{ item.collection_name }}</a
                 ></span
               >
@@ -308,7 +352,7 @@ const listRecordLabels = computed(() => {
   font-weight: 500;
 } */
 .collection-created-by {
-  color: #00000073
+  color: #00000073;
 }
 .collection-list a {
   color: inherit;
@@ -328,6 +372,11 @@ const listRecordLabels = computed(() => {
   width: 200px;
   height: 200px;
   object-fit: cover;
+}
+
+.unrate-button {
+  color: gray;
+  cursor: pointer;
 }
 
 .album-details :deep(.ant-descriptions-item-label) {

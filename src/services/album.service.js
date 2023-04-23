@@ -1,6 +1,7 @@
 import { axiosIntance } from "./base.service";
 import pagination from "../utils/pagination.helper";
 import { message } from "ant-design-vue";
+import { localStorageKeys } from "../common/local-storage-keys";
 
 const getAlbumFilter = async () => {
   try {
@@ -114,15 +115,12 @@ const getCommentAlbum = async (albumId, page, pageSize) => {
   try {
     const { limit, offset } = pagination(page, pageSize);
 
-    const res = await axiosIntance.get(
-      `albums/${albumId}/comments`,
-      {
-        params: {
-          limit,
-          offset
-        }
+    const res = await axiosIntance.get(`albums/${albumId}/comments`, {
+      params: {
+        limit,
+        offset
       }
-    );
+    });
 
     const { total, comments } = res.data;
 
@@ -131,8 +129,38 @@ const getCommentAlbum = async (albumId, page, pageSize) => {
       comments
     };
   } catch (error) {
-    console.log(error)
+    console.log(error);
     message.error("error loading comments");
+  }
+};
+
+const rateAlbum = async (albumId, rating) => {
+  if (!localStorage.getItem(localStorageKeys.ACCESS_TOKEN)) return false;
+  try {
+    await axiosIntance.post(`albums/${albumId}/rating`, { rating });
+    return true;
+  } catch (error) {
+    return false;
+  }
+};
+
+const getUserRatingAlbum = async (albumId) => {
+  if (!localStorage.getItem(localStorageKeys.ACCESS_TOKEN)) return false;
+  try {
+    const rs = await axiosIntance.get(`albums/${albumId}/rating`);
+    return rs?.data?.rating || 0;
+  } catch (error) {
+    return 0;
+  }
+};
+
+const unrateAlbum = async (albumId) => {
+  if (!localStorage.getItem(localStorageKeys.ACCESS_TOKEN)) return false;
+  try {
+    const rs = await axiosIntance.delete(`albums/${albumId}/rating`);
+    return true;
+  } catch (error) {
+    return false;
   }
 };
 
@@ -142,5 +170,8 @@ export const albumService = {
   getCollectionsByAlbum,
   getAlbumDetail,
   postCommentAlbum,
-  getCommentAlbum
+  getCommentAlbum,
+  rateAlbum,
+  getUserRatingAlbum,
+  unrateAlbum
 };
