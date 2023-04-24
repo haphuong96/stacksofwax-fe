@@ -12,7 +12,7 @@ import ArtistDetailPage from "../pages/ArtistDetailPage.vue";
 import UserDetailPage from "../pages/UserDetailPage.vue";
 import MyProfilePage from "../pages/MyProfilePage.vue";
 
-import { checkAuthGuard } from "./guards/check-auth.guard";
+import { checkAuthGuard, requireLoginGuard } from "./guards/check-auth.guard";
 import { routeNames } from "./route-names";
 import { screenLayout } from "./screen-layouts";
 //note: need to add meta:layout and guard (optional)
@@ -129,8 +129,8 @@ const router = createRouter({
       component: DraftCollectionPage,
       meta: {
         layout: screenLayout.DEFAULT_LAYOUT
-      }
-      // beforeEnter: requireLoginGuard
+      },
+      beforeEnter: requireLoginGuard
     },
     {
       path: "/user/:id",

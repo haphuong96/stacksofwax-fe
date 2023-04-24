@@ -1,15 +1,13 @@
 <script setup>
+import { PlusOutlined } from "@ant-design/icons-vue";
+import { Modal, message } from "ant-design-vue";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
 import { onMounted, ref } from "vue";
 import { localStorageKeys } from "../common/local-storage-keys";
-import router from "../router";
-import { routeNames } from "../router/route-names";
-import { axiosIntance } from "../services/base.service";
 import { service } from "../services";
-import { message } from "ant-design-vue";
-import { Modal } from "ant-design-vue";
-import dayjs from "dayjs";
-import { PlusOutlined, EllipsisOutlined } from "@ant-design/icons-vue";
-import relativeTime from "dayjs/plugin/relativeTime";
+import { axiosIntance } from "../services/base.service";
+import ConfirmModal from "../components/ConfirmModal.vue";
 dayjs.extend(relativeTime);
 
 const { navigationService, collectionService, meService } = service;
@@ -19,13 +17,17 @@ const userId = localStorage.getItem(localStorageKeys.USER_ID);
 
 const activeKey = ref("1");
 
-const defaultPageSize = 10;
-
 const myCollection = ref();
 const total = ref();
 
 const favoriteCollection = ref();
 const favoriteTotal = ref();
+
+//delete collection
+const isShowConfirmDeleteCollection = ref(false);
+let deleteCollectionId = 0;
+const deleteCollectionMessage = ref("");
+const isDeleteingCollection = ref(false);
 
 // const visibleDeleteCollection = ref(false);
 
@@ -77,27 +79,29 @@ async function fetchMyFavoriteCollections(page, pageSize) {
 }
 
 const showDeleteCollectionConfirm = (collectionId, collectionName) => {
-  Modal.confirm({
-    title: "Delete Collection?",
-    content: `Collection '${collectionName}' will be deleted from your library.`,
-    okText: "Delete",
+  console.log("vao day");
+  deleteCollectionId = collectionId;
+  deleteCollectionMessage.value = `Collection '<b>${collectionName}</b>' will be deleted from your library.`;
+  isShowConfirmDeleteCollection.value = true;
+};
 
-    async onOk() {
-      try {
-        await collectionService.deleteCollection(collectionId);
-        fetchMyCollections();
-      } catch {
-        message.error("Error delete collection");
-      }
-    },
-
-    oncancel() {}
-  });
+const onConfirmDeleteCollection = async () => {
+  try {
+    isDeleteingCollection.value = true;
+    await collectionService.deleteCollection(deleteCollectionId);
+    message.error("Delete collection successfully");
+    fetchMyCollections();
+  } catch {
+    message.error("Error delete collection");
+  } finally {
+    isDeleteingCollection.value = false;
+    isShowConfirmDeleteCollection.value = false;
+  }
 };
 </script>
 
 <template>
-  <a-row class="m-16 p-16">
+  <a-row class="p-16 my-collection-page-container">
     <a-col :span="24">
       <h3>
         Want to explore other collections from the Stacks of Wax Community?
@@ -110,14 +114,15 @@ const showDeleteCollectionConfirm = (collectionId, collectionName) => {
           </template>
           <a-row>
             <a-col :span="24">
-              <!-- <div class="d-flex h-flex my-8"> -->
-              <h4>Collection by {{ username }}</h4>
-              <div class="btn-add">
-                <a-button @click="createCollection" class="mb-16"
-                  ><PlusOutlined />Add a new collection</a-button
-                >
-              </div>
-              <a-list bordered v-if="myCollection" :data-source="myCollection">
+              <a-list v-if="myCollection" :data-source="myCollection">
+                <template #header>
+                  <div class="d-flex justify-between">
+                    <h4>Collection by {{ username }}</h4>
+                    <a-button @click="createCollection" class="mb-16">
+                      <PlusOutlined />Add a new collection
+                    </a-button>
+                  </div>
+                </template>
                 <template #renderItem="{ item }">
                   <a-list-item>
                     <a-list-item-meta>
@@ -156,28 +161,24 @@ const showDeleteCollectionConfirm = (collectionId, collectionName) => {
                             item.collection_name
                           )
                         "
-                        >delete</a
                       >
-                      <!-- <a-modal
-                        v-model:visible="visibleDeleteCollection"
-                        @ok="handleOk"
-                      >
-                        <p>Some contents...</p>
-                        <p>Some contents...</p>
-                        <p>Some contents...</p>
-                      </a-modal> -->
+                        delete
+                      </a>
                     </template>
                     <!-- <div><EllipsisOutlined></EllipsisOutlined></div> -->
                   </a-list-item>
                 </template>
+                <template #footer>
+                  <a-pagination
+                    v-model:current="current"
+                    :total="total"
+                    show-less-items
+                    @change="
+                      (page, pageSize) => fetchMyCollections(page, pageSize)
+                    "
+                  />
+                </template>
               </a-list>
-
-              <a-pagination
-                v-model:current="current"
-                :total="total"
-                show-less-items
-                @change="(page, pageSize) => fetchMyCollections(page, pageSize)"
-              />
             </a-col>
           </a-row>
         </a-tab-pane>
@@ -224,9 +225,21 @@ const showDeleteCollectionConfirm = (collectionId, collectionName) => {
       </a-tabs>
     </a-col>
   </a-row>
+  <ConfirmModal
+    v-model:visible="isShowConfirmDeleteCollection"
+    title="Delete Collection?"
+    :message="deleteCollectionMessage"
+    :is-loading="isDeleteingCollection"
+    @cancel="isShowConfirmDeleteCollection = false"
+    @confirm="onConfirmDeleteCollection"
+  ></ConfirmModal>
 </template>
 
 <style scoped>
+.my-collection-page-container {
+  height: calc(100vh - 72px);
+  overflow: scroll;
+}
 .btn-add {
   text-align: right;
 }
