@@ -1,11 +1,11 @@
 <script setup>
-import axios from "axios";
 import { message } from "ant-design-vue";
-import { computed, onMounted, ref } from "vue";
-// import {collectionFallbackImage} from "../assets/collections.png";
-import { service } from "../services";
+import { onMounted, ref } from "vue";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import { service } from "../services";
+import fallbackCollectionIcon from "../assets/ic_fallback_collection.png";
+import { HeartFilled } from "@ant-design/icons-vue";
 dayjs.extend(relativeTime);
 const { navigationService, collectionService } = service;
 
@@ -40,7 +40,7 @@ onMounted(async () => {
 
 async function fetchFavoriteCollections(page, pageSize) {
   try {
-    const data = await collectionService.getCollections(1, 4, {
+    const data = await collectionService.getCollections(1, 5, {
       sortBy: "-likes"
     });
     favCollections.value = data.collections;
@@ -51,7 +51,6 @@ async function fetchFavoriteCollections(page, pageSize) {
 
 async function fetchCollections(page, pageSize) {
   try {
-    console.log("sortBy " + sortValue.value);
     const data = await collectionService.getCollections(page, pageSize, {
       searchKeyword: searchKeyword.value,
       sortBy: sortValue.value
@@ -66,121 +65,126 @@ async function fetchCollections(page, pageSize) {
 </script>
 
 <template>
-  <a-row class="m-16 p-16">
-    <a-col :span="24">
-      <a-row>
-        <a-col :span="24">
-          <a-divider orientation="left">Top Favorite Collections</a-divider>
-          <a-list
-            :grid="{
-              gutter: 16,
-              xs: 1,
-              sm: 2,
-              md: 4,
-              lg: 4,
-              xl: 6,
-              xxl: 3,
-              xxxl: 2
-            }"
-            :data-source="favCollections"
-            v-if="favCollections" class="top-fav-collection"
-          >
-            <template #renderItem="{ item }">
-              <a-list-item>
-                <a-card hoverable style="width: 250px" @click="navigationService.goToPublicCollectionDetail(item.collection_id)">
-                  <template #cover>
-                    <img
-                      :src="(item.img_path) ? item.img_path : `@/assets/img_music.png`"
-                    />
-                  </template>
-                  <a-card-meta>
-                    <template #title>
-                      {{ item.collection_name }}
-                    </template>
-                    <template #description>
-                      By {{ item.username }}
-                    </template>
-                  </a-card-meta>
-                </a-card>
-              </a-list-item>
-            </template>
-          </a-list>
-        </a-col>
-      </a-row>
-      <a-row>
-        <a-col :span="24">
-          <a-divider orientation="left">Collections</a-divider>
+  <div class="collection-page-container">
+    <a-row class="m-16 p-16">
+      <a-col :span="24">
+        <a-row>
+          <a-col :span="24">
+            <a-divider orientation="left">Top Favorite Collections</a-divider>
+            <div class="fav-collection-container">
+              <div
+                v-for="item of favCollections"
+                class="fav-collection-item-container"
+                @click="
+                  navigationService.goToPublicCollectionDetail(
+                    item.collection_id
+                  )
+                "
+              >
+                <a-image
+                  class="fav-collection-item-image"
+                  :src="item.img_path || ''"
+                  :fallback="fallbackCollectionIcon"
+                  :width="160"
+                  :height="160"
+                  :preview="false"
+                />
+                <div class="fav-collection-item-divider"></div>
+                <div class="fav-collection-item-name">
+                  {{ item.collection_name }}
+                </div>
+                <div class="fav-collection-item-created">
+                  created by <b>{{ item.username }}</b>
+                </div>
+                <div class="fav-collection-item-like-container">
+                  <HeartFilled class="fav-collection-item-heart" />{{
+                    item.likes_count +
+                    (item.likes_count > 1 ? " likes" : " like")
+                  }}
+                </div>
+              </div>
+            </div>
+          </a-col>
+        </a-row>
+        <a-row class="mt-16">
+          <a-col :span="24">
+            <a-divider orientation="left">Collections</a-divider>
 
-          <span
-            ><a-input-search
-              placeholder="Search collection"
-              v-model:value="searchKeyword"
-              style="width: 250px"
-              @search="(searchValue) => fetchCollections()"
-          /></span>
-          <span class="sort-options"
-            ><a-select
-              v-model:value="sortValue"
-              :options="sortOptions"
-              style="width: 130px"
-              @change="(sortValue) => fetchCollections()"
-            >
-            </a-select>
-          </span>
-          <a-list item-layout="horizontal" :data-source="collections">
-            <template #renderItem="{ item }">
-              <a-list-item>
-                <a-list-item-meta>
-                  <template #description>
-                    <span class="created-by"
-                      >By
+            <span
+              ><a-input-search
+                placeholder="Search collection"
+                v-model:value="searchKeyword"
+                style="width: 250px"
+                @search="(searchValue) => fetchCollections()"
+            /></span>
+            <span class="sort-options"
+              ><a-select
+                v-model:value="sortValue"
+                :options="sortOptions"
+                style="width: 130px"
+                @change="(sortValue) => fetchCollections()"
+              >
+              </a-select>
+            </span>
+            <a-list item-layout="horizontal" :data-source="collections">
+              <template #renderItem="{ item }">
+                <a-list-item>
+                  <a-list-item-meta>
+                    <template #description>
+                      <span class="created-by"
+                        >By
+                        <a
+                          @click="
+                            navigationService.goToUserDetail(item.created_by)
+                          "
+                        >
+                          {{ item.username }}</a
+                        ></span
+                      >
+                      <span v-if="item.collection_desc">
+                        • {{ item.collection_desc }}</span
+                      >
+                    </template>
+                    <template #title>
                       <a
                         @click="
-                          navigationService.goToUserDetail(item.created_by)
+                          () =>
+                            navigationService.goToPublicCollectionDetail(
+                              item.collection_id
+                            )
                         "
+                        >{{ item.collection_name }}</a
                       >
-                        {{ item.username }}</a
-                      ></span
-                    >
-                    <span v-if="item.collection_desc">
-                      • {{ item.collection_desc }}</span
-                    >
-                  </template>
-                  <template #title>
-                    <a
-                      @click="
-                        () =>
-                          navigationService.goToPublicCollectionDetail(
-                            item.collection_id
-                          )
-                      "
-                      >{{ item.collection_name }}</a
-                    >
-                  </template>
-                  <template #avatar>
-                    <img :src="item.img_path" class="w-50" />
-                  </template>
-                </a-list-item-meta>
-                <div class="ml-80">
-                  {{ dayjs(item.created_datetime).fromNow() }}
-                </div>
-              </a-list-item>
-            </template>
-          </a-list>
+                    </template>
+                    <template #avatar>
+                      <img :src="item.img_path" class="w-50" />
+                    </template>
+                  </a-list-item-meta>
+                  <div class="ml-80">
+                    {{ dayjs(item.created_datetime).fromNow() }}
+                  </div>
+                </a-list-item>
+              </template>
+            </a-list>
 
-          <a-pagination
-            v-model:current="current"
-            :total="total"
-            show-less-items
-            @change="(page, pageSize) => fetchCollections(page, pageSize)"
-          />
-        </a-col>
-      </a-row>
-    </a-col>
-  </a-row>
+            <a-pagination
+              v-model:current="current"
+              :total="total"
+              show-less-items
+              @change="(page, pageSize) => fetchCollections(page, pageSize)"
+            />
+          </a-col>
+        </a-row>
+      </a-col>
+    </a-row>
+  </div>
 </template>
 
 <style scoped>
+.collection-page-container {
+  height: calc(100vh - 72px);
+  overflow: scroll;
+}
 .w-50 {
   width: 50px;
 }
@@ -209,4 +213,62 @@ async function fetchCollections(page, pageSize) {
   width: 250px;
 }
 
+.fav-collection-container {
+  height: auto;
+  display: flex;
+  justify-content: space-around;
+}
+
+.fav-collection-item-container {
+  cursor: pointer;
+  width: 192px;
+  align-content: center;
+  align-items: center;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.fav-collection-item-image {
+  background-color: white;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  width: 160px;
+  height: 160px;
+}
+
+.fav-collection-item-divider {
+  height: 1px;
+  width: 191px;
+  background-color: rgba(0, 0, 0, 0.1);
+  margin-top: 16px;
+  margin-left: -16px;
+  margin-bottom: 16px;
+}
+
+.fav-collection-item-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: black;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fav-collection-item-created {
+  font-size: 12px;
+  font-weight: 300;
+  color: gray;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fav-collection-item-like-container {
+  display: flex;
+  align-items: center;
+  text-align: center;
+}
+
+.fav-collection-item-heart {
+  color: #be3930;
+  margin-right: 8px;
+}
 </style>

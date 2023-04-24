@@ -43,7 +43,6 @@ onMounted(() => {
   const currentTab = router.currentRoute.value.query?.currentTab;
   activeKey.value = currentTab || "albums";
   if (!currentTab) {
-    console.log("currentTab", currentTab);
     router.push({
       name: routeNames.EXPLORE,
       query: { currentTab: currentTab || "albums" }
