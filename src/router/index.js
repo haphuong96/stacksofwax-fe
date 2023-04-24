@@ -146,7 +146,8 @@ const router = createRouter({
       component: MyProfilePage,
       meta: {
         layout: screenLayout.DEFAULT_LAYOUT
-      }
+      },
+      beforeEnter: requireLoginGuard
     }
   ]
 });

@@ -157,7 +157,14 @@ async function fetchCollections(page, pageSize) {
                       >
                     </template>
                     <template #avatar>
-                      <img :src="item.img_path" class="w-50" />
+                      <a-image
+                        :src="item.img_path || ''"
+                        :width="50"
+                        :height="50"
+                        class="w-50"
+                        :fallback="fallbackCollectionIcon"
+                        :preview="fasle"
+                      />
                     </template>
                   </a-list-item-meta>
                   <div class="ml-80">
