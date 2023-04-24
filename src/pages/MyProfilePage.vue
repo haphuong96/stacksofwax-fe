@@ -1,6 +1,6 @@
 <template>
   <a-spin :spinning="isLoading">
-    <div class="page-container">
+    <div class="my-profile-page-container">
       <div class="d-flex justify-center">
         <div class="profile-container">
           <CircleImage
@@ -152,7 +152,7 @@ async function saveNewProfilePicture() {
 }
 </script>
 <style scoped>
-.page-container {
+.my-profile-page-container {
   height: calc(100vh - 72px);
   overflow: hidden;
   padding-left: 80px;

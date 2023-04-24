@@ -236,6 +236,10 @@ async function fetchCollections(page, pageSize) {
   padding: 16px;
 }
 
+.fav-collection-item-container:hover {
+  box-shadow: 0px 0px 6px #888888;
+}
+
 .fav-collection-item-image {
   background-color: white;
   border: 1px solid rgba(0, 0, 0, 0.1);
