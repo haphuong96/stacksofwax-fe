@@ -56,11 +56,11 @@ onBeforeUnmount(() => {
 
 async function fetchAlbums(page, pageSize) {
   try {
-    const res = await albumService.getAlbums(page, pageSize, {
+    const res = await albumService.getAlbums({
       searchKeyword: props.searchKeyword,
       genres: genreFilterVals.value,
       decade: decadeFilterVal.value
-    });
+    }, page, pageSize);
 
     total.value = res.total;
     albums.value = res.albums;

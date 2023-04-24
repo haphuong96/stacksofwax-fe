@@ -30,7 +30,7 @@ const getAlbumFilter = async () => {
  * @param {number} pageSize
  * @param {{genres: string[], decade: string, searchKeyword: string}} filters
  */
-const getAlbums = async (page, pageSize, filters) => {
+const getAlbums = async (filters, page, pageSize) => {
   try {
     const { limit, offset } = pagination(page, pageSize);
 

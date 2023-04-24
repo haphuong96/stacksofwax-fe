@@ -8,6 +8,8 @@ import { localStorageKeys } from "../common/local-storage-keys";
 import { axiosIntance } from "../services/base.service";
 import { EditOutlined, EditFilled, CloseOutlined } from "@ant-design/icons-vue";
 import cloneDeep from "lodash/cloneDeep";
+import { service } from "../services";
+const {collectionService, albumService } = service;
 
 const collectionId = router.currentRoute.value.params.id.split("-")[0];
 
@@ -50,25 +52,18 @@ const cancelEdit = () => {
 onMounted(async () => {
   fetchCollectionDetailById();
   fetchCollectionAlbumById();
-  // fetchCollectionById();
 });
 
 async function updateCollection() {
   isSavingCollection.value = true;
   try {
-    const res = await axiosIntance.put(`collections/${collectionId}`, {
-      collection_name: editCollectionName.value,
-      collection_desc: editCollectionDesc.value || undefined
-    });
-    const { collection_name, collection_desc } = res.data;
+    await collectionService.updateCollection(
+      collectionId,
+      editCollectionName.value,
+      editCollectionDesc.value
+    );
 
-    if (collectionData.value) {
-      collectionData.value.collection_name = collection_name;
-      collectionData.value.collection_desc = collection_desc;
-    }
-
-    editCollectionName.value = cloneDeep(collection_name);
-    editCollectionDesc.value = cloneDeep(collection_desc);
+    fetchCollectionDetailById();
   } catch (error) {
     message.error("Error updating collection");
   } finally {
@@ -78,56 +73,27 @@ async function updateCollection() {
 }
 
 async function fetchCollectionDetailById() {
-  const res = await axiosIntance.get(`collections/${collectionId}`, {
-    params: {
-      operationName: "fetchCollectionDetails"
-    }
-  });
-  const { user_id, username, ...collection } = res.data;
 
-  collectionData.value = collection;
-  createdByData.value = {
-    user_id,
-    username
-  };
+  const data = await collectionService.getCollectionDetail(collectionId);
 
-  editCollectionName.value = cloneDeep(collection.collection_name);
-  editCollectionDesc.value = cloneDeep(collection.collection_desc);
+  collectionData.value = data;
+
+  editCollectionName.value = cloneDeep(data.collection_name);
+  editCollectionDesc.value = cloneDeep(data.collection_desc);
 }
 
 async function fetchCollectionAlbumById() {
-  const res = await axiosIntance.get(`collections/${collectionId}`, {
-    params: {
-      operationName: "fetchCollectionAlbums"
-    }
-  });
-  albumsData.value = res.data;
+  const data = await collectionService.getCollectionAlbums(collectionId);
+  albumsData.value = data;
 }
 
-// async function fetchCollectionById() {
-//     const res = await axiosIntance.get(`collections/${collectionId}`);
-//     const { albums, created_by, ...collection } = res.data;
-//     collectionName.value = collection.collection_name;
-//     collectionDesc.value = collection.collection_desc;
-
-//     editCollectionName.value = cloneDeep(collection.collection_name);
-//     editCollectionDesc.value = cloneDeep(collection.collection_desc);
-
-//     albumsData.value = albums;
-//     collectionData.value = collection;
-//     createdByData.value = created_by;
-// }
-
 async function searchAlbum() {
-  const res = await axiosIntance.get(`albums`, {
-    params: {
-      limit: 10,
-      offset: 0,
-      search: searchAlbumKeyword.value
-    }
+
+  const data = await albumService.getAlbums({
+    searchKeyword: searchAlbumKeyword.value
   });
-  searchAlbumData.value = res.data.albums;
-  console.log(searchAlbumData.value);
+
+  searchAlbumData.value = data.albums;
 }
 
 const showAllDescription = ref(false);
@@ -144,26 +110,12 @@ const displayDescription = computed(() => {
 });
 
 async function addAlbumToCollection(albumId) {
-  const res = await axiosIntance.post(
-    `my-collections/${collectionId}/manage-album/add`,
-    {
-      album_id: albumId
-    }
-  );
-
+  await collectionService.addCollectionAlbum(collectionId, albumId);
   fetchCollectionAlbumById();
 }
 
 async function deleteAlbumFromCollection(albumId) {
-  const res = await axiosIntance.delete(
-    `my-collections/${collectionId}/manage-album/delete`,
-    {
-      data: {
-        album_id: albumId
-      }
-    }
-  );
-
+  await collectionService.deleteCollectionAlbum(collectionId, albumId);
   fetchCollectionAlbumById();
 }
 </script>
@@ -171,7 +123,7 @@ async function deleteAlbumFromCollection(albumId) {
 <template>
   <a-row class="m-16 p-16">
     <a-col :span="24">
-      <a-row v-if="collectionData && createdByData">
+      <a-row v-if="collectionData">
         <a-col :span="4">
           <a-image
             :width="200"
@@ -219,7 +171,7 @@ async function deleteAlbumFromCollection(albumId) {
             </a-modal>
           </div>
           <h1>{{ collectionData.collection_name }}</h1>
-          <div>By {{ createdByData.username }}</div>
+          <div>By {{ collectionData.username }}</div>
         </a-col>
       </a-row>
       <a-row>
