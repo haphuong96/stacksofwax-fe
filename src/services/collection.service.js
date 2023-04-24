@@ -34,6 +34,14 @@ const getCollections = async(page, pageSize, filters) => {
     }
 }
 
+const deleteCollection = async(collectionId) => {
+    try {
+        await axiosIntance.delete(`collections/${collectionId}`);
+    } catch (error) {
+        message.error("Error delete collection service")
+    }
+}
 export const collectionService = {
-    getCollections
+    getCollections,
+    deleteCollection
 }

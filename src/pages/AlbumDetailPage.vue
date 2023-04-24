@@ -335,7 +335,7 @@ async function getUserRating() {
               <span class="collection-name"
                 ><a
                   @click="
-                    navigationService.goToCollectionDetail(item.collection_id)
+                    navigationService.goToPublicCollectionDetail(item.collection_id)
                   "
                   >{{ item.collection_name }}</a
                 ></span

@@ -6,7 +6,9 @@ import { routeNames } from "../router/route-names";
 import { axiosIntance } from "../services/base.service";
 import { service } from "../services";
 import { message } from "ant-design-vue";
+import { Modal } from "ant-design-vue";
 import dayjs from "dayjs";
+import { PlusOutlined, EllipsisOutlined } from "@ant-design/icons-vue";
 import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
 
@@ -24,6 +26,8 @@ const total = ref();
 
 const favoriteCollection = ref();
 const favoriteTotal = ref();
+
+// const visibleDeleteCollection = ref(false);
 
 function tabChange(activeKey) {
   switch (activeKey) {
@@ -71,6 +75,25 @@ async function fetchMyFavoriteCollections(page, pageSize) {
     message.error("Error loading my collections");
   }
 }
+
+const showDeleteCollectionConfirm = (collectionId, collectionName) => {
+  Modal.confirm({
+    title: "Delete Collection?",
+    content: `Collection '${collectionName}' will be deleted from your library.`,
+    okText: "Delete",
+
+    async onOk() {
+      try {
+        await collectionService.deleteCollection(collectionId);
+        fetchMyCollections();
+      } catch {
+        message.error("Error delete collection");
+      }
+    },
+
+    oncancel() {}
+  });
+};
 </script>
 
 <template>
@@ -87,10 +110,11 @@ async function fetchMyFavoriteCollections(page, pageSize) {
           </template>
           <a-row>
             <a-col :span="24">
+              <!-- <div class="d-flex h-flex my-8"> -->
               <h4>Collection by {{ username }}</h4>
-              <div>
-                <a-button @click="createCollection"
-                  >Create a new collection</a-button
+              <div class="btn-add">
+                <a-button @click="createCollection" class="mb-16"
+                  ><PlusOutlined />Add a new collection</a-button
                 >
               </div>
               <a-list bordered v-if="myCollection" :data-source="myCollection">
@@ -110,9 +134,40 @@ async function fetchMyFavoriteCollections(page, pageSize) {
                         </a></template
                       >
                       <template #description>
-                          Last updated: {{ dayjs(item.last_updated_datetime).fromNow() }}
+                        Last updated:
+                        {{ dayjs(item.last_updated_datetime).fromNow() }}
                       </template>
                     </a-list-item-meta>
+                    <template #actions>
+                      <a
+                        key="list-loadmore-more"
+                        @click="
+                          navigationService.goToPublicCollectionDetail(
+                            item.collection_id
+                          )
+                        "
+                        >public site</a
+                      >
+                      <a
+                        key="list-loadmore-edit"
+                        @click="
+                          showDeleteCollectionConfirm(
+                            item.collection_id,
+                            item.collection_name
+                          )
+                        "
+                        >delete</a
+                      >
+                      <!-- <a-modal
+                        v-model:visible="visibleDeleteCollection"
+                        @ok="handleOk"
+                      >
+                        <p>Some contents...</p>
+                        <p>Some contents...</p>
+                        <p>Some contents...</p>
+                      </a-modal> -->
+                    </template>
+                    <!-- <div><EllipsisOutlined></EllipsisOutlined></div> -->
                   </a-list-item>
                 </template>
               </a-list>
@@ -171,4 +226,8 @@ async function fetchMyFavoriteCollections(page, pageSize) {
   </a-row>
 </template>
 
-<style scoped></style>
+<style scoped>
+.btn-add {
+  text-align: right;
+}
+</style>

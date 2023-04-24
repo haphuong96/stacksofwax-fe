@@ -87,7 +87,7 @@ async function fetchCollections(page, pageSize) {
           >
             <template #renderItem="{ item }">
               <a-list-item>
-                <a-card hoverable style="width: 250px" @click="navigationService.goToCollectionDetail(item.collection_id)">
+                <a-card hoverable style="width: 250px" @click="navigationService.goToPublicCollectionDetail(item.collection_id)">
                   <template #cover>
                     <img
                       :src="(item.img_path) ? item.img_path : `@/assets/img_music.png`"
@@ -150,7 +150,7 @@ async function fetchCollections(page, pageSize) {
                     <a
                       @click="
                         () =>
-                          navigationService.goToCollectionDetail(
+                          navigationService.goToPublicCollectionDetail(
                             item.collection_id
                           )
                       "

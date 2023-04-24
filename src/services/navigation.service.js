@@ -28,7 +28,7 @@ router.push({
 });
 }
 
-function goToPublicCollections(collectionId) {
+function goToPublicCollectionDetail(collectionId) {
 router.push({
     name: routeNames.COLLECTION_DETAILS,
     params: { id: collectionId }
@@ -42,5 +42,5 @@ export const navigationService = {
     goToUserDetail,
     goToCollections,
     goToDraftCollections,
-    goToPublicCollections
+    goToPublicCollectionDetail
 };
