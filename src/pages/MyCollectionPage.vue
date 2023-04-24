@@ -8,6 +8,8 @@ import { localStorageKeys } from "../common/local-storage-keys";
 import { service } from "../services";
 import { axiosIntance } from "../services/base.service";
 import ConfirmModal from "../components/ConfirmModal.vue";
+import { routeNames } from "../router/route-names";
+import router from "../router";
 dayjs.extend(relativeTime);
 
 const { navigationService, collectionService, meService } = service;
@@ -15,7 +17,7 @@ const { navigationService, collectionService, meService } = service;
 const username = localStorage.getItem(localStorageKeys.USERNAME);
 const userId = localStorage.getItem(localStorageKeys.USER_ID);
 
-const activeKey = ref("1");
+const activeKey = ref("my-collection");
 
 const myCollection = ref();
 const total = ref();
@@ -32,23 +34,43 @@ const isDeleteingCollection = ref(false);
 // const visibleDeleteCollection = ref(false);
 
 function tabChange(activeKey) {
+  router.push({
+    name: routeNames.MY_COLLECTION,
+    query: { currentTab: activeKey }
+  });
+
   switch (activeKey) {
-    case "1":
+    case "my-collection":
       fetchMyCollections();
       break;
-    case "2":
+    case "like-collection":
       fetchMyFavoriteCollections();
       break;
     default:
   }
 }
 onMounted(async () => {
-  fetchMyCollections();
+  const currentTab = router.currentRoute.value.query?.currentTab;
+  if (!currentTab) {
+    activeKey.value = "my-collection";
+    await router.push({
+      name: routeNames.MY_COLLECTION,
+      query: { currentTab: activeKey.value }
+    });
+    tabChange(activeKey.value);
+  } else {
+    activeKey.value = currentTab;
+    await router.push({
+      name: routeNames.MY_COLLECTION,
+      query: { currentTab }
+    });
+    tabChange(currentTab);
+  }
 });
 
 async function postCollection() {
-  const {collection_id : collectionId, ...details} = await collectionService.createCollection(userId);
-
+  const { collection_id: collectionId, ...details } =
+    await collectionService.createCollection(userId);
   navigationService.goToDraftCollections(collectionId);
 }
 
@@ -83,7 +105,7 @@ const showDeleteCollectionConfirm = (collectionId, collectionName) => {
 const onConfirmDeleteCollection = async () => {
   try {
     isDeleteingCollection.value = true;
-    await collectionService.deleteCollection(deleteCollectionId);
+    await service.collectionService.deleteCollection(deleteCollectionId);
     message.success("Delete collection successfully");
     fetchMyCollections();
   } catch {
@@ -96,14 +118,14 @@ const onConfirmDeleteCollection = async () => {
 </script>
 
 <template>
-  <a-row class="p-16 my-collection-page-container">
+  <a-row class="px-32 p-16 my-collection-page-container">
     <a-col :span="24">
       <h3>
         Want to explore other collections from the Stacks of Wax Community?
         Check out <a @click="navigationService.goToCollections">Recent List</a>!
       </h3>
       <a-tabs v-model:activeKey="activeKey" @change="tabChange">
-        <a-tab-pane key="1">
+        <a-tab-pane key="my-collection">
           <template #tab>
             <span> My Collections </span>
           </template>
@@ -177,7 +199,7 @@ const onConfirmDeleteCollection = async () => {
             </a-col>
           </a-row>
         </a-tab-pane>
-        <a-tab-pane key="2">
+        <a-tab-pane key="like-collection">
           <template #tab>
             <span> Liked Collections </span>
           </template>
@@ -206,7 +228,13 @@ const onConfirmDeleteCollection = async () => {
                         </a></template
                       >
                       <template #description>
-                        By <a @click="navigationService.goToUserDetail(item.created_by)">{{ item.created_by_username }}</a>
+                        By
+                        <a
+                          @click="
+                            navigationService.goToUserDetail(item.created_by)
+                          "
+                          >{{ item.created_by_username }}</a
+                        >
                       </template>
                     </a-list-item-meta>
                   </a-list-item>
