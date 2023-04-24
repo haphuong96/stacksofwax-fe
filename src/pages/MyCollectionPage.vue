@@ -46,14 +46,10 @@ onMounted(async () => {
   fetchMyCollections();
 });
 
-async function createCollection() {
-  const res = await axiosIntance.post("collections", {
-    user_id: userId
-  });
+async function postCollection() {
+  const {collection_id : collectionId, ...details} = await collectionService.createCollection(userId);
 
-  const collectionId = res.data[0].collection_id;
-
-  goToDraftCollections(collectionId);
+  navigationService.goToDraftCollections(collectionId);
 }
 
 async function fetchMyCollections(page, pageSize) {
@@ -79,9 +75,8 @@ async function fetchMyFavoriteCollections(page, pageSize) {
 }
 
 const showDeleteCollectionConfirm = (collectionId, collectionName) => {
-  console.log("vao day");
   deleteCollectionId = collectionId;
-  deleteCollectionMessage.value = `Collection '<b>${collectionName}</b>' will be deleted from your library.`;
+  deleteCollectionMessage.value = `Collection <b>${collectionName}</b> will be deleted from your library.`;
   isShowConfirmDeleteCollection.value = true;
 };
 
@@ -89,7 +84,7 @@ const onConfirmDeleteCollection = async () => {
   try {
     isDeleteingCollection.value = true;
     await collectionService.deleteCollection(deleteCollectionId);
-    message.error("Delete collection successfully");
+    message.success("Delete collection successfully");
     fetchMyCollections();
   } catch {
     message.error("Error delete collection");
@@ -118,7 +113,7 @@ const onConfirmDeleteCollection = async () => {
                 <template #header>
                   <div class="d-flex justify-between">
                     <h4>Collection by {{ username }}</h4>
-                    <a-button @click="createCollection" class="mb-16">
+                    <a-button @click="postCollection" class="mb-16">
                       <PlusOutlined />Add a new collection
                     </a-button>
                   </div>
@@ -197,16 +192,23 @@ const onConfirmDeleteCollection = async () => {
               >
                 <template #renderItem="{ item }">
                   <a-list-item>
-                    <a-button
-                      type="link"
-                      @click="
-                        (event) =>
-                          navigationService.goToPublicCollections(
-                            item.collection_id
-                          )
-                      "
-                      >{{ item.collection_name }}
-                    </a-button>
+                    <a-list-item-meta>
+                      <template #title>
+                        <a
+                          type="link"
+                          @click="
+                            (event) =>
+                              navigationService.goToPublicCollectionDetail(
+                                item.collection_id
+                              )
+                          "
+                          >{{ item.collection_name }}
+                        </a></template
+                      >
+                      <template #description>
+                        By <a @click="navigationService.goToUserDetail(item.created_by)">{{ item.created_by_username }}</a>
+                      </template>
+                    </a-list-item-meta>
                   </a-list-item>
                 </template>
               </a-list>

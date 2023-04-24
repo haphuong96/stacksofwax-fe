@@ -41,7 +41,21 @@ const deleteCollection = async(collectionId) => {
         message.error("Error delete collection service")
     }
 }
+
+const createCollection = async(userId) => {
+    try {
+        const data = await axiosIntance.post("collections", {
+            user_id: userId
+          });
+
+        return data;
+
+    } catch (error) {
+        message.error("Error creating collection");
+    }
+}
 export const collectionService = {
     getCollections,
-    deleteCollection
+    deleteCollection,
+    createCollection
 }
