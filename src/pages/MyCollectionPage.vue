@@ -4,6 +4,13 @@ import { localStorageKeys } from "../common/local-storage-keys";
 import router from "../router";
 import { routeNames } from "../router/route-names";
 import { axiosIntance } from "../services/base.service";
+import { service } from "../services";
+import { message } from "ant-design-vue";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+dayjs.extend(relativeTime);
+
+const { navigationService, collectionService, meService } = service;
 
 const username = localStorage.getItem(localStorageKeys.USERNAME);
 const userId = localStorage.getItem(localStorageKeys.USER_ID);
@@ -13,9 +20,10 @@ const activeKey = ref("1");
 const defaultPageSize = 10;
 
 const myCollection = ref();
-const favoriteCollection = ref();
-
 const total = ref();
+
+const favoriteCollection = ref();
+const favoriteTotal = ref();
 
 function tabChange(activeKey) {
   switch (activeKey) {
@@ -32,24 +40,6 @@ onMounted(async () => {
   fetchMyCollections();
 });
 
-function goToCollections() {
-  router.push({ name: routeNames.COLLECTION });
-}
-
-function goToDraftCollections(collectionId) {
-  router.push({
-    name: routeNames.DRAFT_COLLECTION_DETAIL,
-    params: { id: collectionId }
-  });
-}
-
-function goToPublicCollections(collectionId) {
-  router.push({
-    name: routeNames.COLLECTION_DETAILS,
-    params: { id: collectionId }
-  });
-}
-
 async function createCollection() {
   const res = await axiosIntance.post("collections", {
     user_id: userId
@@ -61,31 +51,25 @@ async function createCollection() {
 }
 
 async function fetchMyCollections(page, pageSize) {
-  const limit = pageSize || defaultPageSize;
-  const offset = (page - 1) * pageSize || 0;
-  const res = await axiosIntance.get("my-collections", {
-    params: {
-      limit,
-      offset
-    }
-  });
+  try {
+    const data = await meService.getMyCollections(page, pageSize);
 
-  myCollection.value = res.data.collections;
-  total.value = res.data.total;
+    myCollection.value = data.collections;
+    total.value = data.total;
+  } catch (error) {
+    message.error("Error loading my collections");
+  }
 }
 
-async function fetchMyFavoriteCollections() {
-  console.log("my-fav");
-  const limit = pageSize || defaultPageSize;
-  const offset = (page - 1) * pageSize || 0;
-  const res = await axiosIntance.get(`me/favorite-collections`, {
-    params: {
-      limit,
-      offset
-    }
-  });
+async function fetchMyFavoriteCollections(page, pageSize) {
+  try {
+    const data = await meService.getMyFavoriteCollections(page, pageSize);
 
-  favoriteCollection.value = res.data;
+    favoriteCollection.value = data.collections;
+    favoriteTotal.value = data.total;
+  } catch (error) {
+    message.error("Error loading my collections");
+  }
 }
 </script>
 
@@ -94,7 +78,7 @@ async function fetchMyFavoriteCollections() {
     <a-col :span="24">
       <h3>
         Want to explore other collections from the Stacks of Wax Community?
-        Check out <a @click="goToCollections">Recent List</a>!
+        Check out <a @click="navigationService.goToCollections">Recent List</a>!
       </h3>
       <a-tabs v-model:activeKey="activeKey" @change="tabChange">
         <a-tab-pane key="1">
@@ -104,25 +88,32 @@ async function fetchMyFavoriteCollections() {
           <a-row>
             <a-col :span="24">
               <h4>Collection by {{ username }}</h4>
-              <a-button @click="createCollection"
-                >Create a new collection</a-button
-              >
-              <a-list
-                size="small"
-                bordered
-                v-if="myCollection"
-                :data-source="myCollection"
-              >
+              <div>
+                <a-button @click="createCollection"
+                  >Create a new collection</a-button
+                >
+              </div>
+              <a-list bordered v-if="myCollection" :data-source="myCollection">
                 <template #renderItem="{ item }">
                   <a-list-item>
-                    <a-button
-                      type="link"
-                      @click="
-                        (event) => goToDraftCollections(item.collection_id)
-                      "
-                      >{{ item.collection_name }}
-                    </a-button></a-list-item
-                  >
+                    <a-list-item-meta>
+                      <template #title>
+                        <a
+                          type="link"
+                          @click="
+                            (event) =>
+                              navigationService.goToDraftCollections(
+                                item.collection_id
+                              )
+                          "
+                          >{{ item.collection_name }}
+                        </a></template
+                      >
+                      <template #description>
+                          Last updated: {{ dayjs(item.last_updated_datetime).fromNow() }}
+                      </template>
+                    </a-list-item-meta>
+                  </a-list-item>
                 </template>
               </a-list>
 
@@ -153,7 +144,10 @@ async function fetchMyFavoriteCollections() {
                     <a-button
                       type="link"
                       @click="
-                        (event) => goToPublicCollections(item.collection_id)
+                        (event) =>
+                          navigationService.goToPublicCollections(
+                            item.collection_id
+                          )
                       "
                       >{{ item.collection_name }}
                     </a-button>

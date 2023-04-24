@@ -17,9 +17,30 @@ function goToUserDetail(userId) {
     router.push({name: routeNames.USER_DETAIL, params: {id: userId}});
 }
 
+function goToCollections() {
+    router.push({ name: routeNames.COLLECTION });
+}
+
+function goToDraftCollections(collectionId) {
+router.push({
+    name: routeNames.DRAFT_COLLECTION_DETAIL,
+    params: { id: collectionId }
+});
+}
+
+function goToPublicCollections(collectionId) {
+router.push({
+    name: routeNames.COLLECTION_DETAILS,
+    params: { id: collectionId }
+});
+}
+
 export const navigationService = {
     goToAlbumDetailPage,
     goToArtistDetailPage,
     goToCollectionDetail,
-    goToUserDetail
+    goToUserDetail,
+    goToCollections,
+    goToDraftCollections,
+    goToPublicCollections
 };
