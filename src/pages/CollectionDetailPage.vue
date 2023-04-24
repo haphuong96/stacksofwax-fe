@@ -9,6 +9,7 @@ import { axiosIntance } from "../services/base.service";
 import { HeartOutlined, HeartFilled } from "@ant-design/icons-vue";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import LikeButton from "../components/LikeButton.vue";
 // var relativeTime = require('dayjs/plugin/relativeTime')
 // const dayjs = require('dayjs')
 dayjs.extend(relativeTime);
@@ -156,10 +157,14 @@ async function fetchCollectionById() {
           <div>By {{ createdByData.username }}</div>
         </a-col>
         <a-col>
-          <a-button @click="toggleLikeCollection"
+          <LikeButton
+            @click="toggleLikeCollection"
+            :like="isLiked"
+          ></LikeButton>
+          <!-- <a-button @click="toggleLikeCollection"
             ><heart-outlined v-if="!isLiked" /><heart-filled v-else />
             Like</a-button
-          >
+          > -->
         </a-col>
       </a-row>
       <a-row>

@@ -237,7 +237,7 @@ async function fetchCollections(page, pageSize) {
 }
 
 .fav-collection-item-container:hover {
-  box-shadow: 0px 0px 6px #888888;
+  box-shadow: 0px 0px 4px #88888850;
 }
 
 .fav-collection-item-image {
@@ -250,7 +250,7 @@ async function fetchCollections(page, pageSize) {
 .fav-collection-item-divider {
   height: 1px;
   width: 191px;
-  background-color: rgba(0, 0, 0, 0.1);
+  background-color: white;
   margin-top: 16px;
   margin-left: -16px;
   margin-bottom: 16px;
