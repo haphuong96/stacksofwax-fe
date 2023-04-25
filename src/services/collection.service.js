@@ -45,14 +45,15 @@ const getCollectionDetail = async (collectionId) => {
   }
 };
 
-const getCollectionAlbums = async (collectionId, page, pageSize) => {
+const getCollectionAlbums = async (collectionId, searchKeyword, page, pageSize) => {
   try {
     const { limit, offset } = pagination(page, pageSize);
 
     const res = await axiosIntance.get(`collections/${collectionId}/albums`, {
       params: {
         limit,
-        offset
+        offset,
+        search: searchKeyword
       }
     });
 

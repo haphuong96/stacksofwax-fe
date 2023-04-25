@@ -18,6 +18,9 @@ const userId = localStorage.getItem(localStorageKeys.USER_ID);
 
 const isSavingCollection = ref(false);
 
+const searchAlbumInCollectionKeyword = ref();
+
+
 const albumsData = ref();
 const totalAlbums = ref();
 
@@ -82,6 +85,7 @@ async function fetchCollectionDetailById() {
 async function fetchCollectionAlbumById(page, pageSize) {
   const data = await collectionService.getCollectionAlbums(
     collectionId,
+    searchAlbumInCollectionKeyword.value,
     page,
     pageSize
   );
@@ -193,6 +197,12 @@ async function deleteAlbumFromCollection(albumId) {
       <a-row>
         <a-col :span="24">
           <h1 class="my-16">Album List</h1>
+          <a-input-search
+                v-model:value="searchAlbumInCollectionKeyword"
+                placeholder="Search album in collection"
+                style="width: 250px"
+                @search="() => fetchCollectionAlbumById()"
+              />
           <a-pagination v-model:current="current" :total="totalAlbums" show-less-items />
           <a-list bordered :data-source="albumsData">
             <template #renderItem="{ item }">
