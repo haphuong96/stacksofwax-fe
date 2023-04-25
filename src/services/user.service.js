@@ -2,6 +2,7 @@ import pagination from "../utils/pagination.helper";
 import { axiosIntance } from "./base.service";
 import router from "../router";
 import { routeNames } from "../router/route-names";
+import { message } from "ant-design-vue";
 
 async function fetchUserInfo(userId, page = 1, pageSize = 10) {
   try {
@@ -26,8 +27,11 @@ async function getMyProfile() {
 
 async function signout() {
   localStorage.clear();
-  router.push({ name: routeNames.HOME });
-  window.location.reload();
+  message.error("Expired session!");
+  setTimeout(() => {
+    router.push({ name: routeNames.HOME });
+    window.location.reload();
+  }, 200);
 }
 
 async function updateUserProfilePicture(profilePictureUrl) {

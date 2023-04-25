@@ -120,8 +120,8 @@ const router = createRouter({
       component: MyCollectionPage,
       meta: {
         layout: screenLayout.DEFAULT_LAYOUT
-      }
-      // beforeEnter: requireLoginGuard
+      },
+      beforeEnter: requireLoginGuard
     },
     {
       path: "/my-collections/:id",
