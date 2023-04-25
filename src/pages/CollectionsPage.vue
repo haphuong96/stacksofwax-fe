@@ -81,26 +81,26 @@ async function fetchCollections(page, pageSize) {
                   )
                 "
               >
-                <a-image
-                  class="fav-collection-item-image"
-                  :src="item.img_path || ''"
-                  :fallback="fallbackCollectionIcon"
-                  :width="160"
-                  :height="160"
-                  :preview="false"
-                />
-                <div class="fav-collection-item-divider"></div>
-                <div class="fav-collection-item-name">
-                  {{ item.collection_name }}
-                </div>
-                <div class="fav-collection-item-created">
-                  created by <b>{{ item.username }}</b>
-                </div>
-                <div class="fav-collection-item-like-container">
-                  <HeartFilled class="fav-collection-item-heart" />{{
-                    item.likes_count +
-                    (item.likes_count > 1 ? " likes" : " like")
-                  }}
+                <div class="fav-collection-item-content">
+                  <div class="mb-16">
+                    <a-image
+                      :src="item.img_path || ''"
+                      :fallback="fallbackCollectionIcon"
+                      :preview="false"
+                    />
+                  </div>
+                  <div class="fav-collection-item-name">
+                    {{ item.collection_name }}
+                  </div>
+                  <div class="fav-collection-item-created">
+                    By <b>{{ item.username }}</b>
+                  </div>
+                  <div class="fav-collection-item-like-container">
+                    <HeartFilled class="fav-collection-item-heart" />{{
+                      item.likes_count +
+                      (item.likes_count > 1 ? " likes" : " like")
+                    }}
+                  </div>
                 </div>
               </div>
             </div>
@@ -212,61 +212,42 @@ async function fetchCollections(page, pageSize) {
   margin-left: 10px;
 }
 
-.top-fav-collection :deep(.ant-row) > div {
-  margin: 0 4%;
-}
-
-.top-fav-collection img {
-  width: 250px;
-}
-
 .fav-collection-container {
   height: auto;
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-around;
 }
 
 .fav-collection-item-container {
+  margin: 16px;
   cursor: pointer;
-  width: 192px;
-  align-content: center;
-  align-items: center;
+  max-width: 200px;
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 8px;
-  padding: 16px;
+}
+
+.fav-collection-item-content {
+  margin: 16px;
 }
 
 .fav-collection-item-container:hover {
   box-shadow: 0px 0px 4px #88888850;
 }
 
-.fav-collection-item-image {
-  background-color: white;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  width: 160px;
-  height: 160px;
-}
-
-.fav-collection-item-divider {
-  height: 1px;
-  width: 191px;
-  background-color: white;
-  margin-top: 16px;
-  margin-left: -16px;
-  margin-bottom: 16px;
-}
-
 .fav-collection-item-name {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 700;
   color: black;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .fav-collection-item-created {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 300;
+  margin: 2px 0px;
   color: gray;
   overflow: hidden;
   text-overflow: ellipsis;

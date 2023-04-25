@@ -9,7 +9,7 @@ import { axiosIntance } from "../services/base.service";
 import { EditOutlined, EditFilled, CloseOutlined } from "@ant-design/icons-vue";
 import cloneDeep from "lodash/cloneDeep";
 import { service } from "../services";
-const {collectionService, albumService } = service;
+const { collectionService, albumService, navigationService } = service;
 
 const collectionId = router.currentRoute.value.params.id.split("-")[0];
 
@@ -19,8 +19,9 @@ const userId = localStorage.getItem(localStorageKeys.USER_ID);
 const isSavingCollection = ref(false);
 
 const albumsData = ref();
+const totalAlbums = ref();
+
 const collectionData = ref();
-const createdByData = ref();
 
 const searchAlbumData = ref([]);
 const searchAlbumKeyword = ref();
@@ -28,10 +29,7 @@ const searchAlbumKeyword = ref();
 const isEditMode = ref(false);
 const isSearchAlbumMode = ref(false);
 
-// const collectionName = ref();
 const editCollectionName = ref();
-// const collectionDesc = ref();
-
 const editCollectionDesc = ref();
 
 const showHideAlbumSearchSection = () => {
@@ -73,7 +71,6 @@ async function updateCollection() {
 }
 
 async function fetchCollectionDetailById() {
-
   const data = await collectionService.getCollectionDetail(collectionId);
 
   collectionData.value = data;
@@ -82,13 +79,17 @@ async function fetchCollectionDetailById() {
   editCollectionDesc.value = cloneDeep(data.collection_desc);
 }
 
-async function fetchCollectionAlbumById() {
-  const data = await collectionService.getCollectionAlbums(collectionId);
-  albumsData.value = data;
+async function fetchCollectionAlbumById(page, pageSize) {
+  const data = await collectionService.getCollectionAlbums(
+    collectionId,
+    page,
+    pageSize
+  );
+  albumsData.value = data.albums;
+  totalAlbums.value = data.total;
 }
 
 async function searchAlbum() {
-
   const data = await albumService.getAlbums({
     searchKeyword: searchAlbumKeyword.value
   });
@@ -188,17 +189,32 @@ async function deleteAlbumFromCollection(albumId) {
       </a-row>
       <a-row>
         <a-col :span="24">
-          <h1>Album List</h1>
+          <h1 class="my-16">Album List</h1>
           <a-list bordered :data-source="albumsData">
             <template #renderItem="{ item }">
-              <a-list-item
-                >{{ item.album_title }}
-                <a-button
+              <a-list-item>
+                <a-list-item-meta>
+                  <template #title>
+                    {{ item.album_title }}
+                  </template>
+                  <template #avatar>
+                    <img :src="item.img_path" class="w-50" />
+                  </template>
+                  <template #description>
+                    {{
+                      item.artists
+                        .map((artist) => artist.artist_name)
+                        .join(", ")
+                    }}
+                    • {{ item.release_year }}
+                  </template> </a-list-item-meta
+                ><a
                   type="link"
                   @click="deleteAlbumFromCollection(item.album_id)"
                   v-if="isSearchAlbumMode"
-                  ><close-outlined /></a-button
-              ></a-list-item>
+                  >Remove</a
+                >
+              </a-list-item>
             </template>
           </a-list>
           <a-button
@@ -207,14 +223,19 @@ async function deleteAlbumFromCollection(albumId) {
             @click="showHideAlbumSearchSection"
             >Edit album list</a-button
           >
-          <div v-if="isSearchAlbumMode">
-            <a-input-search
-              v-model:value="searchAlbumKeyword"
-              placeholder="Search album"
-              style="width: 200px"
-              @search="searchAlbum"
-            />
-            <a @click="showHideAlbumSearchSection"><close-outlined /></a>
+          <div v-if="isSearchAlbumMode" class="my-16">
+            <h2>Find albums for your collection</h2>
+            <div class="my-16 d-flex justify-between">
+              <a-input-search
+                v-model:value="searchAlbumKeyword"
+                placeholder="Search album"
+                style="width: 250px"
+                @search="searchAlbum"
+              />
+              <a @click="showHideAlbumSearchSection"
+                ><close-outlined style="font-size: 20px"></close-outlined
+              ></a>
+            </div>
             <a-list
               bordered
               :data-source="searchAlbumData"
@@ -229,6 +250,7 @@ async function deleteAlbumFromCollection(albumId) {
                 >
               </template>
             </a-list>
+            <a v-if="searchAlbumData.length > 0">See all albums >></a>
           </div>
         </a-col>
       </a-row>
@@ -239,5 +261,9 @@ async function deleteAlbumFromCollection(albumId) {
 <style scoped>
 .fs-16 {
   font-size: 16px;
+}
+
+.w-50 {
+  width: 50px;
 }
 </style>

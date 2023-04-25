@@ -45,13 +45,23 @@ const getCollectionDetail = async (collectionId) => {
   }
 };
 
-const getCollectionAlbums = async (collectionId) => {
+const getCollectionAlbums = async (collectionId, page, pageSize) => {
   try {
-    const res = await axiosIntance.get(`collections/${collectionId}/albums`);
+    const { limit, offset } = pagination(page, pageSize);
 
-    const albums = res.data;
+    const res = await axiosIntance.get(`collections/${collectionId}/albums`, {
+      params: {
+        limit,
+        offset
+      }
+    });
 
-    return albums;
+    const { total, albums } = res.data;
+
+    return {
+      total,
+      albums
+    };
   } catch (error) {
     messsage.error("Error loading collection albums");
   }
