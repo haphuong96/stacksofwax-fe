@@ -28,13 +28,18 @@ const getAlbumFilter = async () => {
  *
  * @param {number} page
  * @param {number} pageSize
- * @param {{genres: string[], decade: string, searchKeyword: string}} filters
+ * @param {{genres: string[], decade: string, searchKeyword: string, availableToAddToCollectionId: number}} filters
  */
 const getAlbums = async (filters, page, pageSize) => {
   try {
     const { limit, offset } = pagination(page, pageSize);
 
     const filterParams = new URLSearchParams();
+    
+    if (filters?.searchKeyword) {
+      filterParams.append("search", filters.searchKeyword);
+    }
+
     if (filters?.genres?.length) {
       filters.genres.forEach((genre) => {
         filterParams.append("genreId", genre);
@@ -45,8 +50,8 @@ const getAlbums = async (filters, page, pageSize) => {
       filterParams.append("decade", filters.decade);
     }
 
-    if (filters?.searchKeyword) {
-      filterParams.append("search", filters.searchKeyword);
+    if (filters?.availableToAddToCollectionId) {
+      filterParams.append("availableToAddToCollectionId", filters.availableToAddToCollectionId);
     }
 
     filterParams.append("limit", limit);
@@ -63,6 +68,7 @@ const getAlbums = async (filters, page, pageSize) => {
       albums
     };
   } catch (error) {
+    console.log(error)
     message.error("Error retrieving list of albums");
   }
 };

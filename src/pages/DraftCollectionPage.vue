@@ -91,7 +91,8 @@ async function fetchCollectionAlbumById(page, pageSize) {
 
 async function searchAlbum() {
   const data = await albumService.getAlbums({
-    searchKeyword: searchAlbumKeyword.value
+    searchKeyword: searchAlbumKeyword.value,
+    availableToAddToCollectionId: collectionId
   });
 
   searchAlbumData.value = data.albums;
@@ -113,11 +114,13 @@ const displayDescription = computed(() => {
 async function addAlbumToCollection(albumId) {
   await collectionService.addCollectionAlbum(collectionId, albumId);
   fetchCollectionAlbumById();
+  searchAlbum();
 }
 
 async function deleteAlbumFromCollection(albumId) {
   await collectionService.deleteCollectionAlbum(collectionId, albumId);
   fetchCollectionAlbumById();
+  searchAlbum();
 }
 </script>
 
@@ -190,6 +193,7 @@ async function deleteAlbumFromCollection(albumId) {
       <a-row>
         <a-col :span="24">
           <h1 class="my-16">Album List</h1>
+          <a-pagination v-model:current="current" :total="totalAlbums" show-less-items />
           <a-list bordered :data-source="albumsData">
             <template #renderItem="{ item }">
               <a-list-item>
@@ -236,7 +240,36 @@ async function deleteAlbumFromCollection(albumId) {
                 ><close-outlined style="font-size: 20px"></close-outlined
               ></a>
             </div>
-            <a-list
+            <a-list bordered
+              :data-source="searchAlbumData"
+              v-if="searchAlbumData.length > 0">
+            <template #renderItem="{ item }">
+              <a-list-item>
+                <a-list-item-meta>
+                  <template #title>
+                    {{ item.album_title }}
+                  </template>
+                  <template #avatar>
+                    <img :src="item.img_path" class="w-50" />
+                  </template>
+                  <template #description>
+                    {{
+                      item.artists
+                        .map((artist) => artist.artist_name)
+                        .join(", ")
+                    }}
+                    • {{ item.release_year }}
+                  </template> </a-list-item-meta
+                ><a-button
+                  @click="() => addAlbumToCollection(item.album_id)"
+                  v-if="isSearchAlbumMode"
+                  >Add</a-button
+                >
+              </a-list-item>
+            </template>
+          </a-list>
+
+            <!-- <a-list
               bordered
               :data-source="searchAlbumData"
               v-if="searchAlbumData.length > 0"
@@ -249,8 +282,8 @@ async function deleteAlbumFromCollection(albumId) {
                   ></a-list-item
                 >
               </template>
-            </a-list>
-            <a v-if="searchAlbumData.length > 0">See all albums >></a>
+            </a-list> -->
+            <a v-if="searchAlbumData.length > 0" @click="navigationService.goToExploreAlbum">See all albums >></a>
           </div>
         </a-col>
       </a-row>

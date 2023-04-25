@@ -38,6 +38,10 @@ function goToPublicCollectionDetail(collectionId) {
   });
 }
 
+function goToExploreAlbum() {
+  router.push({name: routeNames.EXPLORE, query: { currentTab: "albums"}})
+}
+
 export const navigationService = {
   goToAlbumDetailPage,
   goToArtistDetailPage,
@@ -45,5 +49,6 @@ export const navigationService = {
   goToUserDetail,
   goToCollections,
   goToDraftCollections,
-  goToPublicCollectionDetail
+  goToPublicCollectionDetail,
+  goToExploreAlbum
 };
