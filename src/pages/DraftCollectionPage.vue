@@ -1,13 +1,10 @@
 <script setup>
-import axios from "axios";
+import { CloseOutlined, EditFilled } from "@ant-design/icons-vue";
 import { message } from "ant-design-vue";
-import { computed, onMounted, ref } from "vue";
-import router from "../router";
-import { routeNames } from "../router/route-names";
-import { localStorageKeys } from "../common/local-storage-keys";
-import { axiosIntance } from "../services/base.service";
-import { EditOutlined, EditFilled, CloseOutlined } from "@ant-design/icons-vue";
 import cloneDeep from "lodash/cloneDeep";
+import { computed, onMounted, ref } from "vue";
+import { localStorageKeys } from "../common/local-storage-keys";
+import router from "../router";
 import { service } from "../services";
 const { collectionService, albumService, navigationService } = service;
 
@@ -140,7 +137,7 @@ async function deleteAlbumFromCollection(albumId) {
 
 <template>
   <a-spin tip="Loading..." :spinning="isLoading" class="m-16 p-16">
-    <a-row class="m-16 draft-collection-page-container">
+    <a-row class="m-16 scroll-page-container">
       <a-col :span="24">
         <a-row v-if="collectionData">
           <a-col :span="4">
@@ -333,10 +330,6 @@ async function deleteAlbumFromCollection(albumId) {
 </template>
 
 <style scoped>
-.draft-collection-page-container {
-  height: calc(100vh - 72px);
-  overflow: scroll;
-}
 .fs-16 {
   font-size: 16px;
 }

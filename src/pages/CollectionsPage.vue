@@ -65,7 +65,7 @@ async function fetchCollections(page, pageSize) {
 </script>
 
 <template>
-  <div class="collection-page-container">
+  <div class="scroll-page-container">
     <a-row class="m-16 p-16">
       <a-col :span="24">
         <a-row>
@@ -188,10 +188,6 @@ async function fetchCollections(page, pageSize) {
 </template>
 
 <style scoped>
-.collection-page-container {
-  height: calc(100vh - 72px);
-  overflow: scroll;
-}
 .w-50 {
   width: 50px;
 }
