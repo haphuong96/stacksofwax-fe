@@ -106,7 +106,7 @@ async function toggleLikeCollection() {
 </script>
 
 <template>
-  <a-row class="m-16 p-16">
+  <a-row class="m-16 p-16 collection-detail-page-container">
     <a-col :span="24">
       <a-row v-if="collectionData">
         <a-col :span="4">
@@ -222,5 +222,10 @@ async function toggleLikeCollection() {
 <style scoped>
 .w-50 {
   width: 50px;
+}
+
+.collection-detail-page-container {
+  height: calc(100vh - 72px);
+  overflow: scroll;
 }
 </style>

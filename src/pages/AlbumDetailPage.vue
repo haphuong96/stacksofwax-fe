@@ -1,11 +1,10 @@
 <script setup>
-import axios from "axios";
+import { CloseCircleFilled } from "@ant-design/icons-vue";
 import { message } from "ant-design-vue";
 import { computed, onMounted, ref } from "vue";
+import { localStorageKeys } from "../common/local-storage-keys";
 import router from "../router";
 import { service } from "../services";
-import { localStorageKeys } from "../common/local-storage-keys";
-import { CloseCircleFilled } from "@ant-design/icons-vue";
 import { formatFromNow } from "../utils/datetime.helper";
 
 const { albumService, navigationService } = service;
@@ -365,9 +364,6 @@ async function getUserRating() {
 </template>
 
 <style scoped>
-/* .collection-name {
-  font-weight: 500;
-} */
 .collection-created-by {
   color: #00000073;
 }
