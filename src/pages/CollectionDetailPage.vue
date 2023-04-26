@@ -3,13 +3,14 @@ import { message } from "ant-design-vue";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { computed, onMounted, ref } from "vue";
+import fallbackCollectionImg from "../assets/ic_fallback_collection.png";
+import userFallbackAvatar from "../assets/user-fallback.png";
 import { localStorageKeys } from "../common/local-storage-keys";
 import LikeButton from "../components/LikeButton.vue";
 import router from "../router";
 import { collectionService } from "../services/collection.service";
 import { navigationService } from "../services/navigation.service";
-import fallbackCollectionImg from "../assets/ic_fallback_collection.png";
-import userFallbackAvatar from "../assets/user-fallback.png";
+import { authAction } from "../utils/auth-action.helper";
 
 dayjs.extend(relativeTime);
 
@@ -72,7 +73,11 @@ async function postComment() {
 
 async function fetchCollectionComments(page, pageSize) {
   try {
-    const data = await collectionService.getCollectionComment(collectionId, page, pageSize);
+    const data = await collectionService.getCollectionComment(
+      collectionId,
+      page,
+      pageSize
+    );
     comments.value = data.comments;
     totalComments.value = data.total;
   } catch (error) {
@@ -111,14 +116,14 @@ async function fetchCollectionAlbumById(page, pageSize) {
 }
 
 async function toggleLikeCollection() {
-  if (isLiked.value) {
-    await collectionService.unlikeCollection(collectionId);
-  } else {
-    await collectionService.likeCollection(collectionId);
-  }
-
-  checkUserLikedCollection();
-  fetchCollectionDetailById();
+  return authAction(async () => {
+    if (isLiked.value) {
+      await collectionService.unlikeCollection(collectionId);
+    } else {
+      await collectionService.likeCollection(collectionId);
+    }
+    checkUserLikedCollection();
+  });
 }
 </script>
 
@@ -212,17 +217,20 @@ async function toggleLikeCollection() {
             </template>
             <template #footer>
               <div class="d-flex justify-right">
-          <a-pagination
-            size="small"
-            v-model:current="current"
-            :total="totalAlbums"
-            show-less-items
-            :show-total="(total, range) => `${range[0]}-${range[1]} of ${total} items`"
-            @change="fetchCollectionAlbumById"
-          /></div>
+                <a-pagination
+                  size="small"
+                  v-model:current="current"
+                  :total="totalAlbums"
+                  show-less-items
+                  :show-total="
+                    (total, range) =>
+                      `${range[0]}-${range[1]} of ${total} items`
+                  "
+                  @change="fetchCollectionAlbumById"
+                />
+              </div>
             </template>
           </a-list>
-          
         </a-col>
       </a-row>
       <a-row>
@@ -271,12 +279,12 @@ async function toggleLikeCollection() {
               </a-list-item>
             </template>
             <template #footer>
-                <a-pagination
-                  size="small"
-                  :total="totalComments"
-                  show-size-changer
-                  @change="fetchCollectionComments"
-                />
+              <a-pagination
+                size="small"
+                :total="totalComments"
+                show-size-changer
+                @change="fetchCollectionComments"
+              />
             </template>
           </a-list>
         </a-col>
