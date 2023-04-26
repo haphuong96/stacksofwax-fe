@@ -10,11 +10,13 @@ import { HeartOutlined, HeartFilled } from "@ant-design/icons-vue";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import LikeButton from "../components/LikeButton.vue";
-// var relativeTime = require('dayjs/plugin/relativeTime')
-// const dayjs = require('dayjs')
+import { collectionService } from "../services/collection.service";
+
 dayjs.extend(relativeTime);
 
 const comments = ref([]);
+const totalComments = ref();
+
 const submitting = ref(false);
 const draftComment = ref("");
 
@@ -44,12 +46,7 @@ async function postComment() {
 
   submitting.value = true;
   try {
-    const postCmt = await axiosIntance.post(
-      `collections/${collectionId}/comments`,
-      {
-        comment: draftComment.value
-      }
-    );
+    collectionService.addCollectionComment(collectionId, draftComment.value);
 
     fetchCollectionComments();
 
@@ -58,30 +55,18 @@ async function postComment() {
   } finally {
     submitting.value = false;
   }
-
-  // setTimeout(() => {
-  //   submitting.value = false;
-  //   comments.value = [
-  //     {
-  //       author: "Han Solo",
-  //       avatar: "https://joeschmoe.io/api/v1/random",
-  //       content: value.value,
-  //       datetime: dayjs().fromNow()
-  //     },
-  //     ...comments.value
-  //   ];
-  //   value.value = "";
-  // }, 1000);
 }
 
 async function fetchCollectionComments() {
-  const res = await axiosIntance.get(`collections/${collectionId}`, {
-    params: {
-      operationName: `fetchCollectionComments`
-    }
-  });
+  try {
+    const data = collectionService.getCollectionComment(collectionId);
+    comments.value = data.comments;
+    totalComments.value = data.total;
 
-  comments.value = res.data;
+  } catch (error) {
+    message.error("Error fetching collection comments")
+  }
+
 }
 
 async function checkUserLikedCollection() {
@@ -98,14 +83,9 @@ async function checkUserLikedCollection() {
 }
 
 async function fetchCollectionDetailById() {
-  const res = await axiosIntance.get(`collections/${collectionId}`, {
-    params: {
-      operationName: "fetchCollectionDetails"
-    }
-  });
-  const { user_id, username, ...collection } = res.data;
+  const data = collectionService.getCollectionDetail(collectionId);
 
-  collectionData.value = collection;
+  collectionData.value = data;
 
   createdByData.value = {
     user_id,

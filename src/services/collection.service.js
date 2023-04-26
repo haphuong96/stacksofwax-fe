@@ -45,7 +45,12 @@ const getCollectionDetail = async (collectionId) => {
   }
 };
 
-const getCollectionAlbums = async (collectionId, searchKeyword, page, pageSize) => {
+const getCollectionAlbums = async (
+  collectionId,
+  searchKeyword,
+  page,
+  pageSize
+) => {
   try {
     const { limit, offset } = pagination(page, pageSize);
 
@@ -119,6 +124,35 @@ const deleteCollectionAlbum = async (collectionId, albumId) => {
     }
   );
 };
+
+const addCollectionComment = async (collectionId, comment) => {
+  try {
+    await axiosIntance.post(`collections/${collectionId}/comments`, {
+      comment: draftComment.value
+    });
+  } catch (error) {
+    message.error("Error posting comment");
+  }
+};
+
+const getCollectionComment = async(collectionId, page, pageSize) => {
+
+  const {limit, offset} = pagination(page, pageSize);
+  
+  try {
+    const res = await axiosIntance.get(`collections/${collectionId}/comments`);
+
+    const {total, comments} = res.data;
+
+    return {
+      total,
+      comments
+    }
+  } catch (error) {
+    message.error("Error loading comments")
+  }
+}
+
 export const collectionService = {
   getCollections,
   getCollectionDetail,
@@ -127,5 +161,7 @@ export const collectionService = {
   createCollection,
   updateCollection,
   addCollectionAlbum,
-  deleteCollectionAlbum
+  deleteCollectionAlbum,
+  addCollectionComment,
+  getCollectionComment
 };
