@@ -12,6 +12,8 @@ import { collectionService } from "../services/collection.service";
 
 dayjs.extend(relativeTime);
 
+const userAvatar = localStorage.getItem(localStorageKeys.USER_AVATAR);
+
 const comments = ref([]);
 const totalComments = ref();
 
@@ -24,14 +26,12 @@ const albumsData = ref();
 const totalAlbums = ref();
 
 const collectionData = ref();
-const isLiked = ref();
+const isLiked = ref(false);
 
 onMounted(async () => {
   fetchCollectionDetailById();
   fetchCollectionAlbumById();
-  if (localStorage.getItem(localStorageKeys.ACCESS_TOKEN)) {
-    checkUserLikedCollection();
-  }
+  checkUserLikedCollection();
   fetchCollectionComments();
 });
 
@@ -121,14 +121,13 @@ async function toggleLikeCollection() {
           <div>By {{ collectionData.username }}</div>
         </a-col>
         <a-col>
-          <LikeButton
-            @click="toggleLikeCollection"
-            :like="isLiked"
-          ></LikeButton>
-          <!-- <a-button @click="toggleLikeCollection"
-            ><heart-outlined v-if="!isLiked" /><heart-filled v-else />
+          <a-button @click="toggleLikeCollection">
+            <LikeButton
+              @click="toggleLikeCollection"
+              :like="isLiked"
+            ></LikeButton>
             Like</a-button
-          > -->
+          >
         </a-col>
       </a-row>
       <a-row>
@@ -170,7 +169,7 @@ async function toggleLikeCollection() {
       </a-row>
       <a-row>
         <a-col :span="24">
-          <h1>Reviews</h1>
+          <h1 class="my-16">Reviews</h1>
           <a-list
             v-if="comments.length"
             :data-source="comments"
@@ -183,7 +182,7 @@ async function toggleLikeCollection() {
               <a-list-item>
                 <a-comment
                   :author="item.username"
-                  :avatar="item.avatar"
+                  :avatar="item.user_avatar"
                   :content="item.comment"
                   :datetime="dayjs(item.created_datetime).fromNow()"
                 />
@@ -192,14 +191,15 @@ async function toggleLikeCollection() {
           </a-list>
           <a-comment>
             <template #avatar>
-              <a-avatar
-                src="https://joeschmoe.io/api/v1/random"
-                alt="Han Solo"
-              />
+              <a-avatar :src="userAvatar" alt="Han Solo" />
             </template>
             <template #content>
               <a-form-item>
-                <a-textarea v-model:value="draftComment" :rows="4" />
+                <a-textarea
+                  v-model:value="draftComment"
+                  :rows="4"
+                  placeholder="Enter your comment"
+                />
               </a-form-item>
               <a-form-item>
                 <a-button

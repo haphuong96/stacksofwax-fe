@@ -270,7 +270,7 @@ async function getUserRating() {
             </template>
             <template #content>
               <a-form-item>
-                <a-textarea v-model:value="draftCommentAlbum" :rows="4" />
+                <a-textarea v-model:value="draftCommentAlbum" :rows="4" placeholder="Enter your comment"/>
               </a-form-item>
               <a-form-item>
                 <a-button

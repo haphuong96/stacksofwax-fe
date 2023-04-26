@@ -32,7 +32,7 @@ async function submitLogin() {
       const me = await axiosIntance.get("get-me");
       localStorage.setItem(localStorageKeys.USER_ID, me.data.user_id);
       localStorage.setItem(localStorageKeys.USERNAME, me.data.username);
-      localStorage.setItem(localStorageKeys.USER_EMAIL, me.data.email_address);
+      localStorage.setItem(localStorageKeys.USER_AVATAR, me.data.img_path);
 
       router.push({ name: routeNames.HOME });
       message.success("Login successfully!");

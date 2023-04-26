@@ -127,9 +127,10 @@ const deleteCollectionAlbum = async (collectionId, albumId) => {
 const addCollectionComment = async (collectionId, comment) => {
   try {
     await axiosIntance.post(`collections/${collectionId}/comments`, {
-      comment: draftComment.value
+      comment: comment
     });
   } catch (error) {
+    console.log(error)
     message.error("Error posting comment");
   }
 };
@@ -169,7 +170,7 @@ const checkUserLikedCollection = async (collectionId) => {
 
 const likeCollection = async (collectionId) => {
   try {
-    await axiosIntance.delete(`collections/${collectionId}/like/post`);
+    await axiosIntance.post(`collections/${collectionId}/like/post`);
   } catch (error) {
     message.error("Error post like collection");
   }
