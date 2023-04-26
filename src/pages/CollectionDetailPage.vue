@@ -27,9 +27,7 @@ const isLiked = ref();
 onMounted(async () => {
   fetchCollectionDetailById();
   fetchCollectionAlbumById();
-  if (localStorage.getItem(localStorageKeys.ACCESS_TOKEN)) {
-    checkUserLikedCollection();
-  }
+  checkUserLikedCollection();
   fetchCollectionComments();
 });
 
