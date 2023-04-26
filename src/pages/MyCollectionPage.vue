@@ -118,7 +118,7 @@ const onConfirmDeleteCollection = async () => {
 </script>
 
 <template>
-  <a-row class="px-32 p-16 my-collection-page-container">
+  <a-row class="px-32 p-16 scroll-page-container">
     <a-col :span="24">
       <h3>
         Want to explore other collections from the Stacks of Wax Community?
@@ -266,10 +266,6 @@ const onConfirmDeleteCollection = async () => {
 </template>
 
 <style scoped>
-.my-collection-page-container {
-  height: calc(100vh - 72px);
-  overflow: scroll;
-}
 .btn-add {
   text-align: right;
 }

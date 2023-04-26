@@ -27,11 +27,6 @@ async function getMyProfile() {
 
 async function signout() {
   localStorage.clear();
-  message.error("Expired session!");
-  setTimeout(() => {
-    router.push({ name: routeNames.HOME });
-    window.location.reload();
-  }, 200);
 }
 
 async function updateUserProfilePicture(profilePictureUrl) {

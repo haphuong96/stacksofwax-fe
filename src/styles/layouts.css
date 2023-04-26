@@ -1,3 +1,9 @@
+.scroll-page-container {
+    /* 72 is the header height */
+    height: calc(100vh - 72px);
+    overflow: scroll;
+}
+
 .d-flex {
     display: flex;
 }

@@ -1,13 +1,11 @@
 <script setup>
-import axios from "axios";
 import { message } from "ant-design-vue";
-import { computed, onMounted, ref } from "vue";
-import router from "../router";
-import { localStorageKeys } from "../common/local-storage-keys";
-import { HeartOutlined, HeartFilled } from "@ant-design/icons-vue";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import { onMounted, ref } from "vue";
+import { localStorageKeys } from "../common/local-storage-keys";
 import LikeButton from "../components/LikeButton.vue";
+import router from "../router";
 import { collectionService } from "../services/collection.service";
 
 dayjs.extend(relativeTime);
@@ -106,7 +104,7 @@ async function toggleLikeCollection() {
 </script>
 
 <template>
-  <a-row class="m-16 p-16 collection-detail-page-container">
+  <a-row class="m-16 p-16 scroll-page-container">
     <a-col :span="24">
       <a-row v-if="collectionData">
         <a-col :span="4">
@@ -222,10 +220,5 @@ async function toggleLikeCollection() {
 <style scoped>
 .w-50 {
   width: 50px;
-}
-
-.collection-detail-page-container {
-  height: calc(100vh - 72px);
-  overflow: scroll;
 }
 </style>
