@@ -83,11 +83,10 @@ const deleteCollection = async (collectionId) => {
 
 const createCollection = async (userId) => {
   try {
-    const data = await axiosIntance.post("collections", {
-      user_id: userId
-    });
+    const res = await axiosIntance.post("collections");
 
-    return data;
+    const collectionDetails = res.data;
+    return collectionDetails;
   } catch (error) {
     message.error("Error creating collection");
   }
@@ -135,23 +134,54 @@ const addCollectionComment = async (collectionId, comment) => {
   }
 };
 
-const getCollectionComment = async(collectionId, page, pageSize) => {
+const getCollectionComment = async (collectionId, page, pageSize) => {
+  const { limit, offset } = pagination(page, pageSize);
 
-  const {limit, offset} = pagination(page, pageSize);
-  
   try {
-    const res = await axiosIntance.get(`collections/${collectionId}/comments`);
+    const res = await axiosIntance.get(`collections/${collectionId}/comments`, {
+      params: { limit, offset }
+    });
 
-    const {total, comments} = res.data;
+    const { total, comments } = res.data;
 
     return {
       total,
       comments
-    }
+    };
   } catch (error) {
-    message.error("Error loading comments")
+    message.error("Error loading comments");
   }
-}
+};
+
+const checkUserLikedCollection = async (collectionId) => {
+  try {
+    const res = await axiosIntance.get(
+      `collections/${collectionId}/like/check`
+    );
+
+    const isLiked = res.data;
+
+    return isLiked;
+  } catch (error) {
+    message.error("Error checking user liked collection");
+  }
+};
+
+const likeCollection = async (collectionId) => {
+  try {
+    await axiosIntance.delete(`collections/${collectionId}/like/post`);
+  } catch (error) {
+    message.error("Error post like collection");
+  }
+};
+
+const unlikeCollection = async (collectionId) => {
+  try {
+    await axiosIntance.delete(`collections/${collectionId}/like/delete`);
+  } catch (error) {
+    message.error("Error delete like collection");
+  }
+};
 
 export const collectionService = {
   getCollections,
@@ -163,5 +193,8 @@ export const collectionService = {
   addCollectionAlbum,
   deleteCollectionAlbum,
   addCollectionComment,
-  getCollectionComment
+  getCollectionComment,
+  checkUserLikedCollection,
+  likeCollection,
+  unlikeCollection
 };

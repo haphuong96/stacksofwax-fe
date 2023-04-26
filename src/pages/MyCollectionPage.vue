@@ -70,7 +70,7 @@ onMounted(async () => {
 
 async function postCollection() {
   const { collection_id: collectionId, ...details } =
-    await collectionService.createCollection(userId);
+    await collectionService.createCollection();
   navigationService.goToDraftCollections(collectionId);
 }
 

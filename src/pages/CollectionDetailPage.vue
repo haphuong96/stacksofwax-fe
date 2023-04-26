@@ -3,9 +3,7 @@ import axios from "axios";
 import { message } from "ant-design-vue";
 import { computed, onMounted, ref } from "vue";
 import router from "../router";
-import { routeNames } from "../router/route-names";
 import { localStorageKeys } from "../common/local-storage-keys";
-import { axiosIntance } from "../services/base.service";
 import { HeartOutlined, HeartFilled } from "@ant-design/icons-vue";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -22,12 +20,10 @@ const draftComment = ref("");
 
 const collectionId = router.currentRoute.value.params.id.split("-")[0];
 
-const username = localStorage.getItem(localStorageKeys.USERNAME);
-const userId = localStorage.getItem(localStorageKeys.USER_ID);
-
 const albumsData = ref();
+const totalAlbums = ref();
+
 const collectionData = ref();
-const createdByData = ref();
 const isLiked = ref();
 
 onMounted(async () => {
@@ -46,7 +42,10 @@ async function postComment() {
 
   submitting.value = true;
   try {
-    collectionService.addCollectionComment(collectionId, draftComment.value);
+    await collectionService.addCollectionComment(
+      collectionId,
+      draftComment.value
+    );
 
     fetchCollectionComments();
 
@@ -59,23 +58,21 @@ async function postComment() {
 
 async function fetchCollectionComments() {
   try {
-    const data = collectionService.getCollectionComment(collectionId);
+    const data = await collectionService.getCollectionComment(collectionId);
     comments.value = data.comments;
     totalComments.value = data.total;
-
   } catch (error) {
-    message.error("Error fetching collection comments")
+    message.error("Error fetching collection comments");
   }
-
 }
 
 async function checkUserLikedCollection() {
   try {
-    const res = await axiosIntance.get(
-      `collections/${collectionId}/like/check`
+    const { is_liked } = await collectionService.checkUserLikedCollection(
+      collectionId
     );
 
-    isLiked.value = res.data.is_liked;
+    isLiked.value = is_liked;
     console.log(isLiked.value);
   } catch (error) {
     isLiked.value = false;
@@ -83,48 +80,35 @@ async function checkUserLikedCollection() {
 }
 
 async function fetchCollectionDetailById() {
-  const data = collectionService.getCollectionDetail(collectionId);
+  const data = await collectionService.getCollectionDetail(collectionId);
 
   collectionData.value = data;
-
-  createdByData.value = {
-    user_id,
-    username
-  };
 }
 
 async function fetchCollectionAlbumById() {
-  const res = await axiosIntance.get(`collections/${collectionId}`, {
-    params: {
-      operationName: "fetchCollectionAlbums"
-    }
-  });
-  albumsData.value = res.data;
+  const { total, albums } = await collectionService.getCollectionAlbums(
+    collectionId
+  );
+
+  albumsData.value = albums;
+  totalAlbums.value = total;
 }
 
 async function toggleLikeCollection() {
   if (isLiked.value) {
-    await axiosIntance.delete(`collections/${collectionId}/like/delete`);
+    await collectionService.unlikeCollection(collectionId);
   } else {
-    await axiosIntance.post(`collections/${collectionId}/like/post`);
+    await collectionService.likeCollection(collectionId);
   }
 
   checkUserLikedCollection();
-}
-
-async function fetchCollectionById() {
-  const res = await axiosIntance.get(`collections/${collectionId}`);
-  const { albums, created_by, ...collection } = res.data;
-  albumsData.value = albums;
-  collectionData.value = collection;
-  createdByData.value = created_by;
 }
 </script>
 
 <template>
   <a-row class="m-16 p-16">
     <a-col :span="24">
-      <a-row v-if="collectionData && createdByData">
+      <a-row v-if="collectionData">
         <a-col :span="4">
           <a-image
             :width="200"
@@ -134,7 +118,7 @@ async function fetchCollectionById() {
         <a-col class="mt-16">
           <div>Collection</div>
           <h1>{{ collectionData.collection_name }}</h1>
-          <div>By {{ createdByData.username }}</div>
+          <div>By {{ collectionData.username }}</div>
         </a-col>
         <a-col>
           <LikeButton
@@ -154,10 +138,32 @@ async function fetchCollectionById() {
       </a-row>
       <a-row
         ><a-col :span="24">
-          <h1>Album List</h1>
+          <h1 class="my-16">Album List</h1>
+          <a-pagination
+            v-model:current="current"
+            :total="totalAlbums"
+            show-less-items
+          />
           <a-list bordered :data-source="albumsData">
             <template #renderItem="{ item }">
-              <a-list-item>{{ item.album_title }} </a-list-item>
+              <a-list-item>
+                <a-list-item-meta>
+                  <template #title>
+                    {{ item.album_title }}
+                  </template>
+                  <template #avatar>
+                    <img :src="item.img_path" class="w-50" />
+                  </template>
+                  <template #description>
+                    {{
+                      item.artists
+                        .map((artist) => artist.artist_name)
+                        .join(", ")
+                    }}
+                    • {{ item.release_year }}
+                  </template>
+                </a-list-item-meta>
+              </a-list-item>
             </template>
           </a-list>
         </a-col>
@@ -213,4 +219,8 @@ async function fetchCollectionById() {
   </a-row>
 </template>
 
-<style scoped></style>
+<style scoped>
+.w-50 {
+  width: 50px;
+}
+</style>
