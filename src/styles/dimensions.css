@@ -69,6 +69,14 @@
     padding: 16px;
 }
 
+.py-16 {
+    padding: 16px 0px;
+}
+
+.py-8 {
+    padding: 8px 0px;
+}
+
 .px-32 {
     padding-left: 32px;
     padding-right: 32px;
