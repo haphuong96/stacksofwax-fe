@@ -69,7 +69,7 @@ const getCollectionAlbums = async (
       albums
     };
   } catch (error) {
-    messsage.error("Error loading collection albums");
+    message.error("Error loading collection albums");
   }
 };
 
@@ -164,7 +164,7 @@ const checkUserLikedCollection = async (collectionId) => {
 
     return isLiked;
   } catch (error) {
-    message.error("Error checking user liked collection");
+    
   }
 };
 

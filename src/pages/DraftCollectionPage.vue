@@ -21,6 +21,7 @@ const searchAlbumInCollectionKeyword = ref();
 
 const albumsData = ref();
 const totalAlbums = ref();
+const currentAlbumPage = ref();
 
 const collectionData = ref();
 
@@ -124,13 +125,15 @@ const displayDescription = computed(() => {
 
 async function addAlbumToCollection(albumId) {
   await collectionService.addCollectionAlbum(collectionId, albumId);
-  fetchCollectionAlbumById();
+  fetchCollectionDetailById();
+  fetchCollectionAlbumById(currentAlbumPage.value);
   searchAlbum();
 }
 
 async function deleteAlbumFromCollection(albumId) {
   await collectionService.deleteCollectionAlbum(collectionId, albumId);
-  fetchCollectionAlbumById();
+  fetchCollectionDetailById();
+  fetchCollectionAlbumById(currentAlbumPage.value);
   searchAlbum();
 }
 </script>
@@ -143,7 +146,7 @@ async function deleteAlbumFromCollection(albumId) {
           <a-col :span="4">
             <a-image
               :width="200"
-              src="https://static-cse.canva.com/blob/1035320/1600w-fxYFTKLArdY.jpg"
+              :src="collectionData.img_path"
             />
           </a-col>
           <a-col :span="20" class="mt-16">
@@ -209,9 +212,10 @@ async function deleteAlbumFromCollection(albumId) {
               </template>
               <template #footer>
                 <a-pagination
-                  v-model:current="current"
+                  v-model:current="currentAlbumPage"
                   :total="totalAlbums"
                   show-less-items
+                  @change="fetchCollectionAlbumById"
                 />
               </template>
             </a-list>

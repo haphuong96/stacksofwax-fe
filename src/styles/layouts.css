@@ -31,3 +31,11 @@
 .justify-flex-end {
     justify-content: flex-end;
 }
+
+.justify-right {
+    justify-content: right;
+}
+
+.justify-even {
+    justify-content: space-evenly;
+}

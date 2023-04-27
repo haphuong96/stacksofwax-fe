@@ -2,11 +2,12 @@
 import { message } from "ant-design-vue";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { localStorageKeys } from "../common/local-storage-keys";
 import LikeButton from "../components/LikeButton.vue";
 import router from "../router";
 import { collectionService } from "../services/collection.service";
+import { navigationService } from "../services/navigation.service";
 
 dayjs.extend(relativeTime);
 
@@ -25,6 +26,19 @@ const totalAlbums = ref();
 
 const collectionData = ref();
 const isLiked = ref(false);
+
+const showAllDescription = ref(false);
+const displayDescription = computed(() => {
+  if (!collectionData.value?.collection_desc) return "";
+  if (
+    showAllDescription.value ||
+    collectionData.value?.collection_desc.length <= 250
+  )
+    return collectionData.value?.collection_desc;
+  return `${collectionData.value?.collection_desc.slice(0, 250)} ${
+    showAllDescription.value ? "" : "..."
+  }`;
+});
 
 onMounted(async () => {
   fetchCollectionDetailById();
@@ -110,29 +124,48 @@ async function toggleLikeCollection() {
         <a-col :span="4">
           <a-image
             :width="200"
-            src="https://static-cse.canva.com/blob/1035320/1600w-fxYFTKLArdY.jpg"
+            :src="collectionData.img_path"
           />
         </a-col>
-        <a-col class="mt-16">
+        <a-col :span="16" class="mt-16">
           <div>Collection</div>
           <h1>{{ collectionData.collection_name }}</h1>
-          <div>By {{ collectionData.username }}</div>
+          <div>
+            By
+            <a @click="navigationService.goToUserDetail(collectionData.user_id)"
+              >{{ collectionData.username }}
+            </a>
+          </div>
+          <h2 class="mt-32">
+            {{ collectionData.total_like.toLocaleString("en-US") }} likes
+          </h2>
         </a-col>
-        <a-col>
-          <a-button @click="toggleLikeCollection">
+        <a-col :span="4" class="d-flex justify-right">
+          <a-button
+            :danger="isLiked ? true : false"
+            @click="toggleLikeCollection"
+            class="mt-16 mr-32 d-flex justify-center"
+          >
             <LikeButton
               @click="toggleLikeCollection"
               :like="isLiked"
             ></LikeButton>
-            Like</a-button
-          >
+            <span>Like</span><span v-if="isLiked">d</span>
+          </a-button>
         </a-col>
-      </a-row>
-      <a-row>
-        <a-col :span="24">
-          <h1>Description</h1>
-        </a-col>
-      </a-row>
+      </a-row >
+      <a-row v-if="collectionData">
+          <a-col :span="24">
+            <div class="fs-16 mt-16">
+              {{ displayDescription }}
+              <a
+                @click="showAllDescription = !showAllDescription"
+                v-if="(collectionData?.collection_desc || '').length > 250"
+                >{{ showAllDescription ? "Show less" : "Show more" }}</a
+              >
+            </div>
+          </a-col>
+        </a-row>
       <a-row
         ><a-col :span="24">
           <h1 class="my-16">Album List</h1>
@@ -146,10 +179,10 @@ async function toggleLikeCollection() {
               <a-list-item>
                 <a-list-item-meta>
                   <template #title>
-                    {{ item.album_title }}
+                    <a @click="navigationService.goToAlbumDetailPage(item.album_id)">{{ item.album_title }}</a>
                   </template>
                   <template #avatar>
-                    <img :src="item.img_path" class="w-50" />
+                    <a @click="navigationService.goToAlbumDetailPage(item.album_id)"><img :src="item.img_path" class="w-50" /></a>
                   </template>
                   <template #description>
                     {{
@@ -221,4 +254,8 @@ async function toggleLikeCollection() {
 .w-50 {
   width: 50px;
 }
+
+/* .like-btn > div {
+  padding: 8px;
+} */
 </style>

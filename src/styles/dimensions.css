@@ -27,6 +27,11 @@
     margin-left: 16px;
 }
 
+/* margin right*/
+.mr-32 {
+    margin-right: 32px;
+}
+
 /* margin top */
 .mt-16 {
     margin-top: 16px;
