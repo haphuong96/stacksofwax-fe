@@ -6,20 +6,19 @@ import { localStorageKeys } from "../common/local-storage-keys";
 import router from "../router";
 import { service } from "../services";
 import { formatFromNow } from "../utils/datetime.helper";
+import { collectionService } from "../services/collection.service";
+import { meService } from "../services/me.service";
+import userFallbackAvatar from "../assets/user-fallback.png";
 
 const { albumService, navigationService } = service;
 
 const albumId = router.currentRoute.value.params.id.split("-")[0];
+const userAvatar = localStorage.getItem(localStorageKeys.USER_AVATAR);
 
 const albumDetails = ref();
 
-const comments = ref([]);
-const totalAlbumComments = ref(0);
 
 const albumStats = ref(new Map());
-
-const albumCollections = ref([]);
-const totalAlbumCollections = ref();
 
 const isLoading = ref(false);
 
@@ -31,6 +30,26 @@ const AddToCollectionVisible = ref(false);
 const submitting = ref(false);
 const draftCommentAlbum = ref();
 const isRated = ref(false);
+
+// comments
+const comments = ref([]);
+const totalAlbumComments = ref(0);
+async function fetchAlbumComments(page, pageSize) {
+  try {
+    const data = await albumService.getCommentAlbum(albumId, page, pageSize);
+    // console.log(data);
+    comments.value = data.comments.map((comment) => {
+      const commentTime = comment?.created_datetime
+        ? formatFromNow(comment?.created_datetime)
+        : "";
+      return { ...comment, created_datetime: commentTime };
+    });
+    totalAlbumComments.value = data.total;
+  } catch (error) {
+    console.log(error);
+    message.error("error loading comments");
+  }
+}
 
 async function submitCommentAlbum() {
   if (!draftCommentAlbum.value) {
@@ -51,27 +70,6 @@ async function submitCommentAlbum() {
   }
 }
 
-async function fetchAlbumComments(page, pageSize) {
-  try {
-    const data = await albumService.getCommentAlbum(albumId, page, pageSize);
-    // console.log(data);
-    comments.value = data.comments.map((comment) => {
-      const commentTime = comment?.created_datetime
-        ? formatFromNow(comment?.created_datetime)
-        : "";
-      return { ...comment, created_datetime: commentTime };
-    });
-    totalAlbumComments.value = data.total;
-  } catch (error) {
-    console.log(error);
-    message.error("error loading comments");
-  }
-}
-
-function showAddToCollectionModal() {
-  AddToCollectionVisible.value = true;
-}
-
 onMounted(async () => {
   await Promise.all([
     fetchAlbumDetail(),
@@ -81,6 +79,8 @@ onMounted(async () => {
   ]);
 });
 
+const albumCollections = ref([]);
+const totalAlbumCollections = ref();
 async function fetchCollectionsByAlbum(page, pageSize) {
   try {
     const { total, collections } = await albumService.getCollectionsByAlbum(
@@ -195,6 +195,40 @@ async function getUserRating() {
     isRated.value = true;
   }
 }
+
+// Add To Collection
+const myCollections = ref();
+const totalMyCollections = ref();
+const searchMyCollectionKeyword = ref();
+
+async function fetchMyCollections(page, pageSize) {
+  try {
+    const { total, collections } = await meService.getMyCollections(
+      searchMyCollectionKeyword.value,
+      page,
+      pageSize
+    );
+    myCollections.value = collections;
+    totalMyCollections.value = total;
+  } catch (error) {
+    message.error = "Error loading my collections";
+  }
+}
+
+async function addToMyCollection(collectionId) {
+  try {
+    await collectionService.addCollectionAlbum(collectionId, albumId);
+    message.success(`Added To Collection`);
+    fetchCollectionsByAlbum();
+  } catch (error) {
+    message.error("Error adding to my collection");
+  }
+}
+
+function showAddToCollectionModal() {
+  AddToCollectionVisible.value = true;
+  fetchMyCollections();
+}
 </script>
 
 <template>
@@ -254,7 +288,7 @@ async function getUserRating() {
               <a-list-item>
                 <a-comment
                   :author="item.username"
-                  :avatar="item.avatar"
+                  :avatar="item.user_avatar || userFallbackAvatar"
                   :content="item.comment"
                   :datetime="item.created_datetime"
                 />
@@ -264,13 +298,17 @@ async function getUserRating() {
           <a-comment>
             <template #avatar>
               <a-avatar
-                src="https://joeschmoe.io/api/v1/random"
+                :src="userAvatar||userFallbackAvatar"
                 alt="Han Solo"
               />
             </template>
             <template #content>
               <a-form-item>
-                <a-textarea v-model:value="draftCommentAlbum" :rows="4" placeholder="Enter your comment"/>
+                <a-textarea
+                  v-model:value="draftCommentAlbum"
+                  :rows="4"
+                  placeholder="Enter your comment"
+                />
               </a-form-item>
               <a-form-item>
                 <a-button
@@ -316,10 +354,39 @@ async function getUserRating() {
           >
           <a-modal
             v-model:visible="AddToCollectionVisible"
-            title="Add To Collection"
+            title="Add To Your Collection"
             :maskClosable="false"
             :footer="null"
           >
+          <a-input-search
+                  v-model:value="searchMyCollectionKeyword"
+                  placeholder="Search your collection"
+                  style="width: 250px"
+                  @search="() => fetchMyCollections()"
+                />
+            <a-list
+              size="small"
+              :data-source="myCollections"
+              item-layout="horizontal"
+              v-if="myCollections"
+            >
+              <template #renderItem="{ item }">
+                <a-list-item
+                  ><a @click="addToMyCollection(item.collection_id)">
+                    {{ item.collection_name }}</a
+                  >
+                </a-list-item>
+              </template>
+            </a-list>
+            <a-pagination
+              v-model:current="current"
+              :total="totalMyCollections"
+              show-less-items
+              @change="
+                (page, pageSize) =>
+                fetchMyCollections(page, pageSize)
+              "
+            />
           </a-modal>
         </a-divider>
         <a-list
@@ -334,7 +401,9 @@ async function getUserRating() {
               <span class="collection-name"
                 ><a
                   @click="
-                    navigationService.goToPublicCollectionDetail(item.collection_id)
+                    navigationService.goToPublicCollectionDetail(
+                      item.collection_id
+                    )
                   "
                   >{{ item.collection_name }}</a
                 ></span
@@ -349,15 +418,15 @@ async function getUserRating() {
             >
           </template>
         </a-list>
-        <!-- <a-pagination
+        <a-pagination class="my-16"
           v-model:current="current"
-          :total="total"
+          :total="totalAlbumCollections"
           show-less-items
           @change="
             (page, pageSize) =>
-              albumService.getCollectionsByAlbum(page, pageSize)
+            fetchCollectionsByAlbum(page, pageSize)
           "
-        /> -->
+        />
       </a-col>
     </a-row>
   </a-spin>

@@ -2,14 +2,15 @@ import { axiosIntance } from "./base.service";
 import pagination from "../utils/pagination.helper";
 import { message } from "ant-design-vue";
 
-const getMyCollections = async (page, pageSize) => {
+const getMyCollections = async (searchKeyword, page, pageSize) => {
   const { limit, offset } = pagination(page, pageSize);
   // const {sortBy : sort, searchKeyword : search} = filters;
   try {
     const res = await axiosIntance.get(`me/collections`, {
       params: {
         limit,
-        offset
+        offset,
+        search: searchKeyword
       }
     });
 

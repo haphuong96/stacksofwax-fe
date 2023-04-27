@@ -8,6 +8,8 @@ import LikeButton from "../components/LikeButton.vue";
 import router from "../router";
 import { collectionService } from "../services/collection.service";
 import { navigationService } from "../services/navigation.service";
+import fallbackCollectionImg from "../assets/ic_fallback_collection.png";
+import userFallbackAvatar from "../assets/user-fallback.png";
 
 dayjs.extend(relativeTime);
 
@@ -124,7 +126,7 @@ async function toggleLikeCollection() {
         <a-col :span="4">
           <a-image
             :width="200"
-            :src="collectionData.img_path"
+            :src="collectionData.img_path || fallbackCollectionImg"
           />
         </a-col>
         <a-col :span="16" class="mt-16">
@@ -213,7 +215,7 @@ async function toggleLikeCollection() {
               <a-list-item>
                 <a-comment
                   :author="item.username"
-                  :avatar="item.user_avatar"
+                  :avatar="item.user_avatar || userFallbackAvatar"
                   :content="item.comment"
                   :datetime="dayjs(item.created_datetime).fromNow()"
                 />
@@ -222,7 +224,7 @@ async function toggleLikeCollection() {
           </a-list>
           <a-comment>
             <template #avatar>
-              <a-avatar :src="userAvatar" alt="Han Solo" />
+              <a-avatar :src="userAvatar || userFallbackAvatar" />
             </template>
             <template #content>
               <a-form-item>

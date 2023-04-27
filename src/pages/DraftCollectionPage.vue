@@ -6,6 +6,8 @@ import { computed, onMounted, ref } from "vue";
 import { localStorageKeys } from "../common/local-storage-keys";
 import router from "../router";
 import { service } from "../services";
+
+import fallbackCollectionImg from "../assets/ic_fallback_collection.png";
 const { collectionService, albumService, navigationService } = service;
 
 const collectionId = router.currentRoute.value.params.id.split("-")[0];
@@ -146,7 +148,7 @@ async function deleteAlbumFromCollection(albumId) {
           <a-col :span="4">
             <a-image
               :width="200"
-              :src="collectionData.img_path"
+              :src="collectionData.img_path || fallbackCollectionImg"
             />
           </a-col>
           <a-col :span="20" class="mt-16">

@@ -74,9 +74,10 @@ async function postCollection() {
   navigationService.goToDraftCollections(collectionId);
 }
 
+const searchMyCollectionKeyword = ref();
 async function fetchMyCollections(page, pageSize) {
   try {
-    const data = await meService.getMyCollections(page, pageSize);
+    const data = await meService.getMyCollections(searchMyCollectionKeyword.value, page, pageSize);
 
     myCollection.value = data.collections;
     total.value = data.total;
@@ -135,6 +136,12 @@ const onConfirmDeleteCollection = async () => {
                 <template #header>
                   <div class="d-flex justify-between">
                     <h4>Collection by {{ username }}</h4>
+                    <a-input-search
+                      v-model:value="searchMyCollectionKeyword"
+                      placeholder="Search your collection"
+                      style="width: 250px"
+                      @search="() => fetchMyCollections()"
+                    />
                     <a-button @click="postCollection" class="mb-16">
                       <PlusOutlined />Add a new collection
                     </a-button>
