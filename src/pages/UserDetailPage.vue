@@ -122,7 +122,7 @@ function formatFromNow(date) {
 <style scoped>
 .user-detail-page-container {
   height: calc(100vh - 72px);
-  overflow: hidden;
+  overflow: scroll;
   padding-left: 80px;
   padding-right: 80px;
   padding-top: 32px;

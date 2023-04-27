@@ -5,7 +5,7 @@ import { navigationService } from '../services/navigation.service';
 </script>
 
 <template>
-  <a-row class="m-16 d-flex">
+  <a-row class="m-16 d-flex scroll-page-container">
     <a-col :span="16">
       <img class="homepage-cover" src="https://cdn.dribbble.com/userupload/4102239/file/original-4e946c2cbb727dc31b9b72a8f04c9175.jpg?compress=1&resize=1600x1200"/>
     </a-col>
