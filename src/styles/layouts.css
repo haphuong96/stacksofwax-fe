@@ -16,6 +16,10 @@
     flex-direction: row;
 }
 
+.wrap-flex {
+    flex-wrap: wrap;
+}
+
 .justify-center {
     justify-content: center;
 }

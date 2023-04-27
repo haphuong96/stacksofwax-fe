@@ -1,7 +1,7 @@
 <script setup>
 import { CloseCircleFilled } from "@ant-design/icons-vue";
 import { message } from "ant-design-vue";
-import { computed, onMounted, ref } from "vue";
+import { computed, nextTick, onMounted, ref } from "vue";
 import { localStorageKeys } from "../common/local-storage-keys";
 import router from "../router";
 import { service } from "../services";
@@ -16,7 +16,6 @@ const albumId = router.currentRoute.value.params.id.split("-")[0];
 const userAvatar = localStorage.getItem(localStorageKeys.USER_AVATAR);
 
 const albumDetails = ref();
-
 
 const albumStats = ref(new Map());
 
@@ -36,8 +35,6 @@ const comments = ref([]);
 const totalAlbumComments = ref(0);
 async function fetchAlbumComments(page, pageSize) {
   try {
-    const data = await albumService.getCommentAlbum(albumId, page, pageSize);
-    // console.log(data);
     comments.value = data.comments.map((comment) => {
       const commentTime = comment?.created_datetime
         ? formatFromNow(comment?.created_datetime)
@@ -297,10 +294,7 @@ function showAddToCollectionModal() {
           </a-list>
           <a-comment>
             <template #avatar>
-              <a-avatar
-                :src="userAvatar||userFallbackAvatar"
-                alt="Han Solo"
-              />
+              <a-avatar :src="userAvatar || userFallbackAvatar" />
             </template>
             <template #content>
               <a-form-item>
@@ -358,12 +352,12 @@ function showAddToCollectionModal() {
             :maskClosable="false"
             :footer="null"
           >
-          <a-input-search
-                  v-model:value="searchMyCollectionKeyword"
-                  placeholder="Search your collection"
-                  style="width: 250px"
-                  @search="() => fetchMyCollections()"
-                />
+            <a-input-search
+              v-model:value="searchMyCollectionKeyword"
+              placeholder="Search your collection"
+              style="width: 250px"
+              @search="() => fetchMyCollections()"
+            />
             <a-list
               size="small"
               :data-source="myCollections"
@@ -382,10 +376,7 @@ function showAddToCollectionModal() {
               v-model:current="current"
               :total="totalMyCollections"
               show-less-items
-              @change="
-                (page, pageSize) =>
-                fetchMyCollections(page, pageSize)
-              "
+              @change="(page, pageSize) => fetchMyCollections(page, pageSize)"
             />
           </a-modal>
         </a-divider>
@@ -418,14 +409,12 @@ function showAddToCollectionModal() {
             >
           </template>
         </a-list>
-        <a-pagination class="my-16"
+        <a-pagination
+          class="my-16"
           v-model:current="current"
           :total="totalAlbumCollections"
           show-less-items
-          @change="
-            (page, pageSize) =>
-            fetchCollectionsByAlbum(page, pageSize)
-          "
+          @change="(page, pageSize) => fetchCollectionsByAlbum(page, pageSize)"
         />
       </a-col>
     </a-row>

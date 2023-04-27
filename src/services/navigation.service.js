@@ -42,6 +42,10 @@ function goToExploreAlbum() {
   router.push({name: routeNames.EXPLORE, query: { currentTab: "albums"}})
 }
 
+function goToSignUp() {
+  router.push({name: routeNames.SIGNUP});
+}
+
 export const navigationService = {
   goToAlbumDetailPage,
   goToArtistDetailPage,
@@ -50,5 +54,6 @@ export const navigationService = {
   goToCollections,
   goToDraftCollections,
   goToPublicCollectionDetail,
-  goToExploreAlbum
+  goToExploreAlbum,
+  goToSignUp
 };
