@@ -3,6 +3,7 @@ import { axiosIntance } from "./base.service";
 import router from "../router";
 import { routeNames } from "../router/route-names";
 import { message } from "ant-design-vue";
+import emitter, { emitterEvents } from "../utils/emitter.helper";
 
 async function fetchUserInfo(userId, page = 1, pageSize = 10) {
   try {
@@ -27,6 +28,7 @@ async function getMyProfile() {
 
 async function signout() {
   localStorage.clear();
+  emitter.emit(emitterEvents.SIGNOUT)
 }
 
 async function updateUserProfilePicture(profilePictureUrl) {

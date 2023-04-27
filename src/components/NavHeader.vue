@@ -70,11 +70,12 @@
 </template>
 <script setup>
 import { UserOutlined, createFromIconfontCN } from "@ant-design/icons-vue";
-import { ref } from "vue";
+import { onBeforeUnmount, onMounted, ref } from "vue";
 import { localStorageKeys } from "../common/local-storage-keys";
 import router from "../router";
 import { routeNames } from "../router/route-names";
 import { service } from "../services";
+import emitter, { emitterEvents } from "../utils/emitter.helper";
 
 const CollectionIcon = createFromIconfontCN({
   scriptUrl: "//at.alicdn.com/t/c/font_4014814_08ddunxy7bas.js"
@@ -85,6 +86,18 @@ activeKey.value = router.currentRoute.value.name;
 
 const username = ref(localStorage.getItem(localStorageKeys.USERNAME));
 const isLoggedIn = ref(!!localStorage.getItem(localStorageKeys.ACCESS_TOKEN));
+
+onMounted(() => {
+  emitter.on(emitterEvents.SIGNOUT, onSignedOut);
+});
+
+onBeforeUnmount(() => {
+  emitter.off(emitterEvents.SIGNOUT, onSignedOut);
+});
+
+function onSignedOut() {
+  isLoggedIn.value = false;
+}
 
 function onTabChanged() {
   router.push({ name: activeKey.value });
