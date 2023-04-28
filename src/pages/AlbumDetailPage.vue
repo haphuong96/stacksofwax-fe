@@ -9,6 +9,7 @@ import { formatFromNow } from "../utils/datetime.helper";
 import { collectionService } from "../services/collection.service";
 import { meService } from "../services/me.service";
 import userFallbackAvatar from "../assets/user-fallback.png";
+import { authAction } from "../utils/auth-action.helper";
 
 const { albumService, navigationService } = service;
 
@@ -50,23 +51,25 @@ async function fetchAlbumComments(page, pageSize) {
   }
 }
 
-async function submitCommentAlbum() {
-  if (!draftCommentAlbum.value) {
-    return;
-  }
+function submitCommentAlbum() {
+  return authAction(async () => {
+    if (!draftCommentAlbum.value) {
+      return;
+    }
 
-  submitting.value = true;
-  try {
-    await albumService.postCommentAlbum(albumId, draftCommentAlbum.value);
+    submitting.value = true;
+    try {
+      await albumService.postCommentAlbum(albumId, draftCommentAlbum.value);
 
-    await fetchAlbumComments();
+      await fetchAlbumComments();
 
-    draftCommentAlbum.value = "";
-  } catch (error) {
-    message.error("error posting comment");
-  } finally {
-    submitting.value = false;
-  }
+      draftCommentAlbum.value = "";
+    } catch (error) {
+      message.error("error posting comment");
+    } finally {
+      submitting.value = false;
+    }
+  });
 }
 
 onMounted(async () => {
@@ -235,8 +238,10 @@ async function addToMyNewCollection() {
 }
 
 function showAddToCollectionModal() {
-  AddToCollectionVisible.value = true;
-  fetchMyCollections();
+  return authAction(() => {
+    AddToCollectionVisible.value = true;
+    fetchMyCollections();
+  });
 }
 </script>
 

@@ -50,25 +50,27 @@ onMounted(async () => {
   fetchCollectionComments();
 });
 
-async function postComment() {
-  if (!draftComment.value) {
-    return;
-  }
+function postComment() {
+  return authAction(async () => {
+    if (!draftComment.value) {
+      return;
+    }
 
-  submitting.value = true;
-  try {
-    await collectionService.addCollectionComment(
-      collectionId,
-      draftComment.value
-    );
+    submitting.value = true;
+    try {
+      await collectionService.addCollectionComment(
+        collectionId,
+        draftComment.value
+      );
 
-    fetchCollectionComments();
+      fetchCollectionComments();
 
-    draftComment.value = "";
-  } catch (error) {
-  } finally {
-    submitting.value = false;
-  }
+      draftComment.value = "";
+    } catch (error) {
+    } finally {
+      submitting.value = false;
+    }
+  });
 }
 
 async function fetchCollectionComments(page, pageSize) {
