@@ -58,7 +58,7 @@ async function fetchCollections(page, pageSize) {
 
     collections.value = data.collections;
     total.value = data.total;
-    console.log(total.value)
+    console.log(total.value);
   } catch (error) {
     message.error("Cannot load collections");
   }
@@ -66,127 +66,128 @@ async function fetchCollections(page, pageSize) {
 </script>
 
 <template>
-  <div class="scroll-page-container">
-    <a-row class="m-16 p-16">
-      <a-col :span="24">
-        <a-row>
-          <a-col :span="24">
-            <a-divider orientation="left">Top Favorite Collections</a-divider>
-            <div class="fav-collection-container">
-              <div
-                v-for="item of favCollections"
-                class="fav-collection-item-container"
-                @click="
-                  navigationService.goToPublicCollectionDetail(
-                    item.collection_id
-                  )
-                "
-              >
-                <div class="fav-collection-item-content">
-                  <div class="mb-16">
-                    <a-image
-                      :src="item.img_path || ''"
-                      :fallback="fallbackCollectionIcon"
-                      :preview="false"
-                    />
-                  </div>
-                  <div class="fav-collection-item-name">
-                    {{ item.collection_name }}
-                  </div>
-                  <div class="fav-collection-item-created">
-                    By <b>{{ item.username }}</b>
-                  </div>
-                  <div class="fav-collection-item-like-container">
-                    <HeartFilled class="fav-collection-item-heart" />{{
-                      item.likes_count +
-                      (item.likes_count > 1 ? " likes" : " like")
-                    }}
-                  </div>
+  <a-row class="p-32">
+    <a-col :span="24">
+      <a-row>
+        <a-col :span="24">
+          <a-divider orientation="left">Top Favorite Collections</a-divider>
+          <div class="fav-collection-container">
+            <div
+              v-for="item of favCollections"
+              class="fav-collection-item-container"
+              @click="
+                navigationService.goToPublicCollectionDetail(item.collection_id)
+              "
+            >
+              <div class="fav-collection-item-content">
+                <div class="mb-16">
+                  <a-image
+                    :src="item.img_path || ''"
+                    :fallback="fallbackCollectionIcon"
+                    :preview="false"
+                  />
+                </div>
+                <div class="fav-collection-item-name">
+                  {{ item.collection_name }}
+                </div>
+                <div class="fav-collection-item-created">
+                  By <b>{{ item.username }}</b>
+                </div>
+                <div class="fav-collection-item-like-container">
+                  <HeartFilled class="fav-collection-item-heart" />{{
+                    item.likes_count +
+                    (item.likes_count > 1 ? " likes" : " like")
+                  }}
                 </div>
               </div>
             </div>
-          </a-col>
-        </a-row>
-        <a-row class="mt-16">
-          <a-col :span="24">
-            <a-divider orientation="left">Collections</a-divider>
+          </div>
+        </a-col>
+      </a-row>
+      <a-row class="mt-16">
+        <a-col :span="24">
+          <a-divider orientation="left">Collections</a-divider>
 
-            <span
-              ><a-input-search
-                placeholder="Search collection"
-                v-model:value="searchKeyword"
-                style="width: 250px"
-                @search="(searchValue) => fetchCollections()"
-            /></span>
-            <span class="sort-options"
-              ><a-select
-                v-model:value="sortValue"
-                :options="sortOptions"
-                style="width: 130px"
-                @change="(sortValue) => fetchCollections()"
-              >
-              </a-select>
-            </span>
-            <a-list item-layout="horizontal" :data-source="collections" class="mt-16">
-              <template #renderItem="{ item }">
-                <a-list-item>
-                  <a-list-item-meta>
-                    <template #description>
-                      <span class="created-by"
-                        >By
-                        <a
-                          @click="
-                            navigationService.goToUserDetail(item.created_by)
-                          "
-                        >
-                          {{ item.username }}</a
-                        ></span
-                      >
-                      <span v-if="item.collection_desc">
-                        • {{ item.collection_desc }}</span
-                      >
-                    </template>
-                    <template #title>
+          <span
+            ><a-input-search
+              placeholder="Search collection"
+              v-model:value="searchKeyword"
+              style="width: 250px"
+              @search="(searchValue) => fetchCollections()"
+          /></span>
+          <span class="sort-options"
+            ><a-select
+              v-model:value="sortValue"
+              :options="sortOptions"
+              style="width: 130px"
+              @change="(sortValue) => fetchCollections()"
+            >
+            </a-select>
+          </span>
+          <a-list
+            item-layout="horizontal"
+            :data-source="collections"
+            class="mt-16"
+          >
+            <template #renderItem="{ item }">
+              <a-list-item>
+                <a-list-item-meta>
+                  <template #description>
+                    <span class="created-by"
+                      >By
                       <a
                         @click="
-                          () =>
-                            navigationService.goToPublicCollectionDetail(
-                              item.collection_id
-                            )
+                          navigationService.goToUserDetail(item.created_by)
                         "
-                        >{{ item.collection_name }}</a
                       >
-                    </template>
-                    <template #avatar>
-                      <a-image
-                        :src="item.img_path || ''"
-                        :width="50"
-                        :height="50"
-                        class="w-50"
-                        :fallback="fallbackCollectionIcon"
-                        :preview="fasle"
-                      />
-                    </template>
-                  </a-list-item-meta>
-                  <div class="ml-80">
-                    {{ dayjs(item.created_datetime).fromNow() }}
-                  </div>
-                </a-list-item>
-              </template>
-            </a-list>
+                        {{ item.username }}</a
+                      ></span
+                    >
+                    <span v-if="item.collection_desc">
+                      • {{ item.collection_desc }}</span
+                    >
+                  </template>
+                  <template #title>
+                    <a
+                      @click="
+                        () =>
+                          navigationService.goToPublicCollectionDetail(
+                            item.collection_id
+                          )
+                      "
+                      >{{ item.collection_name }}</a
+                    >
+                  </template>
+                  <template #avatar>
+                    <a-image
+                      :src="item.img_path || ''"
+                      :width="50"
+                      :height="50"
+                      class="w-50"
+                      :fallback="fallbackCollectionIcon"
+                      :preview="fasle"
+                    />
+                  </template>
+                </a-list-item-meta>
+                <div class="ml-80">
+                  {{ dayjs(item.created_datetime).fromNow() }}
+                </div>
+              </a-list-item>
+            </template>
+          </a-list>
 
-            <a-pagination
-              v-model:current="current"
-              :total="total"
-              show-less-items
-              show-size-changer
-              @change="(page, pageSize) => fetchCollections(page, pageSize)"
-            class="my-16"/>
-          </a-col>
-        </a-row>
-      </a-col>
-    </a-row>
-  </div>
+          <a-pagination
+            v-model:current="current"
+            :total="total"
+            show-less-items
+            show-size-changer
+            @change="(page, pageSize) => fetchCollections(page, pageSize)"
+            class="mt-16"
+          />
+        </a-col>
+      </a-row>
+    </a-col>
+  </a-row>
 </template>
 
 <style scoped>

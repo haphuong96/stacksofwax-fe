@@ -3,13 +3,14 @@ import { message } from "ant-design-vue";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { computed, onMounted, ref } from "vue";
+import fallbackCollectionImg from "../assets/ic_fallback_collection.png";
+import userFallbackAvatar from "../assets/user-fallback.png";
 import { localStorageKeys } from "../common/local-storage-keys";
 import LikeButton from "../components/LikeButton.vue";
 import router from "../router";
 import { collectionService } from "../services/collection.service";
 import { navigationService } from "../services/navigation.service";
-import fallbackCollectionImg from "../assets/ic_fallback_collection.png";
-import userFallbackAvatar from "../assets/user-fallback.png";
+import { authAction } from "../utils/auth-action.helper";
 
 dayjs.extend(relativeTime);
 
@@ -49,30 +50,36 @@ onMounted(async () => {
   fetchCollectionComments();
 });
 
-async function postComment() {
-  if (!draftComment.value) {
-    return;
-  }
+function postComment() {
+  return authAction(async () => {
+    if (!draftComment.value) {
+      return;
+    }
 
-  submitting.value = true;
-  try {
-    await collectionService.addCollectionComment(
-      collectionId,
-      draftComment.value
-    );
+    submitting.value = true;
+    try {
+      await collectionService.addCollectionComment(
+        collectionId,
+        draftComment.value
+      );
 
-    fetchCollectionComments();
+      fetchCollectionComments();
 
-    draftComment.value = "";
-  } catch (error) {
-  } finally {
-    submitting.value = false;
-  }
+      draftComment.value = "";
+    } catch (error) {
+    } finally {
+      submitting.value = false;
+    }
+  });
 }
 
 async function fetchCollectionComments(page, pageSize) {
   try {
-    const data = await collectionService.getCollectionComment(collectionId, page, pageSize);
+    const data = await collectionService.getCollectionComment(
+      collectionId,
+      page,
+      pageSize
+    );
     comments.value = data.comments;
     totalComments.value = data.total;
   } catch (error) {
@@ -111,19 +118,19 @@ async function fetchCollectionAlbumById(page, pageSize) {
 }
 
 async function toggleLikeCollection() {
-  if (isLiked.value) {
-    await collectionService.unlikeCollection(collectionId);
-  } else {
-    await collectionService.likeCollection(collectionId);
-  }
-
-  checkUserLikedCollection();
-  fetchCollectionDetailById();
+  return authAction(async () => {
+    if (isLiked.value) {
+      await collectionService.unlikeCollection(collectionId);
+    } else {
+      await collectionService.likeCollection(collectionId);
+    }
+    checkUserLikedCollection();
+  });
 }
 </script>
 
 <template>
-  <a-row class="m-16 p-16 scroll-page-container">
+  <a-row class="p-32">
     <a-col :span="24">
       <a-row v-if="collectionData">
         <a-col :span="4">
@@ -212,17 +219,20 @@ async function toggleLikeCollection() {
             </template>
             <template #footer>
               <div class="d-flex justify-right">
-          <a-pagination
-            size="small"
-            v-model:current="current"
-            :total="totalAlbums"
-            show-less-items
-            :show-total="(total, range) => `${range[0]}-${range[1]} of ${total} items`"
-            @change="fetchCollectionAlbumById"
-          /></div>
+                <a-pagination
+                  size="small"
+                  v-model:current="current"
+                  :total="totalAlbums"
+                  show-less-items
+                  :show-total="
+                    (total, range) =>
+                      `${range[0]}-${range[1]} of ${total} items`
+                  "
+                  @change="fetchCollectionAlbumById"
+                />
+              </div>
             </template>
           </a-list>
-          
         </a-col>
       </a-row>
       <a-row>
@@ -271,12 +281,12 @@ async function toggleLikeCollection() {
               </a-list-item>
             </template>
             <template #footer>
-                <a-pagination
-                  size="small"
-                  :total="totalComments"
-                  show-size-changer
-                  @change="fetchCollectionComments"
-                />
+              <a-pagination
+                size="small"
+                :total="totalComments"
+                show-size-changer
+                @change="fetchCollectionComments"
+              />
             </template>
           </a-list>
         </a-col>
@@ -289,8 +299,4 @@ async function toggleLikeCollection() {
 .w-50 {
   width: 50px;
 }
-
-/* .like-btn > div {
-  padding: 8px;
-} */
 </style>

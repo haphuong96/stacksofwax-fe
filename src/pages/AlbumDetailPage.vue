@@ -9,6 +9,7 @@ import { formatFromNow } from "../utils/datetime.helper";
 import { collectionService } from "../services/collection.service";
 import { meService } from "../services/me.service";
 import userFallbackAvatar from "../assets/user-fallback.png";
+import { authAction } from "../utils/auth-action.helper";
 
 const { albumService, navigationService } = service;
 
@@ -50,23 +51,25 @@ async function fetchAlbumComments(page, pageSize) {
   }
 }
 
-async function submitCommentAlbum() {
-  if (!draftCommentAlbum.value) {
-    return;
-  }
+function submitCommentAlbum() {
+  return authAction(async () => {
+    if (!draftCommentAlbum.value) {
+      return;
+    }
 
-  submitting.value = true;
-  try {
-    await albumService.postCommentAlbum(albumId, draftCommentAlbum.value);
+    submitting.value = true;
+    try {
+      await albumService.postCommentAlbum(albumId, draftCommentAlbum.value);
 
-    await fetchAlbumComments();
+      await fetchAlbumComments();
 
-    draftCommentAlbum.value = "";
-  } catch (error) {
-    message.error("error posting comment");
-  } finally {
-    submitting.value = false;
-  }
+      draftCommentAlbum.value = "";
+    } catch (error) {
+      message.error("error posting comment");
+    } finally {
+      submitting.value = false;
+    }
+  });
 }
 
 onMounted(async () => {
@@ -235,14 +238,16 @@ async function addToMyNewCollection() {
 }
 
 function showAddToCollectionModal() {
-  AddToCollectionVisible.value = true;
-  fetchMyCollections();
+  return authAction(() => {
+    AddToCollectionVisible.value = true;
+    fetchMyCollections();
+  });
 }
 </script>
 
 <template>
   <a-spin tip="Loading..." :spinning="isLoading" class="m-16 p-16">
-    <a-row class="m-16 p-16 scroll-page-container" v-if="albumDetails">
+    <a-row class="p-32" v-if="albumDetails">
       <a-col :span="16">
         <a-row>
           <a-col :span="6">
@@ -338,12 +343,12 @@ function showAddToCollectionModal() {
               </a-list-item>
             </template>
             <template #footer>
-                <a-pagination
-                  size="small"
-                  :total="totalAlbumComments"
-                  show-size-changer
-                  @change="fetchAlbumComments"
-                />
+              <a-pagination
+                size="small"
+                :total="totalAlbumComments"
+                show-size-changer
+                @change="fetchAlbumComments"
+              />
             </template>
           </a-list>
         </a-row>
@@ -447,7 +452,6 @@ function showAddToCollectionModal() {
           </template>
           <template #footer>
             <a-pagination
-              class="mb-16"
               size="small"
               v-model:current="current"
               :pageSize="pageSizeCollection"
@@ -505,5 +509,4 @@ function showAddToCollectionModal() {
   text-decoration: underline;
   /* font-weight: 500; */
 }
-
 </style>

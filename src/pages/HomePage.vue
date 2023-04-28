@@ -3,11 +3,10 @@ import { localStorageKeys } from "../common/local-storage-keys";
 import { navigationService } from "../services/navigation.service";
 
 const isLoggedIn = localStorage.getItem(localStorageKeys.ACCESS_TOKEN);
-
 </script>
 
 <template>
-  <a-row class="m-16 d-flex scroll-page-container">
+  <a-row class="d-flex home-page-container">
     <a-col :span="16">
       <img
         class="homepage-cover"
@@ -23,15 +22,23 @@ const isLoggedIn = localStorage.getItem(localStorageKeys.ACCESS_TOKEN);
         >Explore music collections from the Stack of Wax community >>></a
       >
       <div class="py-16 my-16" v-if="!isLoggedIn">
-        Not a member? <a @click="navigationService.goToSignUp()">Register</a> now
-        to compile and share your music collections with other music lovers!
+        Not a member?
+        <a @click="navigationService.goToSignUp()">Register</a> now to compile
+        and share your music collections with other music lovers!
       </div>
     </a-col>
   </a-row>
 </template>
 
 <style scoped>
+.home-page-container {
+  height: calc(100vh - 142px);
+  padding: 32px;
+}
 .homepage-cover {
   width: 100%;
+  height: auto;
+  max-height: calc(100vh - 142px);
+  object-fit: cover;
 }
 </style>
