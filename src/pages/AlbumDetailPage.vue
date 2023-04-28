@@ -242,7 +242,7 @@ function showAddToCollectionModal() {
 
 <template>
   <a-spin tip="Loading..." :spinning="isLoading" class="m-16 p-16">
-    <a-row class="m-16 p-16 scroll-page-container" v-if="albumDetails">
+    <a-row class="p-32" v-if="albumDetails">
       <a-col :span="16">
         <a-row>
           <a-col :span="6">
@@ -338,12 +338,12 @@ function showAddToCollectionModal() {
               </a-list-item>
             </template>
             <template #footer>
-                <a-pagination
-                  size="small"
-                  :total="totalAlbumComments"
-                  show-size-changer
-                  @change="fetchAlbumComments"
-                />
+              <a-pagination
+                size="small"
+                :total="totalAlbumComments"
+                show-size-changer
+                @change="fetchAlbumComments"
+              />
             </template>
           </a-list>
         </a-row>
@@ -447,7 +447,6 @@ function showAddToCollectionModal() {
           </template>
           <template #footer>
             <a-pagination
-              class="mb-16"
               size="small"
               v-model:current="current"
               :pageSize="pageSizeCollection"
@@ -505,5 +504,4 @@ function showAddToCollectionModal() {
   text-decoration: underline;
   /* font-weight: 500; */
 }
-
 </style>

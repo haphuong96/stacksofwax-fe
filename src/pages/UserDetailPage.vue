@@ -1,6 +1,6 @@
 <template>
   <a-spin :spinning="isLoading">
-    <div class="user-detail-page-container">
+    <div class="p-32">
       <a-row>
         <a-col :span="3">
           <CircleImage
@@ -120,14 +120,6 @@ function formatFromNow(date) {
 }
 </script>
 <style scoped>
-.user-detail-page-container {
-  height: calc(100vh - 72px);
-  overflow: scroll;
-  padding-left: 80px;
-  padding-right: 80px;
-  padding-top: 32px;
-}
-
 .profile-image {
   height: 120px;
   width: 120px;

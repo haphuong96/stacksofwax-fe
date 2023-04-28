@@ -119,7 +119,7 @@ const onConfirmDeleteCollection = async () => {
 </script>
 
 <template>
-  <a-row class="px-32 p-16 scroll-page-container">
+  <a-row class="p-32">
     <a-col :span="24">
       <h3>
         Want to explore other collections from the Stacks of Wax Community?

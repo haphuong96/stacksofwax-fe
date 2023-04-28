@@ -123,7 +123,7 @@ async function toggleLikeCollection() {
 </script>
 
 <template>
-  <a-row class="m-16 p-16 scroll-page-container">
+  <a-row class="p-32">
     <a-col :span="24">
       <a-row v-if="collectionData">
         <a-col :span="4">
@@ -289,8 +289,4 @@ async function toggleLikeCollection() {
 .w-50 {
   width: 50px;
 }
-
-/* .like-btn > div {
-  padding: 8px;
-} */
 </style>

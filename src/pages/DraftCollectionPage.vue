@@ -142,7 +142,7 @@ async function deleteAlbumFromCollection(albumId) {
 
 <template>
   <a-spin tip="Loading..." :spinning="isLoading" class="m-16 p-16">
-    <a-row class="m-16 p-16 scroll-page-container">
+    <a-row class="p-32">
       <a-col :span="24">
         <a-row v-if="collectionData">
           <a-col :span="4">
@@ -153,9 +153,14 @@ async function deleteAlbumFromCollection(albumId) {
           </a-col>
           <a-col :span="20" class="mt-16">
             <div>
-              Collection <a @click="showEditModal"><edit-filled style="font-size: 16px;"/></a>
+              Collection
+              <a @click="showEditModal"
+                ><edit-filled style="font-size: 16px"
+              /></a>
             </div>
-            <h1>{{ collectionData.collection_name }}</h1>
+            <h1>
+              {{ collectionData.collection_name }}
+            </h1>
             <!-- <a-descriptions :column="3">
               <a-descriptions-item label="Created by">
                 <a v-html="collectionData.username" class="ml-16"></a>
@@ -214,7 +219,11 @@ async function deleteAlbumFromCollection(albumId) {
                 </a-list-item>
               </template>
               <template #footer>
-                <div :class="`d-flex ${isSearchAlbumMode ? 'justify-right' : 'justify-between'}`">
+                <div
+                  :class="`d-flex ${
+                    isSearchAlbumMode ? 'justify-right' : 'justify-between'
+                  }`"
+                >
                   <a
                     v-if="!isSearchAlbumMode"
                     @click="showHideAlbumSearchSection"

@@ -53,7 +53,7 @@ function goToSignUp() {
 </script>
 
 <template>
-  <div class="login-page-container">
+  <div>
     <div class="page-title mt-80 mb-32 login-page-title">Login</div>
     <a-form
       name="basic"
@@ -89,9 +89,6 @@ function goToSignUp() {
 </template>
 
 <style scoped>
-.login-page-container {
-  height: 100vh;
-}
 .login-page-title {
   text-align: center;
 }
