@@ -70,9 +70,9 @@ async function postComment() {
   }
 }
 
-async function fetchCollectionComments() {
+async function fetchCollectionComments(page, pageSize) {
   try {
-    const data = await collectionService.getCollectionComment(collectionId);
+    const data = await collectionService.getCollectionComment(collectionId, page, pageSize);
     comments.value = data.comments;
     totalComments.value = data.total;
   } catch (error) {
@@ -99,8 +99,10 @@ async function fetchCollectionDetailById() {
   collectionData.value = data;
 }
 
-async function fetchCollectionAlbumById() {
+async function fetchCollectionAlbumById(page, pageSize) {
   const { total, albums } = await collectionService.getCollectionAlbums(
+    page,
+    pageSize,
     collectionId
   );
 
@@ -116,6 +118,7 @@ async function toggleLikeCollection() {
   }
 
   checkUserLikedCollection();
+  fetchCollectionDetailById();
 }
 </script>
 
@@ -139,7 +142,12 @@ async function toggleLikeCollection() {
             </a>
           </div>
           <h2 class="mt-32">
-            {{ collectionData.total_like.toLocaleString("en-US") }} likes
+            <div v-if="collectionData.total_like">
+              {{ collectionData.total_like.toLocaleString("en-US") }} like<span
+                v-if="collectionData.total_like > 1"
+                >s</span
+              >
+            </div>
           </h2>
         </a-col>
         <a-col :span="4" class="d-flex justify-right">
@@ -170,12 +178,7 @@ async function toggleLikeCollection() {
       </a-row>
       <a-row
         ><a-col :span="24">
-          <h1 class="my-16">Album List</h1>
-          <a-pagination
-            v-model:current="current"
-            :total="totalAlbums"
-            show-less-items
-          />
+          <h1 class="mt-16">Album List</h1>
           <a-list bordered :data-source="albumsData">
             <template #renderItem="{ item }">
               <a-list-item>
@@ -207,7 +210,19 @@ async function toggleLikeCollection() {
                 </a-list-item-meta>
               </a-list-item>
             </template>
+            <template #footer>
+              <div class="d-flex justify-right">
+          <a-pagination
+            size="small"
+            v-model:current="current"
+            :total="totalAlbums"
+            show-less-items
+            :show-total="(total, range) => `${range[0]}-${range[1]} of ${total} items`"
+            @change="fetchCollectionAlbumById"
+          /></div>
+            </template>
           </a-list>
+          
         </a-col>
       </a-row>
       <a-row>
@@ -254,6 +269,14 @@ async function toggleLikeCollection() {
                   :datetime="dayjs(item.created_datetime).fromNow()"
                 />
               </a-list-item>
+            </template>
+            <template #footer>
+                <a-pagination
+                  size="small"
+                  :total="totalComments"
+                  show-size-changer
+                  @change="fetchCollectionComments"
+                />
             </template>
           </a-list>
         </a-col>

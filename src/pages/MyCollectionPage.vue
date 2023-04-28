@@ -132,17 +132,28 @@ const onConfirmDeleteCollection = async () => {
           </template>
           <a-row>
             <a-col :span="24">
-              <a-list v-if="myCollection" :data-source="myCollection">
-                <template #header>
-                  <div class="d-flex justify-between">
-                    <h4>Collection by {{ username }}</h4>
+              <h4 class="mb-16">Collection by {{ username }}</h4>
+              <!-- <div class="d-flex justify-between my-16">
                     <a-input-search
                       v-model:value="searchMyCollectionKeyword"
                       placeholder="Search your collection"
                       style="width: 250px"
                       @search="() => fetchMyCollections()"
                     />
-                    <a-button @click="postCollection" class="mb-16">
+                    <a-button @click="postCollection">
+                      <PlusOutlined />Add a new collection
+                    </a-button>
+                  </div> -->
+              <a-list bordered v-if="myCollection" :data-source="myCollection">
+                <template #header>
+                    <div class="d-flex">
+                    <a-input-search
+                      v-model:value="searchMyCollectionKeyword"
+                      placeholder="Search your collection"
+                      style="width: 250px"
+                      @search="() => fetchMyCollections()"
+                    />
+                    <a-button @click="postCollection" class="ml-16">
                       <PlusOutlined />Add a new collection
                     </a-button>
                   </div>
@@ -150,6 +161,11 @@ const onConfirmDeleteCollection = async () => {
                 <template #renderItem="{ item }">
                   <a-list-item>
                     <a-list-item-meta>
+                      <template #avatar>
+                        <a @click="navigationService.goToDraftCollections(
+                                item.collection_id
+                              )"><img :src="item.img_path" class="w-50"></a>
+                      </template>
                       <template #title>
                         <a
                           type="link"
@@ -197,6 +213,7 @@ const onConfirmDeleteCollection = async () => {
                     v-model:current="current"
                     :total="total"
                     show-less-items
+                    show-size-changer
                     @change="
                       (page, pageSize) => fetchMyCollections(page, pageSize)
                     "
@@ -212,7 +229,7 @@ const onConfirmDeleteCollection = async () => {
           </template>
           <a-row>
             <a-col :span="24">
-              <h4>Liked collections</h4>
+              <h4 class="mb-16">Liked collections</h4>
               <a-list
                 size="default"
                 bordered
@@ -222,6 +239,12 @@ const onConfirmDeleteCollection = async () => {
                 <template #renderItem="{ item }">
                   <a-list-item>
                     <a-list-item-meta>
+                      <template #avatar>
+                        <a @click="navigationService.goToPublicCollectionDetail(
+                                item.collection_id
+                              )">
+                        <img :src="item.img_path" class="w-50"></a>
+                      </template>
                       <template #title>
                         <a
                           type="link"
@@ -246,16 +269,18 @@ const onConfirmDeleteCollection = async () => {
                     </a-list-item-meta>
                   </a-list-item>
                 </template>
-              </a-list>
-
-              <a-pagination
+                <template #footer>
+                  <a-pagination
                 v-model:current="current"
                 :total="total"
                 show-less-items
+                show-size-changer
                 @change="
                   (page, pageSize) => fetchMyFavoriteCollections(page, pageSize)
                 "
               />
+                </template>
+              </a-list>
             </a-col>
           </a-row>
         </a-tab-pane>
@@ -275,5 +300,9 @@ const onConfirmDeleteCollection = async () => {
 <style scoped>
 .btn-add {
   text-align: right;
+}
+
+.w-50 {
+  width: 50px;
 }
 </style>

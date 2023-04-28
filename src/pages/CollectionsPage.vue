@@ -58,6 +58,7 @@ async function fetchCollections(page, pageSize) {
 
     collections.value = data.collections;
     total.value = data.total;
+    console.log(total.value)
   } catch (error) {
     message.error("Cannot load collections");
   }
@@ -126,7 +127,7 @@ async function fetchCollections(page, pageSize) {
               >
               </a-select>
             </span>
-            <a-list item-layout="horizontal" :data-source="collections">
+            <a-list item-layout="horizontal" :data-source="collections" class="mt-16">
               <template #renderItem="{ item }">
                 <a-list-item>
                   <a-list-item-meta>
@@ -178,8 +179,9 @@ async function fetchCollections(page, pageSize) {
               v-model:current="current"
               :total="total"
               show-less-items
+              show-size-changer
               @change="(page, pageSize) => fetchCollections(page, pageSize)"
-            />
+            class="my-16"/>
           </a-col>
         </a-row>
       </a-col>

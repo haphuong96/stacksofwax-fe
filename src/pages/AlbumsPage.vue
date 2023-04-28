@@ -204,6 +204,7 @@ const listArtists = computed(() => {
           v-model:current="current"
           :total="total"
           show-less-items
+          show-size-changer
           @change="(page, pageSize) => fetchAlbums(page, pageSize)"
         />
       </div>

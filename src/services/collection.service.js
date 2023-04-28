@@ -46,10 +46,10 @@ const getCollectionDetail = async (collectionId) => {
 };
 
 const getCollectionAlbums = async (
-  collectionId,
-  searchKeyword,
   page,
-  pageSize
+  pageSize,
+  collectionId,
+  searchKeyword
 ) => {
   try {
     const { limit, offset } = pagination(page, pageSize);
@@ -81,7 +81,7 @@ const deleteCollection = async (collectionId) => {
   }
 };
 
-const createCollection = async (userId) => {
+const createCollection = async () => {
   try {
     const res = await axiosIntance.post("collections");
 

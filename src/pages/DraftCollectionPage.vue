@@ -94,10 +94,10 @@ async function fetchCollectionDetailById() {
 
 async function fetchCollectionAlbumById(page, pageSize) {
   const data = await collectionService.getCollectionAlbums(
-    collectionId,
-    searchAlbumInCollectionKeyword.value,
     page,
-    pageSize
+    pageSize,
+    collectionId,
+    searchAlbumInCollectionKeyword.value
   );
   albumsData.value = data.albums;
   totalAlbums.value = data.total;
@@ -142,7 +142,7 @@ async function deleteAlbumFromCollection(albumId) {
 
 <template>
   <a-spin tip="Loading..." :spinning="isLoading" class="m-16 p-16">
-    <a-row class="m-16 scroll-page-container">
+    <a-row class="m-16 p-16 scroll-page-container">
       <a-col :span="24">
         <a-row v-if="collectionData">
           <a-col :span="4">
@@ -153,14 +153,15 @@ async function deleteAlbumFromCollection(albumId) {
           </a-col>
           <a-col :span="20" class="mt-16">
             <div>
-              Collection <a @click="showEditModal"><edit-filled /></a>
+              Collection <a @click="showEditModal"><edit-filled style="font-size: 16px;"/></a>
             </div>
             <h1>{{ collectionData.collection_name }}</h1>
-            <a-descriptions :column="3">
+            <!-- <a-descriptions :column="3">
               <a-descriptions-item label="Created by">
                 <a v-html="collectionData.username" class="ml-16"></a>
               </a-descriptions-item>
-            </a-descriptions>
+            </a-descriptions> -->
+            <div>By {{ collectionData.username }}</div>
           </a-col>
         </a-row>
         <a-row>
@@ -177,7 +178,7 @@ async function deleteAlbumFromCollection(albumId) {
         </a-row>
         <a-row>
           <a-col :span="24">
-            <h1>Album List</h1>
+            <h1 class="my-16">Album List</h1>
             <a-list bordered :data-source="albumsData">
               <template #header>
                 <a-input-search
@@ -213,22 +214,27 @@ async function deleteAlbumFromCollection(albumId) {
                 </a-list-item>
               </template>
               <template #footer>
-                <a-pagination
-                  v-model:current="currentAlbumPage"
-                  :total="totalAlbums"
-                  show-less-items
-                  @change="fetchCollectionAlbumById"
-                />
+                <div :class="`d-flex ${isSearchAlbumMode ? 'justify-right' : 'justify-between'}`">
+                  <a
+                    v-if="!isSearchAlbumMode"
+                    @click="showHideAlbumSearchSection"
+                    >Edit album list</a
+                  >
+                  <a-pagination
+                    size="small"
+                    v-model:current="currentAlbumPage"
+                    :total="totalAlbums"
+                    show-less-items
+                    :show-total="
+                      (total, range) =>
+                        `${range[0]}-${range[1]} of ${total} items`
+                    "
+                    @change="fetchCollectionAlbumById"
+                  />
+                </div>
               </template>
             </a-list>
 
-            <a-button
-              class="mt-16"
-              type="link"
-              v-if="!isSearchAlbumMode"
-              @click="showHideAlbumSearchSection"
-              >Edit album list</a-button
-            >
             <div v-if="isSearchAlbumMode" class="my-16">
               <a-list bordered :data-source="searchAlbumData">
                 <template #header>
@@ -311,7 +317,7 @@ async function deleteAlbumFromCollection(albumId) {
         :maxlength="100"
         :show-count="true"
       />
-      <h3>Description:</h3>
+      <h3 class="mt-16">Description:</h3>
       <a-textarea
         v-model:value="editCollectionDesc"
         placeholder="[Optional] Write some description for this collection..."

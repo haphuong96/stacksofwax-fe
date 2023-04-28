@@ -1,5 +1,5 @@
 <script setup>
-import { CloseCircleFilled } from "@ant-design/icons-vue";
+import { CloseCircleFilled, PlusCircleFilled } from "@ant-design/icons-vue";
 import { message } from "ant-design-vue";
 import { computed, nextTick, onMounted, ref } from "vue";
 import { localStorageKeys } from "../common/local-storage-keys";
@@ -80,18 +80,19 @@ onMounted(async () => {
 
 const albumCollections = ref([]);
 const totalAlbumCollections = ref();
+const pageSizeCollection = ref(20);
 async function fetchCollectionsByAlbum(page, pageSize) {
   try {
     const { total, collections } = await albumService.getCollectionsByAlbum(
       page,
-      pageSize,
+      pageSizeCollection.value,
       albumId
     );
 
     totalAlbumCollections.value = total;
     albumCollections.value = collections;
 
-    albumStats.value.set("Collections", totalAlbumCollections.value || 0);
+    albumStats.value.set("Total collections", totalAlbumCollections.value || 0);
   } catch (error) {
     message.error("Erorr retrieving collections");
   }
@@ -110,7 +111,7 @@ async function fetchAlbumDetail() {
     //   const commentTime = formatFromNow;
     // });
 
-    albumStats.value.set("AVG Rating", data.average_rating || 0 + " / 5");
+    albumStats.value.set("AVG Rating", `${data.average_rating || 0} / 5`);
     albumStats.value.set("Total ratings", data.total_ratings || 0);
   } catch (error) {
     console.log(error);
@@ -224,6 +225,15 @@ async function addToMyCollection(collectionId) {
   }
 }
 
+async function addToMyNewCollection() {
+  try {
+    const data = await collectionService.createCollection();
+    await addToMyCollection(data.collection_id);
+  } catch (error) {
+    message.error("Error adding to my new collection");
+  }
+}
+
 function showAddToCollectionModal() {
   AddToCollectionVisible.value = true;
   fetchMyCollections();
@@ -232,7 +242,7 @@ function showAddToCollectionModal() {
 
 <template>
   <a-spin tip="Loading..." :spinning="isLoading" class="m-16 p-16">
-    <a-row class="m-16 scroll-page-container" v-if="albumDetails">
+    <a-row class="m-16 p-16 scroll-page-container" v-if="albumDetails">
       <a-col :span="16">
         <a-row>
           <a-col :span="6">
@@ -244,7 +254,17 @@ function showAddToCollectionModal() {
             />
           </a-col>
           <a-col :span="18" class="mt-16 album-details">
-            <div>Album</div>
+            <div class="d-flex justify-between">
+              <div>Album</div>
+              <div class="mr-16">
+                <a-rate v-model:value="userRating" @change="onRate" />
+                <CloseCircleFilled
+                  class="ml-8 unrate-button"
+                  @click="unrateAlbum"
+                  v-if="isRated"
+                ></CloseCircleFilled>
+              </div>
+            </div>
             <h1>
               {{ albumDetails.album_title }}
             </h1>
@@ -317,19 +337,18 @@ function showAddToCollectionModal() {
                 />
               </a-list-item>
             </template>
+            <template #footer>
+                <a-pagination
+                  size="small"
+                  :total="totalAlbumComments"
+                  show-size-changer
+                  @change="fetchAlbumComments"
+                />
+            </template>
           </a-list>
         </a-row>
       </a-col>
       <a-col :span="8" class="pl-16">
-        <a-divider orientation="left" orientation-margin="0px">
-          Rate This Album
-        </a-divider>
-        <a-rate v-model:value="userRating" @change="onRate" />
-        <CloseCircleFilled
-          class="ml-16 unrate-button"
-          @click="unrateAlbum"
-          v-if="isRated"
-        ></CloseCircleFilled>
         <a-divider orientation="left" orientation-margin="0px">
           Statistics
         </a-divider>
@@ -354,14 +373,24 @@ function showAddToCollectionModal() {
             :maskClosable="false"
             :footer="null"
           >
-            <a-input-search
-              v-model:value="searchMyCollectionKeyword"
-              placeholder="Search your collection"
-              style="width: 250px"
-              @search="() => fetchMyCollections()"
-            />
+            <div class="d-flex justify-between mb-16">
+              <a-input-search
+                v-model:value="searchMyCollectionKeyword"
+                placeholder="Search your collection"
+                style="width: 250px"
+                @search="() => fetchMyCollections()"
+              />
+              <a-pagination
+                size="small"
+                v-model:current="current"
+                :total="totalMyCollections"
+                show-less-items
+                @change="(page, pageSize) => fetchMyCollections(page, pageSize)"
+              />
+            </div>
             <a-list
               size="small"
+              bordered
               :data-source="myCollections"
               item-layout="horizontal"
               v-if="myCollections"
@@ -373,51 +402,63 @@ function showAddToCollectionModal() {
                   >
                 </a-list-item>
               </template>
+              <template #header>
+                <div>
+                  <a @click="addToMyNewCollection"
+                    ><b>
+                      <PlusCircleFilled></PlusCircleFilled> Create a new
+                      collection</b
+                    ></a
+                  >
+                </div>
+              </template>
             </a-list>
-            <a-pagination
-              v-model:current="current"
-              :total="totalMyCollections"
-              show-less-items
-              @change="(page, pageSize) => fetchMyCollections(page, pageSize)"
-            />
           </a-modal>
         </a-divider>
         <a-list
-          size="small"
           :data-source="albumCollections"
           item-layout="horizontal"
           class="collection-list"
-          v-if="albumCollections"
+          v-if="albumCollections.length"
         >
           <template #renderItem="{ item }">
             <a-list-item>
-              <span class="collection-name"
-                ><a
-                  @click="
-                    navigationService.goToPublicCollectionDetail(
-                      item.collection_id
-                    )
-                  "
-                  >{{ item.collection_name }}</a
-                ></span
-              >
-              |
-              <span class="collection-created-by">
-                By
-                <a @click="navigationService.goToUserDetail(item.created_by)">{{
-                  item.username
-                }}</a></span
-              ></a-list-item
+              <div class="my-4">
+                <span class="collection-name"
+                  ><a
+                    @click="
+                      navigationService.goToPublicCollectionDetail(
+                        item.collection_id
+                      )
+                    "
+                    >{{ item.collection_name }}</a
+                  ></span
+                >
+
+                <span class="collection-created-by">
+                  by
+                  <a
+                    @click="navigationService.goToUserDetail(item.created_by)"
+                    >{{ item.username }}</a
+                  ></span
+                >
+              </div></a-list-item
             >
           </template>
+          <template #footer>
+            <a-pagination
+              class="mb-16"
+              size="small"
+              v-model:current="current"
+              :pageSize="pageSizeCollection"
+              :total="totalAlbumCollections"
+              show-less-items
+              @change="
+                (page, pageSize) => fetchCollectionsByAlbum(page, pageSize)
+              "
+            />
+          </template>
         </a-list>
-        <a-pagination
-          class="my-16"
-          v-model:current="current"
-          :total="totalAlbumCollections"
-          show-less-items
-          @change="(page, pageSize) => fetchCollectionsByAlbum(page, pageSize)"
-        />
       </a-col>
     </a-row>
   </a-spin>
@@ -459,4 +500,10 @@ function showAddToCollectionModal() {
 .album-details :deep(.ant-descriptions-item) {
   padding-bottom: 0px;
 }
+
+.collection-name {
+  text-decoration: underline;
+  /* font-weight: 500; */
+}
+
 </style>

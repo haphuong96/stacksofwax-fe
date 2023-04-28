@@ -27,9 +27,21 @@
     margin-left: 16px;
 }
 
+.ml-8 {
+    margin-left: 8px;
+}
+
 /* margin right*/
 .mr-32 {
     margin-right: 32px;
+}
+
+.mr-16 {
+    margin-right: 16px;
+}
+
+.mr-8 {
+    margin-right: 8px;
 }
 
 /* margin top */
@@ -55,6 +67,9 @@
     margin: 8px 0px;
 }
 
+.my-4 {
+    margin: 4px 0px;
+}
 .mx-16 {
     margin: 0px 16px;
 }
@@ -62,6 +77,10 @@
 /* padding-left */
 .pl-16 {
     padding-left: 16px;
+}
+
+.pl-32 {
+    padding-left: 32px;
 }
 
 /* padding */

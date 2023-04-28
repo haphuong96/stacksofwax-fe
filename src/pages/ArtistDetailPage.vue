@@ -24,7 +24,7 @@ async function fetchArtistDetails() {
 </script>
 
 <template>
-  <a-row class="m-16">
+  <a-row class="m-16 p-16">
     <a-col :span="24">
       <a-row v-if="artistData">
         <a-col :span="4">
