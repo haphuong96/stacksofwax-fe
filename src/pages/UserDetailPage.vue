@@ -20,45 +20,67 @@
         </a-col>
       </a-row>
       <a-row class="user-collection-container">
-        <a-tabs class="user-collection-container" v-model:activeKey="activeKey">
-          <a-tab-pane key="1" :tab="`Collection Library (${totalCollections})`">
-            <div>
-              <div class="public-collection-label">Public Collection</div>
-              <a-list item-layout="horizontal" :data-source="collections">
-                <template #renderItem="{ item }">
-                  <a-list-item>
-                    <a-list-item-meta>
-                      <template #description>
-                        {{ item.collection_desc }}
-                      </template>
-                      <template #title>
-                        <a
-                          @click="
-                            () => goToCollectionDetail(item.collection_id)
-                          "
-                          >{{ item.collection_name }}</a
-                        >
-                      </template>
-                      <template #avatar>
-                        <a-avatar src="https://joeschmoe.io/api/v1/random" />
-                      </template>
-                    </a-list-item-meta>
-                  </a-list-item>
-                </template>
-              </a-list>
+        <a-col :span="24">
+          <a-tabs
+            class="user-collection-container"
+            v-model:activeKey="activeKey"
+          >
+            <a-tab-pane
+              key="1"
+              :tab="`Collection Library (${totalCollections})`"
+            >
+              <div>
+                <div class="public-collection-label">Public Collection</div>
+                <a-list item-layout="horizontal" :data-source="collections">
+                  <template #renderItem="{ item }">
+                    <a-list-item>
+                      <a-list-item-meta>
+                        <template #description>
+                          {{ item.collection_desc }}
+                        </template>
+                        <template #title>
+                          <a
+                            @click="
+                              () =>
+                                navigationService.goToCollectionDetail(
+                                  item.collection_id
+                                )
+                            "
+                            >{{ item.collection_name }}</a
+                          >
+                        </template>
+                        <template #avatar>
+                          <a
+                            @click="
+                              () =>
+                                navigationService.goToCollectionDetail(
+                                  item.collection_id
+                                )
+                            "
+                          >
+                            <img :src="item.img_path || fallbackCollectionImg" class="w-50"
+                          /></a>
+                        </template>
+                      </a-list-item-meta>
+                    </a-list-item>
+                  </template>
+                </a-list>
 
-              <a-pagination
-                v-model:current="current"
-                :total="totalCollections"
-                show-less-items
-                @change="(page, pageSize) => fetchUserInfo()"
-              />
-            </div>
-          </a-tab-pane>
-          <a-tab-pane key="2" tab="Reviews" force-render>
-            <div class="public-collection-label">Reviews Content</div>
-          </a-tab-pane>
-        </a-tabs>
+                <a-pagination
+                  v-model:current="current"
+                  :total="totalCollections"
+                  show-less-items
+                  show-size-changer
+                  @change="fetchUserCollection"
+                  class="my-16"
+                />
+              </div>
+            </a-tab-pane>
+            <a-tab-pane key="2" tab="Reviews" force-render>
+              <div class="public-collection-label">Reviews Content</div>
+            </a-tab-pane>
+          </a-tabs>
+        </a-col>
       </a-row>
     </div>
   </a-spin>
@@ -72,6 +94,8 @@ import formatDistanceToNow from "date-fns/formatDistanceToNow";
 import format from "date-fns/format";
 import fallbackImage from "../assets/ic_user.png";
 import CircleImage from "../components/CircleImage.vue";
+import { navigationService } from "../services/navigation.service";
+import fallbackCollectionImg from "../assets/ic_fallback_collection.png";
 
 const isLoading = ref(false);
 const name = ref("");
@@ -87,14 +111,18 @@ const defaultPage = 1;
 const defaultPageSize = 10;
 const current = ref(defaultPage);
 
+const userId = router.currentRoute.value.params.id;
+
 onMounted(async () => {
   isLoading.value = true;
-  const userId = router.currentRoute.value.params.id;
   const userInfo = await service.userService.fetchUserInfo(
     userId,
     current.value,
     defaultPageSize
   );
+
+  await fetchUserCollection();
+
   isLoading.value = false;
   if (userInfo) {
     name.value = userInfo.username;
@@ -104,13 +132,19 @@ onMounted(async () => {
       "MMM dd yyyy"
     );
     lastActiveTime.value = formatFromNow(userInfo.last_active);
-    totalCollections.value = userInfo.collections?.total || 0;
-    collections.value = userInfo.collections?.data || [];
+    // totalCollections.value = userInfo.collections?.total || 0;
+    // collections.value = userInfo.collections?.data || [];
   } else {
     router.go(-1);
     message.error("Cannot get user info");
   }
 });
+
+async function fetchUserCollection(page, pageSize) {
+  const userCollectionInfo = await service.userService.getUserCollection(userId, page, pageSize);
+  totalCollections.value = userCollectionInfo.total;
+  collections.value = userCollectionInfo.collections;
+}
 
 function formatFromNow(date) {
   return formatDistanceToNow(new Date(date), {
@@ -156,5 +190,9 @@ function formatFromNow(date) {
 .public-collection-label {
   font-size: 18px;
   color: black;
+}
+
+.w-50 {
+  width: 50px;
 }
 </style>

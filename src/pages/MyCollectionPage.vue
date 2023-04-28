@@ -10,6 +10,7 @@ import { axiosIntance } from "../services/base.service";
 import ConfirmModal from "../components/ConfirmModal.vue";
 import { routeNames } from "../router/route-names";
 import router from "../router";
+import fallbackCollectionImg from "../assets/ic_fallback_collection.png";
 dayjs.extend(relativeTime);
 
 const { navigationService, collectionService, meService } = service;
@@ -18,12 +19,6 @@ const username = localStorage.getItem(localStorageKeys.USERNAME);
 const userId = localStorage.getItem(localStorageKeys.USER_ID);
 
 const activeKey = ref("my-collection");
-
-const myCollection = ref();
-const total = ref();
-
-const favoriteCollection = ref();
-const favoriteTotal = ref();
 
 //delete collection
 const isShowConfirmDeleteCollection = ref(false);
@@ -74,7 +69,10 @@ async function postCollection() {
   navigationService.goToDraftCollections(collectionId);
 }
 
+/*My collection */
 const searchMyCollectionKeyword = ref();
+const total = ref();
+const myCollection = ref();
 async function fetchMyCollections(page, pageSize) {
   try {
     const data = await meService.getMyCollections(searchMyCollectionKeyword.value, page, pageSize);
@@ -86,6 +84,9 @@ async function fetchMyCollections(page, pageSize) {
   }
 }
 
+/*My favorite collection */
+const favoriteCollection = ref();
+const favoriteTotal = ref();
 async function fetchMyFavoriteCollections(page, pageSize) {
   try {
     const data = await meService.getMyFavoriteCollections(page, pageSize);
@@ -164,7 +165,7 @@ const onConfirmDeleteCollection = async () => {
                       <template #avatar>
                         <a @click="navigationService.goToDraftCollections(
                                 item.collection_id
-                              )"><img :src="item.img_path" class="w-50"></a>
+                              )"><img :src="item.img_path || fallbackCollectionImg" class="w-50"></a>
                       </template>
                       <template #title>
                         <a
@@ -243,7 +244,7 @@ const onConfirmDeleteCollection = async () => {
                         <a @click="navigationService.goToPublicCollectionDetail(
                                 item.collection_id
                               )">
-                        <img :src="item.img_path" class="w-50"></a>
+                        <img :src="item.img_path || fallbackCollectionImg" class="w-50"></a>
                       </template>
                       <template #title>
                         <a
@@ -272,7 +273,7 @@ const onConfirmDeleteCollection = async () => {
                 <template #footer>
                   <a-pagination
                 v-model:current="current"
-                :total="total"
+                :total="favoriteTotal"
                 show-less-items
                 show-size-changer
                 @change="

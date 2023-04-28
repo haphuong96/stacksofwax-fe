@@ -42,9 +42,27 @@ async function updateUserProfilePicture(profilePictureUrl) {
   }
 }
 
+async function getUserCollection(userId, page, pageSize) {
+  try {
+    const { limit, offset } = pagination(page, pageSize);
+    const res = await axiosIntance.get(`/users/${userId}/collections`, {
+      params: { limit, offset }
+    });
+    
+    const {total, collections } = res.data;
+    return {
+      total,
+      collections
+    }
+  } catch (error) {
+    message.error("Error loading user collections")
+  }
+}
+
 export const userService = {
   fetchUserInfo,
   getMyProfile,
   signout,
-  updateUserProfilePicture
+  updateUserProfilePicture,
+  getUserCollection
 };
