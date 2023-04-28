@@ -155,19 +155,19 @@ async function toggleLikeCollection() {
             <span>Like</span><span v-if="isLiked">d</span>
           </a-button>
         </a-col>
-      </a-row >
+      </a-row>
       <a-row v-if="collectionData">
-          <a-col :span="24">
-            <div class="fs-16 mt-16">
-              {{ displayDescription }}
-              <a
-                @click="showAllDescription = !showAllDescription"
-                v-if="(collectionData?.collection_desc || '').length > 250"
-                >{{ showAllDescription ? "Show less" : "Show more" }}</a
-              >
-            </div>
-          </a-col>
-        </a-row>
+        <a-col :span="24">
+          <div class="fs-16 mt-16">
+            {{ displayDescription }}
+            <a
+              @click="showAllDescription = !showAllDescription"
+              v-if="(collectionData?.collection_desc || '').length > 250"
+              >{{ showAllDescription ? "Show less" : "Show more" }}</a
+            >
+          </div>
+        </a-col>
+      </a-row>
       <a-row
         ><a-col :span="24">
           <h1 class="my-16">Album List</h1>
@@ -181,10 +181,20 @@ async function toggleLikeCollection() {
               <a-list-item>
                 <a-list-item-meta>
                   <template #title>
-                    <a @click="navigationService.goToAlbumDetailPage(item.album_id)">{{ item.album_title }}</a>
+                    <a
+                      @click="
+                        navigationService.goToAlbumDetailPage(item.album_id)
+                      "
+                      >{{ item.album_title }}</a
+                    >
                   </template>
                   <template #avatar>
-                    <a @click="navigationService.goToAlbumDetailPage(item.album_id)"><img :src="item.img_path" class="w-50" /></a>
+                    <a
+                      @click="
+                        navigationService.goToAlbumDetailPage(item.album_id)
+                      "
+                      ><img :src="item.img_path" class="w-50"
+                    /></a>
                   </template>
                   <template #description>
                     {{
@@ -203,25 +213,6 @@ async function toggleLikeCollection() {
       <a-row>
         <a-col :span="24">
           <h1 class="my-16">Reviews</h1>
-          <a-list
-            v-if="comments.length"
-            :data-source="comments"
-            :header="`${comments.length} ${
-              comments.length > 1 ? 'replies' : 'reply'
-            }`"
-            item-layout="horizontal"
-          >
-            <template #renderItem="{ item }">
-              <a-list-item>
-                <a-comment
-                  :author="item.username"
-                  :avatar="item.user_avatar || userFallbackAvatar"
-                  :content="item.comment"
-                  :datetime="dayjs(item.created_datetime).fromNow()"
-                />
-              </a-list-item>
-            </template>
-          </a-list>
           <a-comment>
             <template #avatar>
               <a-avatar :src="userAvatar || userFallbackAvatar" />
@@ -246,6 +237,25 @@ async function toggleLikeCollection() {
               </a-form-item>
             </template>
           </a-comment>
+          <a-list
+            v-if="comments.length"
+            :data-source="comments"
+            :header="`${totalComments} ${
+              totalComments > 1 ? 'comments' : 'comment'
+            }`"
+            item-layout="horizontal"
+          >
+            <template #renderItem="{ item }">
+              <a-list-item>
+                <a-comment
+                  :author="item.username"
+                  :avatar="item.user_avatar || userFallbackAvatar"
+                  :content="item.comment"
+                  :datetime="dayjs(item.created_datetime).fromNow()"
+                />
+              </a-list-item>
+            </template>
+          </a-list>
         </a-col>
       </a-row>
     </a-col>

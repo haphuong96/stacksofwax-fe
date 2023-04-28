@@ -7,7 +7,7 @@ const isLoggedIn = localStorage.getItem(localStorageKeys.ACCESS_TOKEN);
 </script>
 
 <template>
-  <a-row class="m-16 d-flex wrap-flex">
+  <a-row class="m-16 d-flex scroll-page-container">
     <a-col :span="16">
       <img
         class="homepage-cover"

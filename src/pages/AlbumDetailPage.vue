@@ -35,6 +35,8 @@ const comments = ref([]);
 const totalAlbumComments = ref(0);
 async function fetchAlbumComments(page, pageSize) {
   try {
+    const data = await albumService.getCommentAlbum(albumId, page, pageSize);
+
     comments.value = data.comments.map((comment) => {
       const commentTime = comment?.created_datetime
         ? formatFromNow(comment?.created_datetime)
@@ -273,25 +275,6 @@ function showAddToCollectionModal() {
         </a-row>
         <a-row class="d-flex v-flex">
           <h1 class="my-16">Reviews</h1>
-          <a-list
-            v-if="comments?.length"
-            :data-source="comments"
-            :header="`${comments.length} ${
-              comments.length > 1 ? 'replies' : 'reply'
-            }`"
-            item-layout="horizontal"
-          >
-            <template #renderItem="{ item }">
-              <a-list-item>
-                <a-comment
-                  :author="item.username"
-                  :avatar="item.user_avatar || userFallbackAvatar"
-                  :content="item.comment"
-                  :datetime="item.created_datetime"
-                />
-              </a-list-item>
-            </template>
-          </a-list>
           <a-comment>
             <template #avatar>
               <a-avatar :src="userAvatar || userFallbackAvatar" />
@@ -316,6 +299,25 @@ function showAddToCollectionModal() {
               </a-form-item>
             </template>
           </a-comment>
+          <a-list
+            v-if="comments?.length"
+            :data-source="comments"
+            :header="`${totalAlbumComments} ${
+              totalAlbumComments > 1 ? 'comments' : 'comment'
+            }`"
+            item-layout="horizontal"
+          >
+            <template #renderItem="{ item }">
+              <a-list-item>
+                <a-comment
+                  :author="item.username"
+                  :avatar="item.user_avatar || userFallbackAvatar"
+                  :content="item.comment"
+                  :datetime="item.created_datetime"
+                />
+              </a-list-item>
+            </template>
+          </a-list>
         </a-row>
       </a-col>
       <a-col :span="8" class="pl-16">
