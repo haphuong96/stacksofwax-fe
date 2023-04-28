@@ -72,7 +72,7 @@
                   show-less-items
                   show-size-changer
                   @change="fetchUserCollection"
-                  class="my-16"
+                  class="mt-16"
                 />
               </div>
             </a-tab-pane>

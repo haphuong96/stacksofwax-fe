@@ -1,6 +1,6 @@
 <template>
   <a-spin :spinning="isLoading">
-    <div class="my-profile-page-container">
+    <div class="p-32">
       <div class="d-flex justify-center">
         <div class="profile-container">
           <CircleImage
@@ -8,15 +8,6 @@
             :failed-image="fallbackImage"
             :src="profileImage"
           ></CircleImage>
-          <!-- <a-image
-            :width="120"
-            :height="120"
-            class="profile-image"
-            :fallback="fallbackImage"
-            :src="profileImage"
-            :placeholder="true"
-            :preview="false"
-          /> -->
           <EditFilled
             class="edit-pen"
             @click="visibleChangeProfilePictureModal = true"
@@ -152,13 +143,6 @@ async function saveNewProfilePicture() {
 }
 </script>
 <style scoped>
-.my-profile-page-container {
-  height: calc(100vh - 72px);
-  overflow: hidden;
-  padding-left: 80px;
-  padding-right: 80px;
-  padding-top: 32px;
-}
 
 .my-profile__lbl-name {
   font-size: 24px;
