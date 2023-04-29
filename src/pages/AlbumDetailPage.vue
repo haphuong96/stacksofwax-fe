@@ -1,15 +1,14 @@
 <script setup>
 import { CloseCircleFilled, PlusCircleFilled } from "@ant-design/icons-vue";
 import { message } from "ant-design-vue";
-import { computed, nextTick, onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
+import userFallbackAvatar from "../assets/user-fallback.png";
 import { localStorageKeys } from "../common/local-storage-keys";
 import router from "../router";
 import { service } from "../services";
-import { formatFromNow } from "../utils/datetime.helper";
 import { collectionService } from "../services/collection.service";
 import { meService } from "../services/me.service";
-import userFallbackAvatar from "../assets/user-fallback.png";
-import { authAction } from "../utils/auth-action.helper";
+import { formatFromNow } from "../utils/datetime.helper";
 
 const { albumService, navigationService } = service;
 
@@ -51,25 +50,23 @@ async function fetchAlbumComments(page, pageSize) {
   }
 }
 
-function submitCommentAlbum() {
-  return authAction(async () => {
-    if (!draftCommentAlbum.value) {
-      return;
-    }
+async function submitCommentAlbum() {
+  if (!draftCommentAlbum.value) {
+    return;
+  }
 
-    submitting.value = true;
-    try {
-      await albumService.postCommentAlbum(albumId, draftCommentAlbum.value);
+  submitting.value = true;
+  try {
+    await albumService.postCommentAlbum(albumId, draftCommentAlbum.value);
 
-      await fetchAlbumComments();
+    await fetchAlbumComments();
 
-      draftCommentAlbum.value = "";
-    } catch (error) {
-      message.error("error posting comment");
-    } finally {
-      submitting.value = false;
-    }
-  });
+    draftCommentAlbum.value = "";
+  } catch (error) {
+    message.error("error posting comment");
+  } finally {
+    submitting.value = false;
+  }
 }
 
 onMounted(async () => {
@@ -238,10 +235,8 @@ async function addToMyNewCollection() {
 }
 
 function showAddToCollectionModal() {
-  return authAction(() => {
-    AddToCollectionVisible.value = true;
-    fetchMyCollections();
-  });
+  AddToCollectionVisible.value = true;
+  fetchMyCollections();
 }
 </script>
 

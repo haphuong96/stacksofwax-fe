@@ -28,7 +28,6 @@ async function getMyProfile() {
 
 async function signout() {
   localStorage.clear();
-  emitter.emit(emitterEvents.SIGNOUT)
 }
 
 async function updateUserProfilePicture(profilePictureUrl) {

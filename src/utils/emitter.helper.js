@@ -4,6 +4,6 @@ const emitter = mitt();
 export const emitterEvents = {
   SHOW_ALERT: "SHOW_ALERT",
   EXECUTE_REQUIRE_LOGIN_ACTION: "EXECUTE_REQUIRE_LOGIN_ACTION",
-  SIGNOUT: "SIGNOUT",
+  EXPIRED_TOKEN: "EXPIRED_TOKEN",
 };
 export default emitter;

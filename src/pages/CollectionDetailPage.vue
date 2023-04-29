@@ -10,7 +10,6 @@ import LikeButton from "../components/LikeButton.vue";
 import router from "../router";
 import { collectionService } from "../services/collection.service";
 import { navigationService } from "../services/navigation.service";
-import { authAction } from "../utils/auth-action.helper";
 
 dayjs.extend(relativeTime);
 
@@ -52,9 +51,8 @@ onMounted(async () => {
   fetchCollectionComments();
 });
 
-function postComment() {
-  return authAction(async () => {
-    if (!draftComment.value) {
+async function postComment() {
+  if (!draftComment.value) {
       return;
     }
 
@@ -72,7 +70,6 @@ function postComment() {
     } finally {
       submitting.value = false;
     }
-  });
 }
 
 async function fetchCollectionComments(page, pageSize) {
@@ -120,14 +117,12 @@ async function fetchCollectionAlbumById(page, pageSize) {
 }
 
 async function toggleLikeCollection() {
-  return authAction(async () => {
-    if (isLiked.value) {
+  if (isLiked.value) {
       await collectionService.unlikeCollection(collectionId);
     } else {
       await collectionService.likeCollection(collectionId);
     }
     checkUserLikedCollection();
-  });
 }
 </script>
 

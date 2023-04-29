@@ -6,12 +6,14 @@ import router from "./router";
 import { routeNames } from "./router/route-names";
 const $route = useRoute();
 const showRequireLoginPopup = ref(false);
+const showExpiredTokenPopup = ref(false);
 const layout = computed(() => $route.meta.layout || undefined);
 onMounted(() => {
   emitter.on(
     emitterEvents.EXECUTE_REQUIRE_LOGIN_ACTION,
     onExecuteRequireLoginAction
   );
+  emitter.on(emitterEvents.EXPIRED_TOKEN, onExpiredToken);
 });
 
 onBeforeUnmount(() => {
@@ -19,15 +21,24 @@ onBeforeUnmount(() => {
     emitterEvents.EXECUTE_REQUIRE_LOGIN_ACTION,
     onExecuteRequireLoginAction
   );
+  emitter.off(emitterEvents.EXPIRED_TOKEN, onExpiredToken);
 });
 
 function onExecuteRequireLoginAction() {
   showRequireLoginPopup.value = true;
 }
 
-function handleOk() {
+function onExpiredToken() {
+  showExpiredTokenPopup.value = true;
+}
+
+function goToLogin() {
   showRequireLoginPopup.value = false;
   router.push({ name: routeNames.LOGIN });
+}
+
+function reloadPage() {
+  window.location.reload();
 }
 </script>
 
@@ -41,7 +52,7 @@ function handleOk() {
     <a-modal
       v-model:visible="showRequireLoginPopup"
       title="Unauthorize"
-      @ok="handleOk"
+      @ok="goToLogin"
       :width="320"
     >
       <template #footer>
@@ -52,9 +63,30 @@ function handleOk() {
           key="submit"
           type="primary"
           :loading="loading"
-          @click="handleOk"
+          @click="goToLogin"
         >
           Go to Login
+        </a-button>
+      </template>
+      <p>Please login and try again later!</p>
+    </a-modal>
+
+    <a-modal
+      v-model:visible="showExpiredTokenPopup"
+      title="Expired Token"
+      @ok="reloadPage"
+      :width="320"
+      :maskClosable="false"
+      :closable="false"
+    >
+      <template #footer>
+        <a-button
+          key="submit"
+          type="primary"
+          :loading="loading"
+          @click="reloadPage"
+        >
+          OK
         </a-button>
       </template>
       <p>Please login and try again later!</p>

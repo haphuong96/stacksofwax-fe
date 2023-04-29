@@ -2,6 +2,7 @@ import axios from "axios";
 import { localStorageKeys } from "../common/local-storage-keys";
 import { userService } from "./user.service";
 import { message } from "ant-design-vue";
+import emitter, { emitterEvents } from "../utils/emitter.helper";
 
 export const axiosIntance = axios.create({
   baseURL: import.meta.env.VITE_BACKEND_URL,
@@ -40,10 +41,13 @@ const handleRequestError = async (error) => {
     );
     userService.signout();
     if (isExpiredToken) {
-      setTimeout(() => {
-        window.location.reload();
-        message.error('Expired token! Please login and try again.')
-      }, 500);
+      emitter.emit(emitterEvents.EXPIRED_TOKEN);
+      // setTimeout(() => {
+      //   window.location.reload();
+      //   message.error('Expired token! Please login and try again.')
+      // }, 500);
+    } else {
+      emitter.emit(emitterEvents.EXECUTE_REQUIRE_LOGIN_ACTION);
     }
   }
   return Promise.reject(error);
