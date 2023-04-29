@@ -46,7 +46,9 @@ const displayDescription = computed(() => {
 onMounted(async () => {
   fetchCollectionDetailById();
   fetchCollectionAlbumById();
-  checkUserLikedCollection();
+  if (localStorage.getItem(localStorageKeys.ACCESS_TOKEN)) {
+    checkUserLikedCollection();
+  }
   fetchCollectionComments();
 });
 
