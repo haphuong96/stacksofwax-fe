@@ -4,6 +4,7 @@ import router from "../router";
 import { axiosIntance } from "../services/base.service";
 import CircleImage from "../components/CircleImage.vue";
 import { navigationService } from "../services/navigation.service";
+import { routeNames } from "../router/route-names";
 
 const artistId = router.currentRoute.value.params.id.split("-")[0];
 
@@ -11,7 +12,13 @@ const artistData = ref();
 const albumsData = ref();
 
 onMounted(async () => {
-  fetchArtistDetails();
+  await fetchArtistDetails();
+  router.replace({
+    name: routeNames.ARTIST_DETAILS,
+    params: {
+      id: `${artistId}-${artistData.value.artist_name?.replaceAll(" ", "-")}`
+    }
+  });
 });
 
 async function fetchArtistDetails() {
@@ -29,10 +36,10 @@ async function fetchArtistDetails() {
       <a-row v-if="artistData">
         <a-col :span="4">
           <!-- <CircleImage :size="200" :src="artistData.img_path"/> -->
-          <CircleImage 
-          :size="200"
-          :failed-image="fallbackImage"
-          :src="artistData.img_path"
+          <CircleImage
+            :size="200"
+            :failed-image="fallbackImage"
+            :src="artistData.img_path"
           ></CircleImage>
         </a-col>
         <a-col :span="20" class="mt-16">
@@ -46,7 +53,30 @@ async function fetchArtistDetails() {
           <h1 class="my-16">Album List</h1>
           <a-list bordered :data-source="albumsData">
             <template #renderItem="{ item }">
-              <a @click="navigationService.goToAlbumDetailPage(item.album_id)"><a-list-item>{{ item.album_title }} </a-list-item></a>
+              <a-list-item>
+                <a-list-item-meta>
+                  <template #avatar>
+                    <a
+                      @click="
+                        navigationService.goToAlbumDetailPage(item.album_id)
+                      "
+                    >
+                      <img :src="item.img_path" class="w-50"
+                    /></a>
+                  </template>
+                  <template #title>
+                    <a
+                      @click="
+                        navigationService.goToAlbumDetailPage(item.album_id)
+                      "
+                      >{{ item.album_title }}
+                    </a>
+                  </template>
+                  <template #description>
+                    {{ item.release_year }}
+                  </template>
+                </a-list-item-meta>
+              </a-list-item>
             </template>
           </a-list>
         </a-col>
@@ -56,4 +86,7 @@ async function fetchArtistDetails() {
 </template>
 
 <style scoped>
+.w-50 {
+  width: 50px;
+}
 </style>

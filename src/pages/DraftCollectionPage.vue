@@ -2,7 +2,8 @@
 import {
   CloseOutlined,
   EditFilled,
-  EllipsisOutlined
+  EllipsisOutlined,
+  FormOutlined
 } from "@ant-design/icons-vue";
 import { message } from "ant-design-vue";
 import cloneDeep from "lodash/cloneDeep";
@@ -12,6 +13,7 @@ import router from "../router";
 import { service } from "../services";
 import ConfirmModal from "../components/ConfirmModal.vue";
 import fallbackCollectionImg from "../assets/ic_fallback_collection.png";
+import { routeNames } from "../router/route-names";
 const { collectionService, albumService, navigationService } = service;
 
 const collectionId = router.currentRoute.value.params.id.split("-")[0];
@@ -62,6 +64,12 @@ onMounted(async () => {
       fetchCollectionDetailById(),
       fetchCollectionAlbumById()
     ]);
+    router.replace({
+    name: routeNames.DRAFT_COLLECTION_DETAIL,
+    params: {
+      id: `${collectionId}-${collectionData.value.collection_name?.replaceAll(" ", "-")}`
+    }
+  });
   } catch (error) {
     message.error(error?.message);
   } finally {
@@ -166,7 +174,6 @@ const onConfirmDeleteCollection = async () => {
     isShowConfirmDeleteCollection.value = false;
   }
 };
-
 </script>
 
 <template>
@@ -184,7 +191,7 @@ const onConfirmDeleteCollection = async () => {
             <div>
               Collection
               <a @click="showEditModal"
-                ><edit-filled style="font-size: 16px"
+                ><EditFilled style="font-size: 16px; margin-left: 3px"
               /></a>
             </div>
             <h1>
@@ -243,10 +250,22 @@ const onConfirmDeleteCollection = async () => {
                 <a-list-item>
                   <a-list-item-meta>
                     <template #title>
-                      {{ item.album_title }}
+                      <a
+                        @click="
+                          navigationService.goToAlbumDetailPage(item.album_id)
+                        "
+                      >
+                        {{ item.album_title }}
+                      </a>
                     </template>
                     <template #avatar>
-                      <img :src="item.img_path" class="w-50" />
+                      <a
+                        @click="
+                          navigationService.goToAlbumDetailPage(item.album_id)
+                        "
+                      >
+                        <img :src="item.img_path" class="w-50"
+                      /></a>
                     </template>
                     <template #description>
                       {{

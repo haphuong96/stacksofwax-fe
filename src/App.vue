@@ -40,6 +40,7 @@ function goToLogin() {
 function reloadPage() {
   window.location.reload();
 }
+
 </script>
 
 <template>

@@ -115,7 +115,7 @@ const router = createRouter({
       // beforeEnter: requireLoginGuard
     },
     {
-      path: "/my-collections",
+      path: "/me/collections",
       name: routeNames.MY_COLLECTION,
       component: MyCollectionPage,
       meta: {
@@ -124,7 +124,7 @@ const router = createRouter({
       beforeEnter: requireLoginGuard
     },
     {
-      path: "/my-collections/:id",
+      path: "/me/collections/:id",
       name: routeNames.DRAFT_COLLECTION_DETAIL,
       component: DraftCollectionPage,
       meta: {

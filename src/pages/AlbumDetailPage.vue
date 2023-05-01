@@ -9,6 +9,7 @@ import { service } from "../services";
 import { collectionService } from "../services/collection.service";
 import { meService } from "../services/me.service";
 import { formatFromNow } from "../utils/datetime.helper";
+import { routeNames } from "../router/route-names";
 
 const { albumService, navigationService } = service;
 
@@ -76,6 +77,12 @@ onMounted(async () => {
     fetchCollectionsByAlbum(),
     fetchAlbumComments()
   ]);
+  router.replace({
+    name: routeNames.ALBUM_DETAILS,
+    params: {
+      id: `${albumId}-${albumDetails.value.album_title?.replaceAll(" ", "-")}`
+    }
+  });
 });
 
 const albumCollections = ref([]);

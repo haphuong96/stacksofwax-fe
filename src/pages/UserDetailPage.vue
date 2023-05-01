@@ -58,7 +58,9 @@
                                 )
                             "
                           >
-                            <img :src="item.img_path || fallbackCollectionImg" class="w-50"
+                            <img
+                              :src="item.img_path || fallbackCollectionImg"
+                              class="w-50"
                           /></a>
                         </template>
                       </a-list-item-meta>
@@ -93,9 +95,11 @@ import { message } from "ant-design-vue";
 import formatDistanceToNow from "date-fns/formatDistanceToNow";
 import format from "date-fns/format";
 import fallbackImage from "../assets/ic_user.png";
+import userFallbackImg from "../assets/user-fallback.png";
 import CircleImage from "../components/CircleImage.vue";
 import { navigationService } from "../services/navigation.service";
 import fallbackCollectionImg from "../assets/ic_fallback_collection.png";
+import { routeNames } from "../router/route-names";
 
 const isLoading = ref(false);
 const name = ref("");
@@ -132,8 +136,7 @@ onMounted(async () => {
       "MMM dd yyyy"
     );
     lastActiveTime.value = formatFromNow(userInfo.last_active);
-    // totalCollections.value = userInfo.collections?.total || 0;
-    // collections.value = userInfo.collections?.data || [];
+
   } else {
     router.go(-1);
     message.error("Cannot get user info");
@@ -141,7 +144,11 @@ onMounted(async () => {
 });
 
 async function fetchUserCollection(page, pageSize) {
-  const userCollectionInfo = await service.userService.getUserCollection(userId, page, pageSize);
+  const userCollectionInfo = await service.userService.getUserCollection(
+    userId,
+    page,
+    pageSize
+  );
   totalCollections.value = userCollectionInfo.total;
   collections.value = userCollectionInfo.collections;
 }

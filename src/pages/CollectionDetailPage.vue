@@ -10,6 +10,7 @@ import LikeButton from "../components/LikeButton.vue";
 import router from "../router";
 import { collectionService } from "../services/collection.service";
 import { navigationService } from "../services/navigation.service";
+import { routeNames } from "../router/route-names";
 
 dayjs.extend(relativeTime);
 
@@ -43,12 +44,19 @@ const displayDescription = computed(() => {
 });
 
 onMounted(async () => {
-  fetchCollectionDetailById();
   fetchCollectionAlbumById();
   if (localStorage.getItem(localStorageKeys.ACCESS_TOKEN)) {
     checkUserLikedCollection();
   }
   fetchCollectionComments();
+  await fetchCollectionDetailById();
+
+  router.replace({
+    name: routeNames.COLLECTION_DETAILS,
+    params: {
+      id: `${collectionId}-${collectionData.value.collection_name?.replaceAll(" ", "-")}`
+    }
+  });
 });
 
 async function postComment() {
