@@ -46,6 +46,10 @@ function goToSignUp() {
   router.push({name: routeNames.SIGNUP});
 }
 
+function goToMyCollection() {
+  router.push({name: routeNames.MY_COLLECTION});
+}
+
 export const navigationService = {
   goToAlbumDetailPage,
   goToArtistDetailPage,
@@ -55,5 +59,6 @@ export const navigationService = {
   goToDraftCollections,
   goToPublicCollectionDetail,
   goToExploreAlbum,
-  goToSignUp
+  goToSignUp,
+  goToMyCollection
 };

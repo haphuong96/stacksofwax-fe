@@ -1,12 +1,16 @@
 <script setup>
-import { CloseOutlined, EditFilled } from "@ant-design/icons-vue";
+import {
+  CloseOutlined,
+  EditFilled,
+  EllipsisOutlined
+} from "@ant-design/icons-vue";
 import { message } from "ant-design-vue";
 import cloneDeep from "lodash/cloneDeep";
 import { computed, onMounted, ref } from "vue";
 import { localStorageKeys } from "../common/local-storage-keys";
 import router from "../router";
 import { service } from "../services";
-
+import ConfirmModal from "../components/ConfirmModal.vue";
 import fallbackCollectionImg from "../assets/ic_fallback_collection.png";
 const { collectionService, albumService, navigationService } = service;
 
@@ -138,6 +142,31 @@ async function deleteAlbumFromCollection(albumId) {
   fetchCollectionAlbumById(currentAlbumPage.value);
   searchAlbum();
 }
+
+// Delete Collection
+const isShowConfirmDeleteCollection = ref(false);
+const deleteCollectionMessage = ref("");
+const isDeleteingCollection = ref(false);
+
+const showDeleteCollectionConfirm = () => {
+  deleteCollectionMessage.value = `Collection <b>${collectionData.value.collection_name}</b> will be deleted from your library.`;
+  isShowConfirmDeleteCollection.value = true;
+};
+
+const onConfirmDeleteCollection = async () => {
+  try {
+    isDeleteingCollection.value = true;
+    await service.collectionService.deleteCollection(collectionId);
+    message.success("Delete collection successfully");
+    navigationService.goToMyCollection();
+  } catch {
+    message.error("Error delete collection");
+  } finally {
+    isDeleteingCollection.value = false;
+    isShowConfirmDeleteCollection.value = false;
+  }
+};
+
 </script>
 
 <template>
@@ -161,12 +190,29 @@ async function deleteAlbumFromCollection(albumId) {
             <h1>
               {{ collectionData.collection_name }}
             </h1>
-            <!-- <a-descriptions :column="3">
-              <a-descriptions-item label="Created by">
-                <a v-html="collectionData.username" class="ml-16"></a>
-              </a-descriptions-item>
-            </a-descriptions> -->
             <div>By {{ collectionData.username }}</div>
+            <div class="mt-32">
+              <a-dropdown :trigger="['click']">
+                <a class="ant-dropdown-link">
+                  <ellipsis-outlined class="more-options"></ellipsis-outlined>
+                </a>
+                <template #overlay>
+                  <a-menu>
+                    <a-menu-item key="delete">
+                      <a @click="showDeleteCollectionConfirm">Delete</a>
+                    </a-menu-item>
+                    <a-menu-item key="public-site">
+                      <a
+                        @click="
+                          navigationService.goToCollectionDetail(collectionId)
+                        "
+                        >Go to public site</a
+                      >
+                    </a-menu-item>
+                  </a-menu>
+                </template>
+              </a-dropdown>
+            </div>
           </a-col>
         </a-row>
         <a-row>
@@ -294,21 +340,6 @@ async function deleteAlbumFromCollection(albumId) {
                   </a>
                 </template>
               </a-list>
-
-              <!-- <a-list
-              bordered
-              :data-source="searchAlbumData"
-              v-if="searchAlbumData.length > 0"
-            >
-              <template #renderItem="{ item }">
-                <a-list-item
-                  >{{ item.album_title }}
-                  <a-button @click="() => addAlbumToCollection(item.album_id)"
-                    >Add</a-button
-                  ></a-list-item
-                >
-              </template>
-            </a-list> -->
             </div>
           </a-col>
         </a-row>
@@ -347,6 +378,14 @@ async function deleteAlbumFromCollection(albumId) {
         >
       </template>
     </a-modal>
+    <ConfirmModal
+      v-model:visible="isShowConfirmDeleteCollection"
+      title="Delete Collection?"
+      :message="deleteCollectionMessage"
+      :is-loading="isDeleteingCollection"
+      @cancel="isShowConfirmDeleteCollection = false"
+      @confirm="onConfirmDeleteCollection"
+    ></ConfirmModal>
   </a-spin>
 </template>
 
@@ -357,5 +396,15 @@ async function deleteAlbumFromCollection(albumId) {
 
 .w-50 {
   width: 50px;
+}
+
+.more-options {
+  font-size: 28px;
+  color: gray;
+}
+
+.more-options:hover {
+  color: black;
+  cursor: pointer;
 }
 </style>

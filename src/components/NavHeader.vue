@@ -36,24 +36,15 @@
       </a-button>
     </div>
     <div v-else class="d-flex h-flex justify-flex-end">
-      <a-button type="link" @click="() => goTo(routeNames.MY_COLLECTION)"
-        ><CollectionIcon
-          type="icon-music_albums_fill"
-          :style="{ fontSize: '24px' }"
-      /></a-button>
+      <a-button type="link" @click="() => goTo(routeNames.MY_COLLECTION)" class="my-library-btn"
+        >
+      My Library
+    </a-button>
       <div class="demo-dropdown-wrap">
         <a-dropdown-button @click="goToMyProfile">
           {{ username }}
           <template #overlay>
             <a-menu @click="handleMenuClick">
-              <!-- <a-menu-item key="1">
-                <UserOutlined />
-                1st menu item
-              </a-menu-item>
-              <a-menu-item key="2">
-                <UserOutlined />
-                2nd menu item
-              </a-menu-item> -->
               <a-menu-item key="3" @click="signout">
                 <UserOutlined />
                 SignOut
@@ -69,16 +60,12 @@
   </div>
 </template>
 <script setup>
-import { UserOutlined, createFromIconfontCN } from "@ant-design/icons-vue";
+import { UserOutlined} from "@ant-design/icons-vue";
 import { ref } from "vue";
 import { localStorageKeys } from "../common/local-storage-keys";
 import router from "../router";
 import { routeNames } from "../router/route-names";
 import { service } from "../services";
-
-const CollectionIcon = createFromIconfontCN({
-  scriptUrl: "//at.alicdn.com/t/c/font_4014814_08ddunxy7bas.js"
-});
 
 const activeKey = ref(routeNames.HOME);
 activeKey.value = router.currentRoute.value.name;
@@ -143,5 +130,14 @@ watch: {
 .demo-dropdown-wrap :deep(.ant-dropdown-button) {
   margin-right: 8px;
   margin-bottom: 8px;
+}
+
+.my-library-btn {
+  margin-right: 5px;
+}
+.my-library-btn:hover {
+  color: #1890ff;
+  color: white;
+  background-color: #1890ff;
 }
 </style>
