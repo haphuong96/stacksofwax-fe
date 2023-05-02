@@ -6,7 +6,7 @@ This template should help get you started developing with Vue 3 in Vite. The tem
 ### Require:
 - Nodejs version: >= v16.0.0
 ### Steps:
-- Step 1: run command "npm i" to install all dependence libraries
+- Step 1: run command "npm i" to install all dependencies
 - Step 2: run command "npm run dev". Application win run on port 3000.
 
 ## Recommended IDE Setup
