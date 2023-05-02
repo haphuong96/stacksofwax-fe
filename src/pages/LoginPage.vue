@@ -17,6 +17,7 @@ const isValid = computed(() => {
 });
 
 async function submitLogin() {
+  if (!isValid.value) return;
   try {
     isLoading.value = true;
     const res = await axios.post("http://localhost:4000/api/login", {
@@ -61,11 +62,11 @@ function goToSignUp() {
       autocomplete="off"
     >
       <a-form-item label="Username or email *" name="username">
-        <a-input v-model:value="username" />
+        <a-input v-model:value="username" @pressEnter="submitLogin" />
       </a-form-item>
 
       <a-form-item label="Password *" name="password">
-        <a-input-password v-model:value="password" />
+        <a-input-password v-model:value="password" @pressEnter="submitLogin" />
       </a-form-item>
 
       <a-form-item :wrapper-col="{ offset: 8, span: 8 }">

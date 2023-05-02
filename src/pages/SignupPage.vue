@@ -1,6 +1,5 @@
 <script setup>
 import { message } from "ant-design-vue";
-import axios from "axios";
 import { computed, ref } from "vue";
 import router from "../router";
 import { routeNames } from "../router/route-names";
@@ -32,6 +31,7 @@ const isValid = computed(() => {
 });
 
 async function submitSignup() {
+  if (!isValid.value) return;
   try {
     const res = await axiosIntance.post("http://localhost:4000/api/signup", {
       username: username.value,
@@ -39,13 +39,13 @@ async function submitSignup() {
       password: password.value
     });
     if (res) {
-      message.success("Signup successfully! You can login now.");
+      message?.success("Signup successfully! You can login now.");
       router.push({ name: routeNames.LOGIN });
     } else {
-      message.error("Something went wrong! please check and try again later!");
+      message?.error("Something went wrong! please check and try again later!");
     }
   } catch (error) {
-    message.error(error.response.data.message);
+    message?.error(error.response.data.message);
   } finally {
     isLoading.value = false;
   }
@@ -65,19 +65,22 @@ function goToLogin() {
     autocomplete="off"
   >
     <a-form-item label="Username *" name="username">
-      <a-input v-model:value="username" />
+      <a-input v-model:value="username" @pressEnter="submitSignup" />
     </a-form-item>
 
     <a-form-item label="Email *" name="email">
-      <a-input v-model:value="email" />
+      <a-input v-model:value="email" @pressEnter="submitSignup" />
     </a-form-item>
 
     <a-form-item label="Password *" name="password">
-      <a-input-password v-model:value="password" />
+      <a-input-password v-model:value="password" @pressEnter="submitSignup" />
     </a-form-item>
 
     <a-form-item label="Confirm Password *" name="password">
-      <a-input-password v-model:value="confirmPassword" />
+      <a-input-password
+        v-model:value="confirmPassword"
+        @pressEnter="submitSignup"
+      />
       <div v-if="isInvalidConfirmPassword" class="error-label mt-8">
         Mismatch password and confirmation password. Please try again.
       </div>
