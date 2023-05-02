@@ -257,7 +257,7 @@ async function showAddToCollectionModal() {
             <div class="d-flex justify-between">
               <div>Album</div>
               <div class="mr-16">
-                <a-rate v-model:value="userRating" @change="onRate" />
+                <a-rate v-model:value="userRating" @change="onRate" :allowClear="false" />
                 <CloseCircleFilled
                   class="ml-8 unrate-button"
                   @click="unrateAlbum"
