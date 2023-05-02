@@ -34,8 +34,7 @@ async function fetchArtistDetails() {
   <a-row class="m-16 p-16">
     <a-col :span="24">
       <a-row v-if="artistData">
-        <a-col :span="4">
-          <!-- <CircleImage :size="200" :src="artistData.img_path"/> -->
+        <a-col :span="4" class="d-flex align-center pr-16">
           <CircleImage
             :size="200"
             :failed-image="fallbackImage"

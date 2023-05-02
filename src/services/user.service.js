@@ -19,7 +19,7 @@ async function fetchUserInfo(userId, page = 1, pageSize = 10) {
 
 async function getMyProfile() {
   try {
-    const rs = await axiosIntance.get(`/get-me`);
+    const rs = await axiosIntance.get(`/me`);
     return rs?.data;
   } catch (error) {
     return undefined;
@@ -28,6 +28,7 @@ async function getMyProfile() {
 
 async function signout() {
   localStorage.clear();
+  window.location.reload();
 }
 
 async function updateUserProfilePicture(profilePictureUrl) {

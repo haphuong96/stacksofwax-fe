@@ -39,7 +39,7 @@ const handleRequestError = async (error) => {
     const isExpiredToken = !!localStorage.getItem(
       localStorageKeys.ACCESS_TOKEN
     );
-    userService.signout();
+    localStorage.clear();
     if (isExpiredToken) {
       emitter.emit(emitterEvents.EXPIRED_TOKEN);
       // setTimeout(() => {

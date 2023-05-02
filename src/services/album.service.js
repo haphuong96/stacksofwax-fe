@@ -141,7 +141,6 @@ const getCommentAlbum = async (albumId, page, pageSize) => {
 };
 
 const rateAlbum = async (albumId, rating) => {
-  if (!localStorage.getItem(localStorageKeys.ACCESS_TOKEN)) return false;
   try {
     await axiosIntance.post(`albums/${albumId}/rating`, { rating });
     return true;
@@ -161,7 +160,6 @@ const getUserRatingAlbum = async (albumId) => {
 };
 
 const unrateAlbum = async (albumId) => {
-  if (!localStorage.getItem(localStorageKeys.ACCESS_TOKEN)) return false;
   try {
     const rs = await axiosIntance.delete(`albums/${albumId}/rating`);
     return true;

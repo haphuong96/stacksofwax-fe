@@ -159,12 +159,6 @@ const listRecordLabels = computed(() => {
 });
 
 async function onRate() {
-  if (!localStorage.getItem(localStorageKeys.ACCESS_TOKEN)) {
-    message.error(
-      "This action requires login. Please log in before rating this album."
-    );
-    return;
-  }
   try {
     const isSuccess = await service.albumService.rateAlbum(
       albumId,
@@ -174,7 +168,10 @@ async function onRate() {
       isRated.value = true;
       await fetchAlbumDetail();
       message.success("Rate album successfully!");
-    } else message.error("Rate album failed!");
+    } else {
+      userRating.value = 0;
+      message.error("Rate album failed!");
+    }
   } catch (error) {
     message.error("Rate album failed!");
   }
@@ -188,7 +185,9 @@ async function unrateAlbum() {
       await fetchAlbumDetail();
       message.success("Unrate album successfully!");
       userRating.value = 0;
-    } else message.error("Unrate album failed!");
+    } else {
+      message.error("Unrate album failed!");
+    }
   } catch (error) {
     message.error("Unrate album failed!");
   }
@@ -217,8 +216,10 @@ async function fetchMyCollections(page, pageSize) {
     );
     myCollections.value = collections;
     totalMyCollections.value = total;
+    return true;
   } catch (error) {
     message.error = "Error loading my collections";
+    return false;
   }
 }
 
@@ -241,9 +242,11 @@ async function addToMyNewCollection() {
   }
 }
 
-function showAddToCollectionModal() {
-  AddToCollectionVisible.value = true;
-  fetchMyCollections();
+async function showAddToCollectionModal() {
+  const fetchSuccess = await fetchMyCollections();
+  if (fetchSuccess) {
+    AddToCollectionVisible.value = true;
+  }
 }
 </script>
 
@@ -252,12 +255,10 @@ function showAddToCollectionModal() {
     <a-row class="p-32" v-if="albumDetails">
       <a-col :span="16">
         <a-row>
-          <a-col :span="6">
+          <a-col :span="6" class="d-flex align-center pr-16">
             <a-image
               :src="albumDetails.img_path"
-              :width="200"
-              :height="200"
-              class="album-img"
+              :style = "{'max-width': '200px'}"
             />
           </a-col>
           <a-col :span="18" class="mt-16 album-details">
@@ -337,11 +338,20 @@ function showAddToCollectionModal() {
             <template #renderItem="{ item }">
               <a-list-item>
                 <a-comment
-                  :author="item.username"
-                  :avatar="item.user_avatar || userFallbackAvatar"
                   :content="item.comment"
                   :datetime="item.created_datetime"
-                />
+                >
+                  <template #author>
+                    <a @click="navigationService.goToUserDetail(item.user_id)">
+                      {{ item.username }}</a
+                    >
+                  </template>
+                  <template #avatar>
+                    <a @click="navigationService.goToUserDetail(item.user_id)">
+                      <a-avatar :src="item.user_avatar || userFallbackAvatar" />
+                    </a>
+                  </template>
+                </a-comment>
               </a-list-item>
             </template>
             <template #footer>
@@ -486,12 +496,6 @@ function showAddToCollectionModal() {
   padding: 5px 0px;
   padding-top: 0px;
   border-bottom: none;
-}
-
-.album-img {
-  width: 200px;
-  height: 200px;
-  object-fit: cover;
 }
 
 .unrate-button {

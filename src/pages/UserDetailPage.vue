@@ -19,7 +19,7 @@
           </div>
         </a-col>
       </a-row>
-      <a-row class="user-collection-container">
+      <a-row>
         <a-col :span="24">
           <a-tabs
             class="user-collection-container"
@@ -180,10 +180,6 @@ function formatFromNow(date) {
 .user-detail__lbl-detail {
   font-size: 14px;
   color: black;
-}
-
-.user-collection-container {
-  height: calc(100vh - 140px);
 }
 
 .public-collection-label {

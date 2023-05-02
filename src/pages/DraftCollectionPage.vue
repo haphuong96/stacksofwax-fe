@@ -181,9 +181,9 @@ const onConfirmDeleteCollection = async () => {
     <a-row class="p-32">
       <a-col :span="24">
         <a-row v-if="collectionData">
-          <a-col :span="4">
+          <a-col :span="4" class="d-flex align-center pr-16">
             <a-image
-              :width="200"
+              :style="{'max-width': '200px'}"
               :src="collectionData.img_path || fallbackCollectionImg"
             />
           </a-col>

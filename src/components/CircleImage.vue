@@ -2,16 +2,16 @@
   <div
     class="circle-image"
     :style="{
-      width: size + 'px',
-      height: size + 'px',
+      'max-width': size + 'px',
+      aspectRatio: 1 / 1,
       borderRadius: size / 2 + 'px',
       border: bordered ? '4px solid lightgray' : ''
     }"
   >
     <a-image
       :style="{
-        width: size + 'px',
-        height: size + 'px'
+        'max-width': size + 'px',
+        aspectRatio: 1 / 1
       }"
       :src="src"
       :fallback="failedImage"

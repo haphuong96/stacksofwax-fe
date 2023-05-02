@@ -54,30 +54,33 @@ onMounted(async () => {
   router.replace({
     name: routeNames.COLLECTION_DETAILS,
     params: {
-      id: `${collectionId}-${collectionData.value.collection_name?.replaceAll(" ", "-")}`
+      id: `${collectionId}-${collectionData.value.collection_name?.replaceAll(
+        " ",
+        "-"
+      )}`
     }
   });
 });
 
 async function postComment() {
   if (!draftComment.value) {
-      return;
-    }
+    return;
+  }
 
-    submitting.value = true;
-    try {
-      await collectionService.addCollectionComment(
-        collectionId,
-        draftComment.value
-      );
+  submitting.value = true;
+  try {
+    await collectionService.addCollectionComment(
+      collectionId,
+      draftComment.value
+    );
 
-      fetchCollectionComments();
+    fetchCollectionComments();
 
-      draftComment.value = "";
-    } catch (error) {
-    } finally {
-      submitting.value = false;
-    }
+    draftComment.value = "";
+  } catch (error) {
+  } finally {
+    submitting.value = false;
+  }
 }
 
 async function fetchCollectionComments(page, pageSize) {
@@ -126,11 +129,12 @@ async function fetchCollectionAlbumById(page, pageSize) {
 
 async function toggleLikeCollection() {
   if (isLiked.value) {
-      await collectionService.unlikeCollection(collectionId);
-    } else {
-      await collectionService.likeCollection(collectionId);
-    }
-    checkUserLikedCollection();
+    await collectionService.unlikeCollection(collectionId);
+  } else {
+    await collectionService.likeCollection(collectionId);
+  }
+  checkUserLikedCollection();
+  fetchCollectionDetailById();
 }
 </script>
 
@@ -138,10 +142,10 @@ async function toggleLikeCollection() {
   <a-row class="p-32">
     <a-col :span="24">
       <a-row v-if="collectionData">
-        <a-col :span="4">
+        <a-col :span="4" class="d-flex align-center pr-16">
           <a-image
-            :width="200"
             :src="collectionData.img_path || fallbackCollectionImg"
+            :style="{'max-width': '200px'}"
           />
         </a-col>
         <a-col :span="16" class="mt-16">
@@ -278,11 +282,20 @@ async function toggleLikeCollection() {
             <template #renderItem="{ item }">
               <a-list-item>
                 <a-comment
-                  :author="item.username"
-                  :avatar="item.user_avatar || userFallbackAvatar"
                   :content="item.comment"
                   :datetime="dayjs(item.created_datetime).fromNow()"
-                />
+                >
+                  <template #author>
+                    <a @click="navigationService.goToUserDetail(item.user_id)">
+                      {{ item.username }}</a
+                    >
+                  </template>
+                  <template #avatar>
+                    <a @click="navigationService.goToUserDetail(item.user_id)">
+                      <a-avatar :src="item.user_avatar || userFallbackAvatar" />
+                    </a>
+                  </template>
+                </a-comment>
               </a-list-item>
             </template>
             <template #footer>

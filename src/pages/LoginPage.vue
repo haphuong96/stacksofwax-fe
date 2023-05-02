@@ -29,7 +29,7 @@ async function submitLogin() {
       localStorage.setItem(localStorageKeys.ACCESS_TOKEN, accessToken);
 
       // get user info and store in local storage
-      const me = await axiosIntance.get("get-me");
+      const me = await axiosIntance.get("me");
       localStorage.setItem(localStorageKeys.USER_ID, me.data.user_id);
       localStorage.setItem(localStorageKeys.USERNAME, me.data.username);
       localStorage.setItem(localStorageKeys.USER_AVATAR, me.data.img_path);
@@ -40,8 +40,7 @@ async function submitLogin() {
       message.error("Something went wrong! please check and try again later!");
     }
   } catch (error) {
-    console.log(error);
-    message.error("Something went wrong! please check and try again later!");
+    message.error(error.response.data.message || error.message);
   } finally {
     isLoading.value = false;
   }

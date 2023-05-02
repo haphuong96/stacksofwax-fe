@@ -4,6 +4,7 @@ import axios from "axios";
 import { computed, ref } from "vue";
 import router from "../router";
 import { routeNames } from "../router/route-names";
+import { axiosIntance } from "../services/base.service";
 
 // reactive state
 const username = ref();
@@ -32,7 +33,7 @@ const isValid = computed(() => {
 
 async function submitSignup() {
   try {
-    const res = await axios.post("http://localhost:4000/api/signup", {
+    const res = await axiosIntance.post("http://localhost:4000/api/signup", {
       username: username.value,
       email_address: email.value,
       password: password.value
@@ -44,7 +45,7 @@ async function submitSignup() {
       message.error("Something went wrong! please check and try again later!");
     }
   } catch (error) {
-    message.error("Something went wrong! please check and try again later!");
+    message.error(error.response.data.message);
   } finally {
     isLoading.value = false;
   }

@@ -83,6 +83,22 @@
     padding-left: 32px;
 }
 
+.pl-48 {
+    padding-left: 48px;
+}
+
+.pr-48 {
+    padding-right: 48px;
+}
+
+.pr-32 {
+    padding-right: 32px;
+}
+
+.pr-16 {
+    padding-right: 16px;
+}
+
 /* padding */
 .p-32 {
     padding: 32px;
