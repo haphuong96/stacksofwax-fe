@@ -58,7 +58,6 @@ async function fetchCollections(page, pageSize) {
 
     collections.value = data.collections;
     total.value = data.total;
-    console.log(total.value);
   } catch (error) {
     message.error("Cannot load collections");
   }

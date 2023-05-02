@@ -68,7 +68,6 @@ const getAlbums = async (filters, page, pageSize) => {
       albums
     };
   } catch (error) {
-    console.log(error)
     message.error("Error retrieving list of albums");
   }
 };
@@ -135,7 +134,6 @@ const getCommentAlbum = async (albumId, page, pageSize) => {
       comments
     };
   } catch (error) {
-    console.log(error);
     message.error("error loading comments");
   }
 };

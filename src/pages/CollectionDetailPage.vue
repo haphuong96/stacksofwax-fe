@@ -104,7 +104,6 @@ async function checkUserLikedCollection() {
     );
 
     isLiked.value = is_liked;
-    console.log(isLiked.value);
   } catch (error) {
     isLiked.value = false;
   }
@@ -173,7 +172,7 @@ async function toggleLikeCollection() {
             class="mt-16 mr-32 d-flex justify-center"
           >
             <LikeButton
-              @click="toggleLikeCollection"
+
               :like="isLiked"
             ></LikeButton>
             <span>Like</span><span v-if="isLiked">d</span>

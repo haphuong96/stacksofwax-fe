@@ -65,7 +65,6 @@ async function fetchAlbums(page, pageSize) {
     total.value = res.total;
     albums.value = res.albums;
   } catch (Error) {
-    console.log(Error);
     message.error("Error retrieving list of albums");
   }
 }

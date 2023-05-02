@@ -130,7 +130,6 @@ const addCollectionComment = async (collectionId, comment) => {
       comment: comment
     });
   } catch (error) {
-    console.log(error)
     message.error("Error posting comment");
   }
 };

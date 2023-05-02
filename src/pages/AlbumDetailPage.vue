@@ -46,7 +46,6 @@ async function fetchAlbumComments(page, pageSize) {
     });
     totalAlbumComments.value = data.total;
   } catch (error) {
-    console.log(error);
     message.error("error loading comments");
   }
 }
@@ -111,17 +110,10 @@ async function fetchAlbumDetail() {
     const data = await albumService.getAlbumDetail(albumId);
 
     albumDetails.value = data;
-    console.log(albumDetails.value);
-
-    // albumTracks.value = res.data.tracks;
-    // comments.value = data.comments.map((comment) => {
-    //   const commentTime = formatFromNow;
-    // });
 
     albumStats.value.set("AVG Rating", `${data.average_rating || 0} / 5`);
     albumStats.value.set("Total ratings", data.total_ratings || 0);
   } catch (error) {
-    console.log(error);
     message.error("Cannot load album detail");
   } finally {
     isLoading.value = false;

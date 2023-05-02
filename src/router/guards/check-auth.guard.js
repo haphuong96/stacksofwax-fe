@@ -12,7 +12,6 @@ export function checkAuthGuard(_to, _from, next) {
 
 export function requireLoginGuard(_to, _from, next) {
   const accessToken = localStorage.getItem(localStorageKeys.ACCESS_TOKEN);
-  console.log(accessToken)
   if (!accessToken) {
     next({ name: routeNames.LOGIN });
   } else {
