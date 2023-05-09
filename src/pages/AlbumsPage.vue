@@ -85,9 +85,9 @@ const listArtists = computed(() => {
   return albumDetails.value?.artists
     .map((artist) => {
       const artistDetailUrl = `${import.meta.env.VITE_BASE_URL}/artists/${
-        artist.artist_id
+        artist.artistId
       }`;
-      return `<a href="${artistDetailUrl}">${artist.artist_name}</a>`;
+      return `<a href="${artistDetailUrl}">${artist.artistName}</a>`;
     })
     .join(", ");
 });
@@ -148,10 +148,10 @@ const listArtists = computed(() => {
                     <a
                       @click="
                         navigationService.goToArtistDetailPage(
-                          item.artists[0].artist_id
+                          item.artists[0].artistId
                         )
                       "
-                      >{{ item.artists[0].artist_name }}</a
+                      >{{ item.artists[0].artistName }}</a
                     >
                   </span>
                   <span
@@ -162,15 +162,15 @@ const listArtists = computed(() => {
                     <a
                       @click="
                         navigationService.goToArtistDetailPage(
-                          item.artists[n].artist_id
+                          item.artists[n].artistId
                         )
                       "
-                      >{{ item.artists[n].artist_name }}</a
+                      >{{ item.artists[n].artistName }}</a
                     >
                   </span>
                   •
                   <span>
-                    {{ item.release_year }}
+                    {{ item.releaseYear }}
                   </span>
                 </template>
                 <template #title>
@@ -178,9 +178,9 @@ const listArtists = computed(() => {
                     type="link"
                     @click="
                       (event) =>
-                        navigationService.goToAlbumDetailPage(item.album_id)
+                        navigationService.goToAlbumDetailPage(item.albumId)
                     "
-                    >{{ item.album_title }}</a
+                    >{{ item.albumTitle }}</a
                   >
                 </template>
                 <template #avatar>
@@ -188,9 +188,9 @@ const listArtists = computed(() => {
                     type="link"
                     @click="
                       (event) =>
-                        navigationService.goToAlbumDetailPage(item.album_id)
+                        navigationService.goToAlbumDetailPage(item.albumId)
                     "
-                    ><img :src="item.img_path" class="w-50"
+                    ><img :src="item.imgPath" class="w-50"
                   /></a>
                 </template>
               </a-list-item-meta>

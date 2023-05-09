@@ -32,13 +32,13 @@ const isLiked = ref(false);
 
 const showAllDescription = ref(false);
 const displayDescription = computed(() => {
-  if (!collectionData.value?.collection_desc) return "";
+  if (!collectionData.value?.collectionDesc) return "";
   if (
     showAllDescription.value ||
-    collectionData.value?.collection_desc.length <= 250
+    collectionData.value?.collectionDesc.length <= 250
   )
-    return collectionData.value?.collection_desc;
-  return `${collectionData.value?.collection_desc.slice(0, 250)} ${
+    return collectionData.value?.collectionDesc;
+  return `${collectionData.value?.collectionDesc.slice(0, 250)} ${
     showAllDescription.value ? "" : "..."
   }`;
 });
@@ -54,7 +54,7 @@ onMounted(async () => {
   router.replace({
     name: routeNames.COLLECTION_DETAILS,
     params: {
-      id: `${collectionId}-${collectionData.value.collection_name?.replaceAll(
+      id: `${collectionId}-${collectionData.value.collectionName?.replaceAll(
         " ",
         "-"
       )}`
@@ -99,11 +99,11 @@ async function fetchCollectionComments(page, pageSize) {
 
 async function checkUserLikedCollection() {
   try {
-    const { is_liked } = await collectionService.checkUserLikedCollection(
+    const { isLiked } = await collectionService.checkUserLikedCollection(
       collectionId
     );
 
-    isLiked.value = is_liked;
+    isLiked.value = isLiked;
   } catch (error) {
     isLiked.value = false;
   }
@@ -143,23 +143,23 @@ async function toggleLikeCollection() {
       <a-row v-if="collectionData">
         <a-col :span="4" class="d-flex align-center pr-16">
           <a-image
-            :src="collectionData.img_path || fallbackCollectionImg"
+            :src="collectionData.imgPath || fallbackCollectionImg"
             :style="{'max-width': '200px'}"
           />
         </a-col>
         <a-col :span="16" class="mt-16">
           <div>Collection</div>
-          <h1>{{ collectionData.collection_name }}</h1>
+          <h1>{{ collectionData.collectionName }}</h1>
           <div>
             By
-            <a @click="navigationService.goToUserDetail(collectionData.user_id)"
+            <a @click="navigationService.goToUserDetail(collectionData.userId)"
               >{{ collectionData.username }}
             </a>
           </div>
           <h2 class="mt-32">
-            <div v-if="collectionData.total_like">
-              {{ collectionData.total_like.toLocaleString("en-US") }} like<span
-                v-if="collectionData.total_like > 1"
+            <div v-if="collectionData.totalLike">
+              {{ collectionData.totalLike.toLocaleString("en-US") }} like<span
+                v-if="collectionData.totalLike > 1"
                 >s</span
               >
             </div>
@@ -185,7 +185,7 @@ async function toggleLikeCollection() {
             {{ displayDescription }}
             <a
               @click="showAllDescription = !showAllDescription"
-              v-if="(collectionData?.collection_desc || '').length > 250"
+              v-if="(collectionData?.collectionDesc || '').length > 250"
               >{{ showAllDescription ? "Show less" : "Show more" }}</a
             >
           </div>
@@ -201,26 +201,26 @@ async function toggleLikeCollection() {
                   <template #title>
                     <a
                       @click="
-                        navigationService.goToAlbumDetailPage(item.album_id)
+                        navigationService.goToAlbumDetailPage(item.albumId)
                       "
-                      >{{ item.album_title }}</a
+                      >{{ item.albumTitle }}</a
                     >
                   </template>
                   <template #avatar>
                     <a
                       @click="
-                        navigationService.goToAlbumDetailPage(item.album_id)
+                        navigationService.goToAlbumDetailPage(item.albumId)
                       "
-                      ><img :src="item.img_path" class="w-50"
+                      ><img :src="item.imgPath" class="w-50"
                     /></a>
                   </template>
                   <template #description>
                     {{
                       item.artists
-                        .map((artist) => artist.artist_name)
+                        .map((artist) => artist.artistName)
                         .join(", ")
                     }}
-                    • {{ item.release_year }}
+                    • {{ item.releaseYear }}
                   </template>
                 </a-list-item-meta>
               </a-list-item>
@@ -282,16 +282,16 @@ async function toggleLikeCollection() {
               <a-list-item>
                 <a-comment
                   :content="item.comment"
-                  :datetime="dayjs(item.created_datetime).fromNow()"
+                  :datetime="dayjs(item.createdDatetime).fromNow()"
                 >
                   <template #author>
-                    <a @click="navigationService.goToUserDetail(item.user_id)">
+                    <a @click="navigationService.goToUserDetail(item.userId)">
                       {{ item.username }}</a
                     >
                   </template>
                   <template #avatar>
-                    <a @click="navigationService.goToUserDetail(item.user_id)">
-                      <a-avatar :src="item.user_avatar || userFallbackAvatar" />
+                    <a @click="navigationService.goToUserDetail(item.userId)">
+                      <a-avatar :src="item.userAvatar || userFallbackAvatar" />
                     </a>
                   </template>
                 </a-comment>

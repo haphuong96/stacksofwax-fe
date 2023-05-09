@@ -98,9 +98,9 @@ async function onTabChanged(tabIndex) {
                     type="link"
                     @click="
                       (event) =>
-                        navigationService.goToArtistDetailPage(item.artist_id)
+                        navigationService.goToArtistDetailPage(item.artistId)
                     "
-                    >{{ item.artist_name }}</a
+                    >{{ item.artistName }}</a
                   >
                 </template>
                 <template #avatar>
@@ -108,10 +108,10 @@ async function onTabChanged(tabIndex) {
                     type="link"
                     @click="
                       (event) =>
-                        navigationService.goToArtistDetailPage(item.artist_id)
+                        navigationService.goToArtistDetailPage(item.artistId)
                     "
                     ><a-avatar
-                      :src="item.img_path"
+                      :src="item.imgPath"
                       :style="{ width: '50px', height: '50px' }"
                     ></a-avatar
                   ></a>

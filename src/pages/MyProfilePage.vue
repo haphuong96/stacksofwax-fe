@@ -104,12 +104,12 @@ onMounted(async () => {
   isLoading.value = false;
   if (userInfo) {
     name.value = userInfo.username;
-    profileImage.value = userInfo.img_path;
+    profileImage.value = userInfo.imgPath;
     createdAt.value = format(
-      new Date(userInfo.created_datetime),
+      new Date(userInfo.createdDatetime),
       "MMM dd yyyy"
     );
-    lastActiveTime.value = formatFromNow(userInfo.last_active);
+    lastActiveTime.value = formatFromNow(userInfo.lastActive);
   } else {
     router.go(-1);
     message.error("Cannot get user info");

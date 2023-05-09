@@ -39,10 +39,10 @@ async function fetchAlbumComments(page, pageSize) {
     const data = await albumService.getCommentAlbum(albumId, page, pageSize);
 
     comments.value = data.comments.map((comment) => {
-      const commentTime = comment?.created_datetime
-        ? formatFromNow(comment?.created_datetime)
+      const commentTime = comment?.createdDatetime
+        ? formatFromNow(comment?.createdDatetime)
         : "";
-      return { ...comment, created_datetime: commentTime };
+      return { ...comment, createdDatetime: commentTime };
     });
     totalAlbumComments.value = data.total;
   } catch (error) {
@@ -79,7 +79,7 @@ onMounted(async () => {
   router.replace({
     name: routeNames.ALBUM_DETAILS,
     params: {
-      id: `${albumId}-${albumDetails.value.album_title?.replaceAll(" ", "-")}`
+      id: `${albumId}-${albumDetails.value.albumTitle?.replaceAll(" ", "-")}`
     }
   });
 });
@@ -111,8 +111,8 @@ async function fetchAlbumDetail() {
 
     albumDetails.value = data;
 
-    albumStats.value.set("AVG Rating", `${data.average_rating || 0} / 5`);
-    albumStats.value.set("Total ratings", data.total_ratings || 0);
+    albumStats.value.set("AVG Rating", `${data.averageRating || 0} / 5`);
+    albumStats.value.set("Total ratings", data.totalRatings || 0);
   } catch (error) {
     message.error("Cannot load album detail");
   } finally {
@@ -124,7 +124,7 @@ const listGenres = computed(() => {
   if (!albumDetails.value?.genres?.length) return "";
   return albumDetails.value?.genres
     .map((genre) => {
-      return `${genre.genre_name}`;
+      return `${genre.genreName}`;
     })
     .join(", ");
 });
@@ -134,18 +134,18 @@ const listArtists = computed(() => {
   return albumDetails.value?.artists
     .map((artist) => {
       const artistDetailUrl = `${import.meta.env.VITE_BASE_URL}/artists/${
-        artist.artist_id
+        artist.artistId
       }`;
-      return `<a href="${artistDetailUrl}">${artist.artist_name}</a>`;
+      return `<a href="${artistDetailUrl}">${artist.artistName}</a>`;
     })
     .join(", ");
 });
 
 const listRecordLabels = computed(() => {
-  if (!albumDetails.value?.record_labels?.length) return "";
-  return albumDetails.value?.record_labels
+  if (!albumDetails.value?.recordLabels?.length) return "";
+  return albumDetails.value?.recordLabels
     .map((recordLabel) => {
-      return `${recordLabel.company_name}`;
+      return `${recordLabel.companyName}`;
     })
     .join(", ");
 });
@@ -228,7 +228,7 @@ async function addToMyCollection(collectionId) {
 async function addToMyNewCollection() {
   try {
     const data = await collectionService.createCollection();
-    await addToMyCollection(data.collection_id);
+    await addToMyCollection(data.collectionId);
   } catch (error) {
     message.error("Error adding to my new collection");
   }
@@ -249,7 +249,7 @@ async function showAddToCollectionModal() {
         <a-row>
           <a-col :span="6" class="d-flex align-center pr-16">
             <a-image
-              :src="albumDetails.img_path"
+              :src="albumDetails.imgPath"
               :style = "{'max-width': '200px'}"
             />
           </a-col>
@@ -266,7 +266,7 @@ async function showAddToCollectionModal() {
               </div>
             </div>
             <h1>
-              {{ albumDetails.album_title }}
+              {{ albumDetails.albumTitle }}
             </h1>
 
             <a-descriptions :column="1">
@@ -280,7 +280,7 @@ async function showAddToCollectionModal() {
                 <div v-html="listGenres"></div>
               </a-descriptions-item>
               <a-descriptions-item label="Release Year">
-                {{ albumDetails.release_year }}
+                {{ albumDetails.releaseYear }}
               </a-descriptions-item>
             </a-descriptions>
           </a-col>
@@ -289,7 +289,7 @@ async function showAddToCollectionModal() {
           <h1 class="my-16">Tracklist</h1>
           <a-list size="small" bordered :data-source="albumDetails.tracks">
             <template #renderItem="{ item }">
-              <a-list-item>{{ item.track_title }}</a-list-item>
+              <a-list-item>{{ item.trackTitle }}</a-list-item>
             </template>
           </a-list>
         </a-row>
@@ -331,16 +331,16 @@ async function showAddToCollectionModal() {
               <a-list-item>
                 <a-comment
                   :content="item.comment"
-                  :datetime="item.created_datetime"
+                  :datetime="item.createdDatetime"
                 >
                   <template #author>
-                    <a @click="navigationService.goToUserDetail(item.user_id)">
+                    <a @click="navigationService.goToUserDetail(item.userId)">
                       {{ item.username }}</a
                     >
                   </template>
                   <template #avatar>
-                    <a @click="navigationService.goToUserDetail(item.user_id)">
-                      <a-avatar :src="item.user_avatar || userFallbackAvatar" />
+                    <a @click="navigationService.goToUserDetail(item.userId)">
+                      <a-avatar :src="item.userAvatar || userFallbackAvatar" />
                     </a>
                   </template>
                 </a-comment>
@@ -406,8 +406,8 @@ async function showAddToCollectionModal() {
             >
               <template #renderItem="{ item }">
                 <a-list-item
-                  ><a @click="addToMyCollection(item.collection_id)">
-                    {{ item.collection_name }}</a
+                  ><a @click="addToMyCollection(item.collectionId)">
+                    {{ item.collectionName }}</a
                   >
                 </a-list-item>
               </template>
@@ -437,17 +437,17 @@ async function showAddToCollectionModal() {
                   ><a
                     @click="
                       navigationService.goToPublicCollectionDetail(
-                        item.collection_id
+                        item.collectionId
                       )
                     "
-                    >{{ item.collection_name }}</a
+                    >{{ item.collectionName }}</a
                   ></span
                 >
 
                 <span class="collection-created-by">
                   by
                   <a
-                    @click="navigationService.goToUserDetail(item.created_by)"
+                    @click="navigationService.goToUserDetail(item.createdBy)"
                     >{{ item.username }}</a
                   ></span
                 >

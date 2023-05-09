@@ -17,15 +17,15 @@ const current = ref(1);
 const searchQuery = ref();
 const searchKeyword = ref();
 
-const sortValue = ref("-created_datetime");
+const sortValue = ref("-createdDatetime");
 const sortOptions = ref([
   {
     label: "Newest",
-    value: "-created_datetime"
+    value: "-createdDatetime"
   },
   {
     label: "Oldest",
-    value: "created_datetime"
+    value: "createdDatetime"
   },
   {
     label: "Most Popular",
@@ -75,27 +75,27 @@ async function fetchCollections(page, pageSize) {
               v-for="item of favCollections"
               class="fav-collection-item-container"
               @click="
-                navigationService.goToPublicCollectionDetail(item.collection_id)
+                navigationService.goToPublicCollectionDetail(item.collectionId)
               "
             >
               <div class="fav-collection-item-content">
                 <div class="mb-16">
                   <a-image
-                    :src="item.img_path || ''"
+                    :src="item.imgPath || ''"
                     :fallback="fallbackCollectionIcon"
                     :preview="false"
                   />
                 </div>
                 <div class="fav-collection-item-name">
-                  {{ item.collection_name }}
+                  {{ item.collectionName }}
                 </div>
                 <div class="fav-collection-item-created">
                   By <b>{{ item.username }}</b>
                 </div>
                 <div class="fav-collection-item-like-container">
                   <HeartFilled class="fav-collection-item-heart" />{{
-                    item.likes_count +
-                    (item.likes_count > 1 ? " likes" : " like")
+                    item.likesCount +
+                    (item.likesCount > 1 ? " likes" : " like")
                   }}
                 </div>
               </div>
@@ -136,14 +136,14 @@ async function fetchCollections(page, pageSize) {
                       >By
                       <a
                         @click="
-                          navigationService.goToUserDetail(item.created_by)
+                          navigationService.goToUserDetail(item.createdBy)
                         "
                       >
                         {{ item.username }}</a
                       ></span
                     >
-                    <span v-if="item.collection_desc">
-                      • {{ item.collection_desc }}</span
+                    <span v-if="item.collectionDesc">
+                      • {{ item.collectionDesc }}</span
                     >
                   </template>
                   <template #title>
@@ -151,15 +151,15 @@ async function fetchCollections(page, pageSize) {
                       @click="
                         () =>
                           navigationService.goToPublicCollectionDetail(
-                            item.collection_id
+                            item.collectionId
                           )
                       "
-                      >{{ item.collection_name }}</a
+                      >{{ item.collectionName }}</a
                     >
                   </template>
                   <template #avatar>
                     <a-image
-                      :src="item.img_path || ''"
+                      :src="item.imgPath || ''"
                       :width="50"
                       :height="50"
                       class="w-50"
@@ -169,7 +169,7 @@ async function fetchCollections(page, pageSize) {
                   </template>
                 </a-list-item-meta>
                 <div class="ml-80">
-                  {{ dayjs(item.created_datetime).fromNow() }}
+                  {{ dayjs(item.createdDatetime).fromNow() }}
                 </div>
               </a-list-item>
             </template>

@@ -16,7 +16,7 @@ onMounted(async () => {
   router.replace({
     name: routeNames.ARTIST_DETAILS,
     params: {
-      id: `${artistId}-${artistData.value.artist_name?.replaceAll(" ", "-")}`
+      id: `${artistId}-${artistData.value.artistName?.replaceAll(" ", "-")}`
     }
   });
 });
@@ -38,13 +38,13 @@ async function fetchArtistDetails() {
           <CircleImage
             :size="200"
             :failed-image="fallbackImage"
-            :src="artistData.img_path"
+            :src="artistData.imgPath"
           ></CircleImage>
         </a-col>
         <a-col :span="20" class="mt-16">
           <div>Artist</div>
-          <h1>{{ artistData.artist_name }}</h1>
-          <div>{{ artistData.artist_description }}</div>
+          <h1>{{ artistData.artistName }}</h1>
+          <div>{{ artistData.artistDescription }}</div>
         </a-col>
       </a-row>
       <a-row v-if="albumsData">
@@ -57,22 +57,22 @@ async function fetchArtistDetails() {
                   <template #avatar>
                     <a
                       @click="
-                        navigationService.goToAlbumDetailPage(item.album_id)
+                        navigationService.goToAlbumDetailPage(item.albumId)
                       "
                     >
-                      <img :src="item.img_path" class="w-50"
+                      <img :src="item.imgPath" class="w-50"
                     /></a>
                   </template>
                   <template #title>
                     <a
                       @click="
-                        navigationService.goToAlbumDetailPage(item.album_id)
+                        navigationService.goToAlbumDetailPage(item.albumId)
                       "
-                      >{{ item.album_title }}
+                      >{{ item.albumTitle }}
                     </a>
                   </template>
                   <template #description>
-                    {{ item.release_year }}
+                    {{ item.releaseYear }}
                   </template>
                 </a-list-item-meta>
               </a-list-item>

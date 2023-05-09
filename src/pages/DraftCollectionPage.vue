@@ -67,7 +67,7 @@ onMounted(async () => {
     router.replace({
     name: routeNames.DRAFT_COLLECTION_DETAIL,
     params: {
-      id: `${collectionId}-${collectionData.value.collection_name?.replaceAll(" ", "-")}`
+      id: `${collectionId}-${collectionData.value.collectionName?.replaceAll(" ", "-")}`
     }
   });
   } catch (error) {
@@ -100,8 +100,8 @@ async function fetchCollectionDetailById() {
 
   collectionData.value = data;
 
-  editCollectionName.value = cloneDeep(data.collection_name);
-  editCollectionDesc.value = cloneDeep(data.collection_desc);
+  editCollectionName.value = cloneDeep(data.collectionName);
+  editCollectionDesc.value = cloneDeep(data.collectionDesc);
 }
 
 async function fetchCollectionAlbumById(page, pageSize) {
@@ -126,13 +126,13 @@ async function searchAlbum() {
 
 const showAllDescription = ref(false);
 const displayDescription = computed(() => {
-  if (!collectionData.value?.collection_desc) return "";
+  if (!collectionData.value?.collectionDesc) return "";
   if (
     showAllDescription.value ||
-    collectionData.value?.collection_desc.length <= 250
+    collectionData.value?.collectionDesc.length <= 250
   )
-    return collectionData.value?.collection_desc;
-  return `${collectionData.value?.collection_desc.slice(0, 250)} ${
+    return collectionData.value?.collectionDesc;
+  return `${collectionData.value?.collectionDesc.slice(0, 250)} ${
     showAllDescription.value ? "" : "..."
   }`;
 });
@@ -157,7 +157,7 @@ const deleteCollectionMessage = ref("");
 const isDeleteingCollection = ref(false);
 
 const showDeleteCollectionConfirm = () => {
-  deleteCollectionMessage.value = `Collection <b>${collectionData.value.collection_name}</b> will be deleted from your library.`;
+  deleteCollectionMessage.value = `Collection <b>${collectionData.value.collectionName}</b> will be deleted from your library.`;
   isShowConfirmDeleteCollection.value = true;
 };
 
@@ -184,7 +184,7 @@ const onConfirmDeleteCollection = async () => {
           <a-col :span="4" class="d-flex align-center pr-16">
             <a-image
               :style="{'max-width': '200px'}"
-              :src="collectionData.img_path || fallbackCollectionImg"
+              :src="collectionData.imgPath || fallbackCollectionImg"
             />
           </a-col>
           <a-col :span="20" class="mt-16">
@@ -195,7 +195,7 @@ const onConfirmDeleteCollection = async () => {
               /></a>
             </div>
             <h1>
-              {{ collectionData.collection_name }}
+              {{ collectionData.collectionName }}
             </h1>
             <div>By {{ collectionData.username }}</div>
             <div class="mt-32">
@@ -228,7 +228,7 @@ const onConfirmDeleteCollection = async () => {
               {{ displayDescription }}
               <a
                 @click="showAllDescription = !showAllDescription"
-                v-if="(collectionData?.collection_desc || '').length > 250"
+                v-if="(collectionData?.collectionDesc || '').length > 250"
                 >{{ showAllDescription ? "Show less" : "Show more" }}</a
               >
             </div>
@@ -252,32 +252,32 @@ const onConfirmDeleteCollection = async () => {
                     <template #title>
                       <a
                         @click="
-                          navigationService.goToAlbumDetailPage(item.album_id)
+                          navigationService.goToAlbumDetailPage(item.albumId)
                         "
                       >
-                        {{ item.album_title }}
+                        {{ item.albumTitle }}
                       </a>
                     </template>
                     <template #avatar>
                       <a
                         @click="
-                          navigationService.goToAlbumDetailPage(item.album_id)
+                          navigationService.goToAlbumDetailPage(item.albumId)
                         "
                       >
-                        <img :src="item.img_path" class="w-50"
+                        <img :src="item.imgPath" class="w-50"
                       /></a>
                     </template>
                     <template #description>
                       {{
                         item.artists
-                          .map((artist) => artist.artist_name)
+                          .map((artist) => artist.artistName)
                           .join(", ")
                       }}
-                      • {{ item.release_year }}
+                      • {{ item.releaseYear }}
                     </template> </a-list-item-meta
                   ><a
                     type="link"
-                    @click="deleteAlbumFromCollection(item.album_id)"
+                    @click="deleteAlbumFromCollection(item.albumId)"
                     v-if="isSearchAlbumMode"
                     >Remove</a
                   >
@@ -330,21 +330,21 @@ const onConfirmDeleteCollection = async () => {
                   <a-list-item>
                     <a-list-item-meta>
                       <template #title>
-                        {{ item.album_title }}
+                        {{ item.albumTitle }}
                       </template>
                       <template #avatar>
-                        <img :src="item.img_path" class="w-50" />
+                        <img :src="item.imgPath" class="w-50" />
                       </template>
                       <template #description>
                         {{
                           item.artists
-                            .map((artist) => artist.artist_name)
+                            .map((artist) => artist.artistName)
                             .join(", ")
                         }}
-                        • {{ item.release_year }}
+                        • {{ item.releaseYear }}
                       </template> </a-list-item-meta
                     ><a-button
-                      @click="() => addAlbumToCollection(item.album_id)"
+                      @click="() => addAlbumToCollection(item.albumId)"
                       v-if="isSearchAlbumMode"
                       >Add</a-button
                     >

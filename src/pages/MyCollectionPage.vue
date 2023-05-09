@@ -64,7 +64,7 @@ onMounted(async () => {
 });
 
 async function postCollection() {
-  const { collection_id: collectionId, ...details } =
+  const { collectionId: collectionId, ...details } =
     await collectionService.createCollection();
   navigationService.goToDraftCollections(collectionId);
 }
@@ -164,8 +164,8 @@ const onConfirmDeleteCollection = async () => {
                     <a-list-item-meta>
                       <template #avatar>
                         <a @click="navigationService.goToDraftCollections(
-                                item.collection_id
-                              )"><img :src="item.img_path || fallbackCollectionImg" class="w-50"></a>
+                                item.collectionId
+                              )"><img :src="item.imgPath || fallbackCollectionImg" class="w-50"></a>
                       </template>
                       <template #title>
                         <a
@@ -173,15 +173,15 @@ const onConfirmDeleteCollection = async () => {
                           @click="
                             (event) =>
                               navigationService.goToDraftCollections(
-                                item.collection_id
+                                item.collectionId
                               )
                           "
-                          >{{ item.collection_name }}
+                          >{{ item.collectionName }}
                         </a></template
                       >
                       <template #description>
                         Last updated:
-                        {{ dayjs(item.last_updated_datetime).fromNow() }}
+                        {{ dayjs(item.lastUpdatedDatetime).fromNow() }}
                       </template>
                     </a-list-item-meta>
                     <template #actions>
@@ -189,7 +189,7 @@ const onConfirmDeleteCollection = async () => {
                         key="list-loadmore-more"
                         @click="
                           navigationService.goToPublicCollectionDetail(
-                            item.collection_id
+                            item.collectionId
                           )
                         "
                         >public site</a
@@ -198,8 +198,8 @@ const onConfirmDeleteCollection = async () => {
                         key="list-loadmore-edit"
                         @click="
                           showDeleteCollectionConfirm(
-                            item.collection_id,
-                            item.collection_name
+                            item.collectionId,
+                            item.collectionName
                           )
                         "
                       >
@@ -242,9 +242,9 @@ const onConfirmDeleteCollection = async () => {
                     <a-list-item-meta>
                       <template #avatar>
                         <a @click="navigationService.goToPublicCollectionDetail(
-                                item.collection_id
+                                item.collectionId
                               )">
-                        <img :src="item.img_path || fallbackCollectionImg" class="w-50"></a>
+                        <img :src="item.imgPath || fallbackCollectionImg" class="w-50"></a>
                       </template>
                       <template #title>
                         <a
@@ -252,19 +252,19 @@ const onConfirmDeleteCollection = async () => {
                           @click="
                             (event) =>
                               navigationService.goToPublicCollectionDetail(
-                                item.collection_id
+                                item.collectionId
                               )
                           "
-                          >{{ item.collection_name }}
+                          >{{ item.collectionName }}
                         </a></template
                       >
                       <template #description>
                         By
                         <a
                           @click="
-                            navigationService.goToUserDetail(item.created_by)
+                            navigationService.goToUserDetail(item.createdBy)
                           "
-                          >{{ item.created_by_username }}</a
+                          >{{ item.createdByUsername }}</a
                         >
                       </template>
                     </a-list-item-meta>

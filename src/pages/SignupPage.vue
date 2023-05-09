@@ -33,9 +33,9 @@ const isValid = computed(() => {
 async function submitSignup() {
   if (!isValid.value) return;
   try {
-    const res = await axiosIntance.post("http://localhost:4000/api/signup", {
+    const res = await axiosIntance.post("http://localhost:4000/signup", {
       username: username.value,
-      email_address: email.value,
+      emailAddress: email.value,
       password: password.value
     });
     if (res) {

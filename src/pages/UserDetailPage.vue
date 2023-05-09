@@ -36,17 +36,17 @@
                     <a-list-item>
                       <a-list-item-meta>
                         <template #description>
-                          {{ item.collection_desc }}
+                          {{ item.collectionDesc }}
                         </template>
                         <template #title>
                           <a
                             @click="
                               () =>
                                 navigationService.goToCollectionDetail(
-                                  item.collection_id
+                                  item.collectionId
                                 )
                             "
-                            >{{ item.collection_name }}</a
+                            >{{ item.collectionName }}</a
                           >
                         </template>
                         <template #avatar>
@@ -54,12 +54,12 @@
                             @click="
                               () =>
                                 navigationService.goToCollectionDetail(
-                                  item.collection_id
+                                  item.collectionId
                                 )
                             "
                           >
                             <img
-                              :src="item.img_path || fallbackCollectionImg"
+                              :src="item.imgPath || fallbackCollectionImg"
                               class="w-50"
                           /></a>
                         </template>
@@ -88,18 +88,16 @@
   </a-spin>
 </template>
 <script setup>
-import { onMounted, ref } from "vue";
-import { service } from "../services";
-import router from "../router";
 import { message } from "ant-design-vue";
-import formatDistanceToNow from "date-fns/formatDistanceToNow";
 import format from "date-fns/format";
-import fallbackImage from "../assets/ic_user.png";
-import userFallbackImg from "../assets/user-fallback.png";
-import CircleImage from "../components/CircleImage.vue";
-import { navigationService } from "../services/navigation.service";
+import formatDistanceToNow from "date-fns/formatDistanceToNow";
+import { onMounted, ref } from "vue";
 import fallbackCollectionImg from "../assets/ic_fallback_collection.png";
-import { routeNames } from "../router/route-names";
+import fallbackImage from "../assets/ic_user.png";
+import CircleImage from "../components/CircleImage.vue";
+import router from "../router";
+import { service } from "../services";
+import { navigationService } from "../services/navigation.service";
 
 const isLoading = ref(false);
 const name = ref("");
@@ -130,12 +128,12 @@ onMounted(async () => {
   isLoading.value = false;
   if (userInfo) {
     name.value = userInfo.username;
-    profileImage.value = userInfo.img_path;
+    profileImage.value = userInfo.imgPath;
     createdAt.value = format(
-      new Date(userInfo.created_datetime),
+      new Date(userInfo.createdDatetime),
       "MMM dd yyyy"
     );
-    lastActiveTime.value = formatFromNow(userInfo.last_active);
+    lastActiveTime.value = formatFromNow(userInfo.lastActive);
 
   } else {
     router.go(-1);

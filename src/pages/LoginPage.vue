@@ -20,20 +20,20 @@ async function submitLogin() {
   if (!isValid.value) return;
   try {
     isLoading.value = true;
-    const res = await axios.post("http://localhost:4000/api/login", {
+    const res = await axios.post("http://localhost:4000/login", {
       username: username.value,
       password: password.value
     });
-    const accessToken = res.data.access_token;
+    const accessToken = res.data.accessToken;
 
     if (accessToken) {
       localStorage.setItem(localStorageKeys.ACCESS_TOKEN, accessToken);
 
       // get user info and store in local storage
       const me = await axiosIntance.get("me");
-      localStorage.setItem(localStorageKeys.USER_ID, me.data.user_id);
+      localStorage.setItem(localStorageKeys.USER_ID, me.data.userId);
       localStorage.setItem(localStorageKeys.USERNAME, me.data.username);
-      localStorage.setItem(localStorageKeys.USER_AVATAR, me.data.img_path);
+      localStorage.setItem(localStorageKeys.USER_AVATAR, me.data.imgPath);
 
       router.push({ name: routeNames.HOME });
       message.success("Login successfully!");
